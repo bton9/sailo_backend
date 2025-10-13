@@ -1,0 +1,8 @@
+--- 使用說明 ---
+1. src/config/ 放設定相關 *資料庫 *三方服務
+2. src/controllers/ 放路由邏輯 *登入登出註冊 *使用者相關CRUD 
+3. src/middlewares/ 放中介軟體 *驗證 *錯誤處理 *日誌
+4. src/routes/ 放路由定義 *登入登出註冊 *使用者相關路由
+5. src/utils/ 放工具函式 共用模組 *加密 *驗證 *Token(JWT)
+6. src/app.js 組合上述, 初始化APP (別動)
+7. server.js 啟動伺服器 (別動)
