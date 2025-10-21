@@ -7,9 +7,9 @@ import passport from './src/config/passport.js'
 import { validateImageKitConfig } from './src/config/imagekit.js'
 import authRoutes from './src/routes/authRoutes.js'
 import userRoutes from './src/routes/userRoutes.js'
-import path from 'path' //blog圖片用的之後會刪掉
-import { fileURLToPath } from 'url' //blog圖片用的之後會刪掉
-import blogRoutes from './src/routes/blog/index.js'//blog的路由
+import blogRoutes from './src/routes/blog/index.js' //blog用
+
+
 // ES Modules 環境下取得 __dirname
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -62,16 +62,14 @@ app.listen(PORT, () => {
   console.log(`Backend server running on http://localhost:${PORT}`)
 })
 
-
 // === 部落格 ===
-
-// === 圖片上傳用(之後會刪掉) ===
-
-app.use('/uploads', express.static(path.join(__dirname, 'public/uploads'))) //blog
 
 // === Routes ===
+app.use('/api/blog', blogRoutes) //blog用
 
-app.use('/api/blog', blogRoutes) //blog
+// === 圖片上傳用的 ===
+
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads'))) //blog用 之後會刪掉
 
 
-// === 部落格 ===
+// ===  部落格 ===
