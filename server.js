@@ -8,6 +8,7 @@ import { validateImageKitConfig } from './src/config/imagekit.js'
 import authRoutes from './src/routes/authRoutes.js'
 import userRoutes from './src/routes/userRoutes.js'
 import blogRoutes from './src/routes/blog/index.js' //blog用
+import setupProductRoutes from './src/middleware/pd_router.js'
 
 
 // ES Modules 環境下取得 __dirname
@@ -35,6 +36,9 @@ app.use(express.json())
 // 提供 uploads 目錄中的檔案訪問（用於頭像圖片）
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 console.log('✅ 靜態檔案目錄:', path.join(__dirname, 'uploads'))
+
+// ============ ProductRoutes ============
+setupProductRoutes(app) 
 
 // ============ Passport 初始化 ============
 app.use(passport.initialize())
