@@ -9,7 +9,12 @@ import authRoutes from './src/routes/authRoutes.js'
 import userRoutes from './src/routes/userRoutes.js'
 import blogRoutes from './src/routes/blog/index.js' //blog用
 import setupProductRoutes from './src/middleware/pd_router.js'
-
+// 行程規畫用
+import locationRoutes from './src/routes/location.js'
+import placesRoutes from './src/routes/placesRoutes.js'
+import favoriteRoutes from './src/routes/favoriteRoutes.js'
+import { setupStaticRoutes } from './src/config/staticRoutes.js'
+// 行程規畫用
 
 // ES Modules 環境下取得 __dirname
 const __filename = fileURLToPath(import.meta.url)
@@ -38,7 +43,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 console.log('✅ 靜態檔案目錄:', path.join(__dirname, 'uploads'))
 
 // ============ ProductRoutes ============
-setupProductRoutes(app) 
+setupProductRoutes(app)
 
 // ============ Passport 初始化 ============
 app.use(passport.initialize())
@@ -75,5 +80,19 @@ app.use('/api/blog', blogRoutes) //blog用
 
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads'))) //blog用 之後會刪掉
 
-
 // ===  部落格 ===
+
+// === 行程規畫用 ===
+
+// ============ Routes ============
+// 地區資料相關 API（如縣市、行政區）
+app.use('/api/locations', locationRoutes)
+/*景點（Places）相關路由 /api/places*/
+app.use('/api/places', placesRoutes)
+/*收藏清單（Favorites）相關路由 api/favorites -----------------------*/
+app.use('/api/favorites', favoriteRoutes)
+// ============ 靜態圖片與 CORS 預檢路由 ============
+// 包含景點封面圖片或使用者上傳檔案的靜態資源服務設定
+setupStaticRoutes(app)
+
+// === 行程規畫用 ===
