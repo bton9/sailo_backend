@@ -7,6 +7,7 @@ import passport from './src/config/passport.js'
 import { validateImageKitConfig } from './src/config/imagekit.js'
 import authRoutes from './src/routes/authRoutes.js'
 import userRoutes from './src/routes/userRoutes.js'
+import blogRoutes from './src/routes/blog/index.js' //blog用
 import setupProductRoutes from './src/middleware/pd_router.js'
 
 
@@ -64,3 +65,15 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Backend server running on http://localhost:${PORT}`)
 })
+
+// === 部落格 ===
+
+// === Routes ===
+app.use('/api/blog', blogRoutes) //blog用
+
+// === 圖片上傳用的 ===
+
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads'))) //blog用 之後會刪掉
+
+
+// ===  部落格 ===
