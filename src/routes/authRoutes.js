@@ -10,7 +10,12 @@ import {
   googleLogin,
   googleCallback,
   googleLogout,
+  enable2FA,
+  verify2FA,
+  disable2FA,
+  get2FAStatus,
 } from '../controllers/authController.js'
+import { authenticate } from '../middleware/auth.js'
 
 const router = express.Router()
 
@@ -109,5 +114,40 @@ router.get(
  * @route POST /api/auth/google/logout
  */
 router.post('/google/logout', googleLogout)
+
+// ============================================
+// Google Authenticator (2FA) 相關路由
+// ============================================
+
+/**
+ * 啟用 Google Authenticator (雙因素驗證)
+ * @route POST /api/auth/2fa/enable
+ * @access Private - 需要 JWT Token
+ * @returns QR Code 和 Secret Key
+ */
+router.post('/2fa/enable', authenticate, enable2FA)
+
+/**
+ * 驗證並確認啟用 Google Authenticator
+ * @route POST /api/auth/2fa/verify
+ * @access Private - 需要 JWT Token
+ * @body {string} token - 6 位數驗證碼
+ */
+router.post('/2fa/verify', authenticate, verify2FA)
+
+/**
+ * 停用 Google Authenticator
+ * @route POST /api/auth/2fa/disable
+ * @access Private - 需要 JWT Token
+ * @body {string} password - 使用者密碼 (安全驗證)
+ */
+router.post('/2fa/disable', authenticate, disable2FA)
+
+/**
+ * 取得 2FA 狀態
+ * @route GET /api/auth/2fa/status
+ * @access Private - 需要 JWT Token
+ */
+router.get('/2fa/status', authenticate, get2FAStatus)
 
 export default router

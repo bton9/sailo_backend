@@ -1,21 +1,25 @@
 ﻿/**
- * 使用者路由
+ * 使用者路由 (OAuth 2.0 版本)
  * 檔案路徑: sailo_backend/src/routes/userRoutes.js
  *
  * 功能說明：
  * - 處理使用者相關的 API 路由
  * - 包含使用者資料更新功能（暱稱、個人資料）
- * - 所有路由都需要經過 JWT 身份驗證
+ * - 所有路由都需要經過 OAuth 2.0 身份驗證
  *
  * 依賴項目：
  * - express: Web 框架
- * - authenticate: JWT 驗證中介層
+ * - authenticate: OAuth 2.0 驗證中介層 (使用 httpOnly cookie)
  * - userController: 使用者控制器函數
  */
 
 import express from 'express'
-import { authenticate } from '../middleware/auth.js'
-import { updateNickname, updateProfile } from '../controllers/userController.js'
+import { authenticate } from '../middleware/authV2.js' // OAuth 2.0 版本
+import {
+  updateNickname,
+  updateProfile,
+  updatePassword,
+} from '../controllers/userController.js'
 import {
   uploadAvatar,
   deleteAvatar,
@@ -33,12 +37,12 @@ const router = express.Router()
 /**
  * 更新使用者暱稱
  *
- * @route PUT /api/user/update-nickname
+ * @route PUT /api/v2/user/update-nickname
  * @access 私有路由 (需要登入)
- * @middleware authenticate - JWT 驗證中介層
+ * @middleware authenticate - OAuth 2.0 驗證中介層 (httpOnly cookie)
  * @controller updateNickname - 處理暱稱更新邏輯
  *
- * @header {string} Authorization - Bearer Token (必填)
+ * @cookies {string} access_token - OAuth 2.0 Access Token (httpOnly)
  * @body {string} nickname - 新的暱稱 (必填)
  *
  * @returns {Object} 回應格式：
@@ -48,8 +52,8 @@ const router = express.Router()
  *
  * @example
  * // 請求範例
- * PUT /api/user/update-nickname
- * Headers: { Authorization: "Bearer eyJhbGc..." }
+ * PUT /api/v2/user/update-nickname
+ * Cookies: { access_token: "eyJhbGc..." }
  * Body: { nickname: "新暱稱" }
  *
  * // 成功回應
@@ -60,12 +64,12 @@ router.put('/update-nickname', authenticate, updateNickname)
 /**
  * 更新使用者個人資料
  *
- * @route PUT /api/user/update-profile
+ * @route PUT /api/v2/user/update-profile
  * @access 私有路由 (需要登入)
- * @middleware authenticate - JWT 驗證中介層
+ * @middleware authenticate - OAuth 2.0 驗證中介層 (httpOnly cookie)
  * @controller updateProfile - 處理個人資料更新邏輯
  *
- * @header {string} Authorization - Bearer Token (必填)
+ * @cookies {string} access_token - OAuth 2.0 Access Token (httpOnly)
  * @body {string} name - 姓名 (必填)
  * @body {string} phone - 手機號碼 (選填)
  * @body {string} birthday - 生日 格式: YYYY-MM-DD (選填)
@@ -95,6 +99,47 @@ router.put('/update-nickname', authenticate, updateNickname)
  * }
  */
 router.put('/update-profile', authenticate, updateProfile)
+
+/**
+ * 更新使用者密碼
+ *
+ * @route PUT /api/user/update-password
+ * @access 私有路由 (需要登入)
+ * @middleware authenticate - JWT 驗證中介層
+ * @controller updatePassword - 處理密碼更新邏輯
+ *
+ * @header {string} Authorization - Bearer Token (必填)
+ * @body {string} currentPassword - 目前密碼 (必填)
+ * @body {string} newPassword - 新密碼 (必填，至少8字元，需包含字母和數字)
+ * @body {string} confirmPassword - 確認新密碼 (必填，需與新密碼一致)
+ *
+ * @returns {Object} 回應格式：
+ *   - success: true/false
+ *   - message: 操作結果訊息
+ *
+ * @example
+ * // 請求範例
+ * PUT /api/user/update-password
+ * Headers: { Authorization: "Bearer eyJhbGc..." }
+ * Body: {
+ *   currentPassword: "OldPass123",
+ *   newPassword: "NewPass456",
+ *   confirmPassword: "NewPass456"
+ * }
+ *
+ * // 成功回應
+ * {
+ *   success: true,
+ *   message: "密碼更新成功"
+ * }
+ *
+ * // 錯誤回應範例
+ * {
+ *   success: false,
+ *   message: "目前密碼不正確"
+ * }
+ */
+router.put('/update-password', authenticate, updatePassword)
 
 // ============================================
 // 頭像管理相關路由

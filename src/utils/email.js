@@ -437,9 +437,186 @@ export async function sendWelcomeEmail(email, userName) {
   }
 }
 
+/**
+ * ========================================
+ * 發送密碼重置 OTP 郵件
+ * ========================================
+ *
+ * 功能說明：
+ * - 發送 6 位數 OTP 驗證碼到使用者信箱
+ * - 取代原本的 Token 連結方式
+ * - OTP 有效期 10 分鐘
+ *
+ * @param {string} email - 收件人信箱
+ * @param {string} otp - 6 位數 OTP 驗證碼
+ * @param {string} userName - 使用者名稱
+ * @returns {Promise<boolean>} 是否發送成功
+ */
+export async function sendPasswordResetOTPEmail(email, otp, userName) {
+  try {
+    console.log('📧 準備發送密碼重置 OTP 郵件:', {
+      to: email,
+      otp: otp,
+      userName: userName || '(未提供)',
+    })
+
+    // HTML 郵件模板
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html lang="zh-TW">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+          }
+          .container {
+            max-width: 600px;
+            margin: 30px auto;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+          }
+          .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 30px;
+            text-align: center;
+          }
+          .header h1 {
+            margin: 0;
+            font-size: 24px;
+          }
+          .content {
+            padding: 40px 30px;
+          }
+          .otp-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            font-size: 36px;
+            font-weight: bold;
+            letter-spacing: 8px;
+            text-align: center;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+          }
+          .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+          }
+          .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+          }
+          .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #6c757d;
+          }
+          p {
+            line-height: 1.6;
+            color: #333;
+          }
+          strong {
+            color: #667eea;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <!-- 標題區 -->
+          <div class="header">
+            <h1>🔒 密碼重置驗證碼</h1>
+          </div>
+          
+          <!-- 內容區 -->
+          <div class="content">
+            <p>哈囉 <strong>${userName || '會員'}</strong>，</p>
+            <p>我們收到了您的密碼重置請求。請使用以下 6 位數驗證碼完成密碼重置：</p>
+            
+            <!-- OTP 驗證碼 -->
+            <div class="otp-box">
+              ${otp}
+            </div>
+            
+            <!-- 重要資訊 -->
+            <div class="info-box">
+              <p style="margin: 0;">
+                <strong>⏰ 有效期限：</strong> 此驗證碼將在 <strong>10 分鐘</strong>後失效
+              </p>
+            </div>
+            
+            <div class="info-box">
+              <p style="margin: 0;">
+                <strong>🔢 驗證次數：</strong> 最多可驗證 <strong>5 次</strong>，超過後需重新申請
+              </p>
+            </div>
+            
+            <!-- 安全提醒 -->
+            <div class="warning-box">
+              <p style="margin: 0;">
+                <strong>⚠️ 安全提醒：</strong><br>
+                • 請勿將驗證碼分享給任何人<br>
+                • SailoTravel 不會主動要求您提供驗證碼<br>
+                • 如果您未申請密碼重置，請忽略此郵件
+              </p>
+            </div>
+            
+            <p style="margin-top: 30px;">
+              如有任何問題，歡迎聯繫我們的客服團隊。
+            </p>
+            
+            <p style="color: #6c757d; font-size: 14px;">
+              祝您旅途愉快！<br>
+              <strong>SailoTravel 團隊</strong>
+            </p>
+          </div>
+          
+          <!-- 頁尾 -->
+          <div class="footer">
+            <p style="margin: 5px 0;">© 2025 SailoTravel. All rights reserved.</p>
+            <p style="margin: 5px 0;">這是系統自動發送的郵件，請勿直接回覆</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+
+    // 發送郵件
+    await transporter.sendMail({
+      from: `"SailoTravel 客服中心" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: '🔒 密碼重置驗證碼 - SailoTravel',
+      html: htmlContent,
+    })
+
+    console.log('✅ Password reset OTP email sent to:', email)
+    return true
+  } catch (error) {
+    console.error('❌ Failed to send password reset OTP email:', error)
+    return false
+  }
+}
+
 export default {
   verifyEmailConnection,
   sendPasswordResetEmail,
+  sendPasswordResetOTPEmail,
   sendVerificationEmail,
   sendWelcomeEmail,
 }

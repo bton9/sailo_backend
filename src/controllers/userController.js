@@ -7,9 +7,11 @@
  * API 端點：
  * - PUT /api/user/update-nickname - 更新暱稱
  * - PUT /api/user/update-profile - 更新個人資料
+ * - PUT /api/user/update-password - 更新密碼
  */
 
 import { query } from '../config/database.js'
+import { hashPassword, verifyPassword } from '../utils/password.js'
 
 /**
  * 更新使用者暱稱
@@ -200,6 +202,142 @@ export async function updateProfile(req, res) {
     })
   } catch (error) {
     console.error('❌ Update profile error:', error)
+    res.status(500).json({
+      success: false,
+      message: '伺服器錯誤，請稍後再試',
+    })
+  }
+}
+
+/**
+ * 更新使用者密碼
+ *
+ * @route PUT /api/user/update-password
+ * @header {string} Authorization - Bearer Token (必填)
+ * @body {string} currentPassword - 目前密碼 (必填)
+ * @body {string} newPassword - 新密碼 (必填)
+ * @body {string} confirmPassword - 確認新密碼 (必填)
+ * @returns {Object} { success, message }
+ */
+export async function updatePassword(req, res) {
+  try {
+    // ============================================
+    // 步驟 1: 取得使用者 ID (由 authenticate middleware 提供)
+    // ============================================
+    const userId = req.user.userId
+
+    // ============================================
+    // 步驟 2: 驗證輸入
+    // ============================================
+    const { currentPassword, newPassword, confirmPassword } = req.body
+
+    // 檢查必填欄位
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: '請填寫所有欄位',
+      })
+    }
+
+    // 檢查新密碼與確認密碼是否一致
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: '新密碼與確認密碼不一致',
+      })
+    }
+
+    // 檢查新密碼不能與舊密碼相同
+    if (currentPassword === newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: '新密碼不能與目前密碼相同',
+      })
+    }
+
+    // 驗證新密碼長度
+    if (newPassword.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: '新密碼至少需要 8 個字元',
+      })
+    }
+
+    // 驗證新密碼複雜度 (至少包含一個字母和一個數字)
+    const hasLetter = /[a-zA-Z]/.test(newPassword)
+    const hasNumber = /\d/.test(newPassword)
+
+    if (!hasLetter || !hasNumber) {
+      return res.status(400).json({
+        success: false,
+        message: '密碼必須包含至少一個字母和一個數字',
+      })
+    }
+
+    // ============================================
+    // 步驟 3: 從資料庫取得使用者資料
+    // ============================================
+    const users = await query(
+      'SELECT id, password, google_id FROM users WHERE id = ? LIMIT 1',
+      [userId]
+    )
+
+    if (users.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: '使用者不存在',
+      })
+    }
+
+    const user = users[0]
+
+    // ============================================
+    // 步驟 4: 檢查是否為 Google 登入使用者
+    // ============================================
+    // Google 登入使用者沒有密碼，無法修改
+    if (user.google_id && !user.password) {
+      return res.status(400).json({
+        success: false,
+        message: '此帳號使用 Google 登入，無法設定密碼',
+      })
+    }
+
+    // ============================================
+    // 步驟 5: 驗證目前密碼是否正確
+    // ============================================
+    const isPasswordValid = await verifyPassword(currentPassword, user.password)
+
+    if (!isPasswordValid) {
+      return res.status(400).json({
+        success: false,
+        message: '目前密碼不正確',
+      })
+    }
+
+    // ============================================
+    // 步驟 6: 加密新密碼
+    // ============================================
+    const hashedPassword = await hashPassword(newPassword)
+
+    // ============================================
+    // 步驟 7: 更新資料庫
+    // ============================================
+    await query('UPDATE users SET password = ? WHERE id = ?', [
+      hashedPassword,
+      userId,
+    ])
+
+    console.log(`✅ 使用者 ${userId} 密碼已更新`)
+
+    // ============================================
+    // 步驟 8: 回傳成功訊息
+    // ============================================
+    res.json({
+      success: true,
+      message: '密碼更新成功',
+    })
+  } catch (error) {
+    console.error('❌ Update password error:', error)
     res.status(500).json({
       success: false,
       message: '伺服器錯誤，請稍後再試',

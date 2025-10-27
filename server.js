@@ -1,11 +1,14 @@
 import express from 'express'
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
+import session from 'express-session'
 import dotenv from 'dotenv'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import passport from './src/config/passport.js'
 import { validateImageKitConfig } from './src/config/imagekit.js'
-import authRoutes from './src/routes/authRoutes.js'
+// import authRoutes from './src/routes/authRoutes.js' // 舊版已棄用
+import authRoutesV2 from './src/routes/authRoutesV2.js' // OAuth 2.0 版本
 import userRoutes from './src/routes/userRoutes.js'
 import blogRoutes from './src/routes/blog/index.js' //blog用
 import setupProductRoutes from './src/middleware/pd_router.js'
@@ -31,11 +34,31 @@ const PORT = process.env.PORT || 5000
 // ============ Middleware ============
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    credentials: true,
+    origin: [
+      process.env.FRONTEND_URL || 'http://localhost:3000',
+      'http://localhost:3001', // 支援 port 3001 (當 3000 被佔用時)
+    ],
+    credentials: true, // 允許傳送 cookies
   })
 )
 app.use(express.json())
+app.use(cookieParser()) // 解析 cookies
+
+// ============ Session 配置 ============
+// 用於 Passport Google OAuth
+app.use(
+  session({
+    secret:
+      process.env.SESSION_SECRET || 'your-secret-key-change-in-production',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production', // 生產環境使用 HTTPS
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 24 小時
+    },
+  })
+)
 
 // ============ 靜態檔案服務 ============
 // 提供 uploads 目錄中的檔案訪問（用於頭像圖片）
@@ -47,10 +70,12 @@ setupProductRoutes(app)
 
 // ============ Passport 初始化 ============
 app.use(passport.initialize())
+app.use(passport.session()) // 啟用 Passport session 支援
 
 // ============ Routes ============
-app.use('/api/auth', authRoutes)
-app.use('/api/user', userRoutes)
+// app.use('/api/auth', authRoutes) // 舊版認證 (向後相容)
+app.use('/api/v2/auth', authRoutesV2) // OAuth 2.0 版本 (新)
+app.use('/api/v2/user', userRoutes) // OAuth 2.0 版本 (新)
 
 // ============ Health Check ============
 app.get('/health', (req, res) => {
@@ -59,10 +84,15 @@ app.get('/health', (req, res) => {
 
 // ============ Error Handling ============
 app.use((err, req, res, next) => {
-  console.error('Error:', err)
+  console.error('❌ Server Error:', err)
+  console.error('Error Stack:', err.stack)
+  console.error('Request URL:', req.url)
+  console.error('Request Method:', req.method)
+
   res.status(500).json({
     success: false,
     message: 'Internal server error',
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined,
   })
 })
 
