@@ -92,8 +92,7 @@ export const getPostsByTag = async (req, res) => {
       formatPostData 
     } = await import('../../utils/blog/helpers.js');
     const { 
-      getPostsQuery, 
-      getUserInteractionFields 
+      getPostsQuery
     } = await import('../../utils/blog/queries.js');
 
     const [tags] = await db.query(
@@ -107,11 +106,7 @@ export const getPostsByTag = async (req, res) => {
 
     const { offset, limit: validLimit } = formatPagination(page, limit);
 
-    let sql = getPostsQuery();
-    
-    if (currentUserId) {
-      sql += getUserInteractionFields(currentUserId);
-    }
+    let sql = getPostsQuery(currentUserId);
 
     sql += `
       INNER JOIN post_tags pt ON p.post_id = pt.post_id

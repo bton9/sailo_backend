@@ -9,7 +9,7 @@ import {
 } from '../../controllers/blog/itinerary.controller.js';
 
 // Middleware
-import { blogAuthMiddleware as authMiddleware } from '../../middleware/blog/blogAuth.js';
+import { blogAuthMiddleware as authMiddleware, optionalAuth } from '../../middleware/blog/blogAuth.js';
 import validate from '../../middleware/blog/validate.middleware.js';
 
 // Validators
@@ -31,6 +31,7 @@ router.get(
 // 取得關聯此行程的文章列表
 router.get(
   '/:tripId/posts',
+  optionalAuth,
   validateQueryParams,
   validate,
   getPostsByItinerary

@@ -11,7 +11,13 @@
 /**
  * 取得留言列表的 SQL (含 JOIN users)
  */
-export const getCommentsQuery = () => {
+export const getCommentsQuery = (currentUserId = null) => {
+  const interactionFields = currentUserId 
+    ? `
+      EXISTS(SELECT 1 FROM comment_likes WHERE comment_id = c.comment_id AND user_id = ${currentUserId}) AS is_liked`
+    : `
+      0 AS is_liked`;
+
   return `
     SELECT 
       c.comment_id,
@@ -24,8 +30,10 @@ export const getCommentsQuery = () => {
       u.nickname AS author_nickname,
       u.avatar AS author_avatar,
       
-      (SELECT COUNT(*) FROM comment_likes WHERE comment_id = c.comment_id) AS like_count
+      (SELECT COUNT(*) FROM comment_likes WHERE comment_id = c.comment_id) AS like_count,
       
+      ${interactionFields.trim()}
+
     FROM comments c
     INNER JOIN users u ON c.user_id = u.id
   `;
@@ -34,8 +42,18 @@ export const getCommentsQuery = () => {
 /**
  * 取得文章列表的 SQL (含完整行程資訊)
  */
-export const getPostsQuery = () => {
-  return `
+export const getPostsQuery = (currentUserId = null) => {
+  const interactionFields = currentUserId 
+    ? `
+      EXISTS(SELECT 1 FROM post_likes WHERE post_id = p.post_id AND user_id = ${currentUserId}) AS is_liked,
+      EXISTS(SELECT 1 FROM bookmarks WHERE post_id = p.post_id AND user_id = ${currentUserId}) AS is_bookmarked,
+      EXISTS(SELECT 1 FROM follows WHERE follower_id = ${currentUserId} AND following_id = p.user_id) AS is_following_author`
+    : `
+      0 AS is_liked,
+      0 AS is_bookmarked,
+      0 AS is_following_author`;
+
+  return  `
     SELECT 
       -- 文章基本資訊
       p.post_id,
@@ -88,7 +106,9 @@ export const getPostsQuery = () => {
       (SELECT JSON_ARRAYAGG(JSON_OBJECT('photo_id', pp.photo_id, 'url', pp.url))
        FROM post_photos pp
        WHERE pp.post_id = p.post_id
-      ) AS photos
+      ) AS photos,
+
+      ${interactionFields.trim()}
       
     FROM posts p
     INNER JOIN users u ON p.user_id = u.id
@@ -96,26 +116,3 @@ export const getPostsQuery = () => {
   `;
 };
 
-/**
- * 加入當前使用者互動狀態的 SQL 片段
- */
-export const getUserInteractionFields = (userId) => {
-  if (!userId) return '';
-  
-  return `
-    , EXISTS(SELECT 1 FROM post_likes WHERE post_id = p.post_id AND user_id = ${userId}) AS is_liked
-    , EXISTS(SELECT 1 FROM bookmarks WHERE post_id = p.post_id AND user_id = ${userId}) AS is_bookmarked
-    , EXISTS(SELECT 1 FROM follows WHERE follower_id = ${userId} AND following_id = p.user_id) AS is_following_author
-  `;
-};
-
-/**
- * 加入當前使用者對留言的互動狀態
- */
-export const getCommentInteractionFields = (userId) => {
-  if (!userId) return '';
-  
-  return `
-    , EXISTS(SELECT 1 FROM comment_likes WHERE comment_id = c.comment_id AND user_id = ${userId}) AS is_liked
-  `;
-};

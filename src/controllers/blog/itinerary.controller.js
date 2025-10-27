@@ -146,8 +146,7 @@ export const getPostsByItinerary = async (req, res) => {
       formatPostData 
     } = await import('../../utils/blog/helpers.js');
     const { 
-      getPostsQuery, 
-      getUserInteractionFields 
+      getPostsQuery
     } = await import('../../utils/blog/queries.js');
 
     const [trips] = await db.query(
@@ -161,11 +160,7 @@ export const getPostsByItinerary = async (req, res) => {
 
     const { offset, limit: validLimit } = formatPagination(page, limit);
 
-    let sql = getPostsQuery();
-    
-    if (currentUserId) {
-      sql += getUserInteractionFields(currentUserId);
-    }
+    let sql = getPostsQuery(currentUserId);
 
     sql += `
       WHERE p.trip_id = ? AND p.visible = TRUE

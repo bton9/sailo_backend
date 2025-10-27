@@ -6,8 +6,7 @@ import {
   sendError 
 } from '../../utils/blog/helpers.js';
 import { 
-  getCommentsQuery,
-  getCommentInteractionFields 
+  getCommentsQuery 
 } from '../../utils/blog/queries.js';
 
 /**
@@ -31,11 +30,7 @@ export const getCommentsByPostId = async (req, res) => {
 
     const { offset, limit: validLimit } = formatPagination(page, limit);
 
-    let sql = getCommentsQuery();
-    
-    if (currentUserId) {
-      sql += getCommentInteractionFields(currentUserId);
-    }
+    let sql = getCommentsQuery(currentUserId);
 
     sql += `
       INNER JOIN post_comments pc ON c.comment_id = pc.comment_id

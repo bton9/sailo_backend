@@ -52,3 +52,44 @@ export const blogAuthMiddleware = (req, res, next) => {
 
 // 也 export default
 export default blogAuthMiddleware;
+
+/**
+ * 可選登入的 middleware
+ * - 有 token：驗證並設置 req.user
+ * - 沒有 token：不報錯，req.user = undefined
+ */
+export const optionalAuth = (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader) {
+      req.user = undefined;
+      return next();
+    }
+    
+    const token = authHeader.replace('Bearer ', '');
+    
+    if (!token) {
+      req.user = undefined;
+      return next();
+    }
+    
+    const decoded = verifyToken(token);
+    
+    if (decoded) {
+      req.user = {
+        id: decoded.userId,
+        email: decoded.email,
+        access: decoded.access
+      };
+    } else {
+      req.user = undefined;
+    }
+    
+    next();
+  } catch (error) {
+    console.warn('Optional auth warning:', error.message);
+    req.user = undefined;
+    next();
+  }
+};

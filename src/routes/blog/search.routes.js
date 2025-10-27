@@ -8,6 +8,7 @@ import {
 } from '../../controllers/blog/search.controller.js';
 
 // Middleware
+import { optionalAuth } from '../../middleware/blog/blogAuth.js';
 import validate from '../../middleware/blog/validate.middleware.js';
 
 // Validators
@@ -23,6 +24,7 @@ import {
 // 全站搜尋
 router.get(
   '/',
+  optionalAuth,
   validateSearchParams,
   validate,
   search
