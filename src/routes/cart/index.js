@@ -1,7 +1,7 @@
 /**
  * 購物車模組路由匯總
  * 檔案路徑: backend/src/routes/cart/index.js
- * 
+ *
  * 功能：整合所有購物車相關路由
  */
 
@@ -9,9 +9,6 @@ import express from 'express'
 import cartRoutes from './cart.routes.js'
 import orderRoutes from './order.routes.js'
 import paymentRoutes from './payment.routes.js'
-
-
-const app = express()
 
 const router = express.Router()
 
@@ -45,21 +42,16 @@ router.get('/health', (req, res) => {
   })
 })
 
-
-// ... 其他中介軟體和路由 ...
-
-// 綠界金流測試
-app.get('/api/ecpay', (req, res) => {
-  const result = getECPayParams(990, '商品之一x2,商品之二x3,商品之三x4')
-  const htmlContent = getHtmlFormContent(
-    result.payload.action,
-    result.payload.params
-  )
-  res.send(htmlContent)
-})
-
-app.listen(3000, () => {
-  console.log('Server running on port 3000')
-})
+// ❌ 暫時註解：綠界金流測試 - 缺少 payment.service.js
+// 會造成3000被佔用
+// 需要時請建立 payment.service.js 並實作 getECPayParams 和 getHtmlFormContent
+// router.get('/ecpay', (req, res) => {
+//   const result = getECPayParams(990, '商品之一x2,商品之二x3,商品之三x4')
+//   const htmlContent = getHtmlFormContent(
+//     result.payload.action,
+//     result.payload.params
+//   )
+//   res.send(htmlContent)
+// })
 
 export default router

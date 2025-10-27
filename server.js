@@ -11,7 +11,7 @@ import { validateImageKitConfig } from './src/config/imagekit.js'
 import authRoutesV2 from './src/routes/authRoutesV2.js' // OAuth 2.0 版本
 import userRoutes from './src/routes/userRoutes.js'
 import blogRoutes from './src/routes/blog/index.js' //blog用
-import setupProductRoutes from './src/middleware/pd_router.js'
+import setupProductRoutes from './src/middleware/product/pd_router.js' // 改名
 
 // 行程規畫用
 import locationRoutes from './src/routes/location.js'
