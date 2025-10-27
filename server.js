@@ -7,18 +7,29 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import passport from './src/config/passport.js'
 import { validateImageKitConfig } from './src/config/imagekit.js'
-// import authRoutes from './src/routes/authRoutes.js' // 舊版已棄用
+// authRoutes.js' // 舊版已棄用
 import authRoutesV2 from './src/routes/authRoutesV2.js' // OAuth 2.0 版本
 import userRoutes from './src/routes/userRoutes.js'
 import blogRoutes from './src/routes/blog/index.js' //blog用
 import setupProductRoutes from './src/middleware/pd_router.js'
+
 // 行程規畫用
 import locationRoutes from './src/routes/location.js'
 import placesRoutes from './src/routes/placesRoutes.js'
 import favoriteRoutes from './src/routes/favoriteRoutes.js'
 import { setupStaticRoutes } from './src/config/staticRoutes.js'
+// ========== 🆕 行程管理 API import ==========
+import tripManagementRoutes from './src/routes/custom/tripmanagementroutes.js'
+import tripFavoriteRoutes from './src/routes/custom/tripfavoriteroutes.js'
+import tripUploadRoutes from './src/routes/custom/tripuploadroutes.js'
+import tripErrorHandler from './src/middleware/custom/triperrorhandler.js'
+import { validateImageKitTripConfig } from './src/config/custom/imagekittrip.js'
+// ========== 🆕 行程管理 API import 結束 ==========
 // 行程規畫用
-import cartRoutes from './src/routes/cart/index.js' //購物車用
+
+//購物車用
+import cartRoutes from './src/routes/cart/index.js'
+//購物車用
 
 // ES Modules 環境下取得 __dirname
 const __filename = fileURLToPath(import.meta.url)
@@ -126,6 +137,20 @@ app.use('/api/favorites', favoriteRoutes)
 // 包含景點封面圖片或使用者上傳檔案的靜態資源服務設定
 setupStaticRoutes(app)
 
+// ========== 🆕 行程管理 API (新增) ==========
+// 驗證 ImageKit 設定 (行程封面圖)
+validateImageKitTripConfig()
+
+// 行程管理路由
+app.use('/api/trip-management', tripManagementRoutes)
+// 行程收藏路由
+app.use('/api/trip-favorites', tripFavoriteRoutes)
+// 行程圖片上傳路由
+app.use('/api/trip-upload', tripUploadRoutes)
+
+// 行程 API 專用錯誤處理 (放在最後)
+app.use('/api/trip', tripErrorHandler)
+// ========== 行程管理 API 結束 ==========
 // === 行程規畫用 ===
 
 // === Cart Routes ===

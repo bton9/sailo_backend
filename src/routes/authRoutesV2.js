@@ -146,13 +146,27 @@ router.post('/reset-password', resetPassword)
 /**
  * Google 登入 - 啟動 OAuth 流程
  * @route GET /api/v2/auth/google
+ * @query {string} [redirect] - 登入後要返回的前端路徑
  */
-router.get(
-  '/google',
+router.get('/google', (req, res, next) => {
+  // 使用 OAuth state 參數傳遞重導向路徑
+  // 因為 Passport OAuth 流程中 session 可能會被重置
+  let state = {}
+
+  if (req.query.redirect) {
+    state.redirect = req.query.redirect
+    console.log('📝 將重導向路徑編碼到 state:', state.redirect)
+  }
+
+  // 將 state 物件序列化為 JSON 字串
+  const stateString = JSON.stringify(state)
+
+  // 啟動 Passport Google 認證，並傳遞 state
   passport.authenticate('google', {
     scope: ['profile', 'email'],
-  })
-)
+    state: stateString,
+  })(req, res, next)
+})
 
 /**
  * Google OAuth 回調

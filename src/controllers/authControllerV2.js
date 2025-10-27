@@ -1043,11 +1043,27 @@ export async function googleCallback(req, res) {
     // 重導向到前端頁面
     // ========================================
     // 安全性改進：不在 URL 中傳遞 token，前端會自動從 cookie 讀取
-    const redirectPath = user.isNewUser ? '/' : '/site/membercenter'
+    // 支援自訂重導向路徑（從 OAuth state 參數讀取）
+    let redirectPath = user.isNewUser ? '/' : '/site/membercenter'
+
+    // 從 OAuth state 參數讀取重導向路徑
+    // Google OAuth 會在 callback 時將 state 放在 req.query.state
+    if (req.query.state) {
+      try {
+        const state = JSON.parse(req.query.state)
+        if (state.redirect) {
+          redirectPath = decodeURIComponent(state.redirect)
+          console.log('🔄 使用 OAuth state 的重導向路徑:', redirectPath)
+        }
+      } catch (e) {
+        console.error('❌ 無法解析 OAuth state:', e)
+      }
+    }
+
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000'
     const redirectUrl = `${frontendUrl}${redirectPath}`
 
-    console.log('🔄 Redirecting to:', redirectUrl)
+    console.log('🔄 最終重導向到:', redirectUrl)
     res.redirect(redirectUrl)
   } catch (error) {
     console.error('❌ Google callback error:', error)
