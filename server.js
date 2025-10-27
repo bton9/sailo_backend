@@ -18,6 +18,7 @@ import placesRoutes from './src/routes/placesRoutes.js'
 import favoriteRoutes from './src/routes/favoriteRoutes.js'
 import { setupStaticRoutes } from './src/config/staticRoutes.js'
 // 行程規畫用
+import cartRoutes from './src/routes/cart/index.js' //購物車用
 
 // ES Modules 環境下取得 __dirname
 const __filename = fileURLToPath(import.meta.url)
@@ -126,3 +127,6 @@ app.use('/api/favorites', favoriteRoutes)
 setupStaticRoutes(app)
 
 // === 行程規畫用 ===
+
+// === Cart Routes ===
+app.use('/api', cartRoutes)
