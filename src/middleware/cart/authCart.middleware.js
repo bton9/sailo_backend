@@ -2,34 +2,33 @@
  * 購物車模組認證中介層
  * 檔案路徑: backend/src/middleware/cart/authCart.middleware.js
  *
- * 功能：整合現有的 JWT 認證系統，用於購物車相關路由
+ * 功能：整合 Auth V2 的 httpOnly cookie JWT 認證系統
  *
- * 注意：此檔案使用專案現有的 authenticate 函式
- * JWT Payload 結構: { userId, email, access, iss, iat, exp }
+ * Auth V2 規範：
+ * - 使用 httpOnly cookies (不使用 localStorage)
+ * - Cookie 名稱: access_token
+ * - JWT Payload 結構: { userId, email, access, iss, iat, exp }
  */
 
 import { verifyToken } from '../../utils/jwt.js'
 
 /**
  * 檢查用戶是否登入（必須登入才能訪問）
- * 
- * 這是主要的認證中介層，用於保護需要登入的路由
+ *
+ * Auth V2: 從 httpOnly cookie 讀取 JWT
  */
 export const requireAuth = (req, res, next) => {
   try {
-    // 從 Header 取得 Token
-    const authHeader = req.headers.authorization
+    // 🔐 Auth V2: 從 httpOnly cookie 取得 access_token
+    const token = req.cookies?.access_token
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!token) {
       return res.status(401).json({
         success: false,
         message: '請先登入',
         code: 'UNAUTHORIZED',
       })
     }
-
-    // 移除 "Bearer " 前綴
-    const token = authHeader.replace('Bearer ', '')
 
     // 驗證 Token
     const decoded = verifyToken(token)
@@ -44,7 +43,7 @@ export const requireAuth = (req, res, next) => {
 
     // 將使用者資訊附加到請求物件
     req.user = decoded
-    req.userId = decoded.userId // 新增這個方便後續使用
+    req.userId = decoded.userId // 方便後續使用
 
     next()
   } catch (error) {
@@ -60,15 +59,14 @@ export const requireAuth = (req, res, next) => {
 /**
  * 可選的認證（允許訪客和登入用戶）
  *
- * 如果提供 Token 就驗證，沒有也不會報錯
- * 適用於購物車查詢等可以不登入就能執行的操作
+ * Auth V2: 如果有 cookie 就驗證，沒有也不會報錯
  */
 export const optionalAuth = (req, res, next) => {
   try {
-    const authHeader = req.headers.authorization
+    // 🔐 Auth V2: 從 httpOnly cookie 取得 access_token
+    const token = req.cookies?.access_token
 
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.replace('Bearer ', '')
+    if (token) {
       const decoded = verifyToken(token)
 
       if (decoded) {
@@ -129,10 +127,7 @@ export const validateCartOwnership = (req, res, next) => {
     )
 
     // 檢查是否為本人或管理員
-    if (
-      req.user.userId !== requestedUserId &&
-      req.user.access !== 'admin'
-    ) {
+    if (req.user.userId !== requestedUserId && req.user.access !== 'admin') {
       return res.status(403).json({
         success: false,
         message: '無權限存取此購物車',
