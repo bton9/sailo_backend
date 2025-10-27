@@ -255,7 +255,7 @@ export const getUserStats = async (req, res) => {
 export const checkFollowStatus = async (req, res) => {
   try {
     const { userId } = req.params;
-    const followerId = req.user.id;
+    const followerId = req.user?.id;
 
     // 檢查目標使用者是否存在
     const [users] = await db.query(
@@ -265,6 +265,11 @@ export const checkFollowStatus = async (req, res) => {
 
     if (users.length === 0) {
       return sendError(res, '找不到該使用者', 404);
+    }
+
+    // ✅ 新增：未登入直接回傳 false
+    if (!followerId) {
+      return sendSuccess(res, { is_following: false });
     }
 
     // 檢查是否已追蹤

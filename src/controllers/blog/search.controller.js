@@ -6,8 +6,7 @@ import {
   sendError 
 } from '../../utils/blog/helpers.js';
 import { 
-  getPostsQuery, 
-  getUserInteractionFields 
+  getPostsQuery
 } from '../../utils/blog/queries.js';
 import blogConfig from '../../config/blog.config.js';
 
@@ -64,11 +63,7 @@ export const search = async (req, res) => {
 const searchPosts = async (keyword, page = 1, limit = 10, currentUserId = null) => {
   const { offset, limit: validLimit } = formatPagination(page, limit);
 
-  let sql = getPostsQuery();
-  
-  if (currentUserId) {
-    sql += getUserInteractionFields(currentUserId);
-  }
+  let sql = getPostsQuery(currentUserId);
 
   sql += `
     WHERE p.visible = TRUE 

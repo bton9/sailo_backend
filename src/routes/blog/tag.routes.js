@@ -11,7 +11,7 @@ import {
 } from '../../controllers/blog/tag.controller.js';
 
 // Middleware
-import { blogAuthMiddleware as authMiddleware } from '../../middleware/blog/blogAuth.js';
+import { blogAuthMiddleware as authMiddleware, optionalAuth } from '../../middleware/blog/blogAuth.js';
 import validate from '../../middleware/blog/validate.middleware.js';
 
 // Validators
@@ -41,6 +41,7 @@ router.get(
 // 取得指定標籤的文章列表
 router.get(
   '/:tagId/posts',
+  optionalAuth,
   validateTagId,
   validateQueryParams,
   validate,

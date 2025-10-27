@@ -9,7 +9,7 @@ import {
 } from '../../controllers/blog/interaction.controller.js';
 
 // Middleware
-import { blogAuthMiddleware as authMiddleware } from '../../middleware/blog/blogAuth.js';
+import { blogAuthMiddleware as authMiddleware, optionalAuth } from '../../middleware/blog/blogAuth.js';
 import validate from '../../middleware/blog/validate.middleware.js';
 
 // Validators

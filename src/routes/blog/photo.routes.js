@@ -10,7 +10,7 @@ import {
 } from '../../controllers/blog/photo.controller.js';
 
 // Middleware
-import { blogAuthMiddleware as authMiddleware } from '../../middleware/blog/blogAuth.js';
+import { blogAuthMiddleware as authMiddleware, optionalAuth } from '../../middleware/blog/blogAuth.js';
 import { uploadSingle } from '../../middleware/upload.middleware.js';
 import validate from '../../middleware/blog/validate.middleware.js';
 

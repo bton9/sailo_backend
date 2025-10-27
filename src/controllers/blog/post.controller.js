@@ -8,8 +8,7 @@ import {
   isValidCategory 
 } from '../../utils/blog/helpers.js';
 import { 
-  getPostsQuery, 
-  getUserInteractionFields 
+  getPostsQuery 
 } from '../../utils/blog/queries.js';
 
 /**
@@ -23,11 +22,7 @@ export const getPosts = async (req, res) => {
 
     const { offset, limit: validLimit } = formatPagination(page, limit);
 
-    let sql = getPostsQuery();
-    
-    if (currentUserId) {
-      sql += getUserInteractionFields(currentUserId);
-    }
+    let sql = getPostsQuery(currentUserId);
 
     const conditions = ['p.visible = TRUE'];
     const params = [];
@@ -127,11 +122,7 @@ export const getPostById = async (req, res) => {
     const { postId } = req.params;
     const currentUserId = req.user?.id;
 
-    let sql = getPostsQuery();
-    
-    if (currentUserId) {
-      sql += getUserInteractionFields(currentUserId);
-    }
+    let sql = getPostsQuery(currentUserId);
 
     sql += ' WHERE p.post_id = ? AND p.visible = TRUE';
 
@@ -360,11 +351,7 @@ export const getUserPosts = async (req, res) => {
 
     const { offset, limit: validLimit } = formatPagination(page, limit);
 
-    let sql = getPostsQuery();
-    
-    if (currentUserId) {
-      sql += getUserInteractionFields(currentUserId);
-    }
+    let sql = getPostsQuery(currentUserId);
 
     const conditions = ['p.user_id = ?', 'p.visible = TRUE'];
     const params = [userId];
@@ -420,11 +407,7 @@ export const getUserLikedPosts = async (req, res) => {
 
     const { offset, limit: validLimit } = formatPagination(page, limit);
 
-    let sql = getPostsQuery();
-    
-    if (currentUserId) {
-      sql += getUserInteractionFields(currentUserId);
-    }
+    let sql = getPostsQuery(currentUserId);
 
     sql += `
       INNER JOIN post_likes pl ON p.post_id = pl.post_id

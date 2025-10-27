@@ -24,7 +24,7 @@ import {
 } from '../../controllers/blog/itinerary.controller.js';
 
 // Middleware
-import { blogAuthMiddleware as authMiddleware } from '../../middleware/blog/blogAuth.js';
+import { blogAuthMiddleware as authMiddleware, optionalAuth } from '../../middleware/blog/blogAuth.js';
 import validate from '../../middleware/blog/validate.middleware.js';
 
 // Validators
@@ -49,6 +49,7 @@ router.get(
 // 取得使用者的文章列表
 router.get(
   '/:userId/posts',
+  optionalAuth,
   validateUserId,
   validateQueryParams,
   validate,
@@ -58,6 +59,7 @@ router.get(
 // ⭐ 新增:取得使用者按讚的文章
 router.get(
   '/:userId/liked',
+  optionalAuth,
   validateUserId,
   validateQueryParams,
   validate,
@@ -67,6 +69,7 @@ router.get(
 // 取得使用者的收藏列表
 router.get(
   '/:userId/bookmarks',
+  optionalAuth,
   validateUserId,
   validateQueryParams,
   validate,
@@ -93,7 +96,7 @@ router.post(
 // ⭐ 新增:檢查追蹤狀態
 router.get(
   '/:userId/follow-status',
-  authMiddleware,
+  optionalAuth,
   validateUserId,
   validate,
   checkFollowStatus
@@ -102,6 +105,7 @@ router.get(
 // 取得使用者的追蹤者列表
 router.get(
   '/:userId/followers',
+  optionalAuth,
   validateUserId,
   validateQueryParams,
   validate,
@@ -111,6 +115,7 @@ router.get(
 // 取得使用者追蹤中的列表
 router.get(
   '/:userId/following',
+  optionalAuth,
   validateUserId,
   validateQueryParams,
   validate,

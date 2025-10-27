@@ -154,15 +154,11 @@ export const getUserBookmarks = async (req, res) => {
     const currentUserId = req.user?.id;
 
     const { formatPagination, getSortSQL, formatPostData } = await import('../../utils/blog/helpers.js');
-    const { getPostsQuery, getUserInteractionFields } = await import('../../utils/blog/queries.js');
+    const { getPostsQuery } = await import('../../utils/blog/queries.js');
 
     const { offset, limit: validLimit } = formatPagination(page, limit);
 
-    let sql = getPostsQuery();
-    
-    if (currentUserId) {
-      sql += getUserInteractionFields(currentUserId);
-    }
+    let sql = getPostsQuery(currentUserId);
 
     sql += `
       INNER JOIN bookmarks b ON p.post_id = b.post_id

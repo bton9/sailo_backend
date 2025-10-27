@@ -18,7 +18,7 @@ import {
 } from '../../controllers/blog/comment.controller.js';
 
 // Middleware
-import { blogAuthMiddleware as authMiddleware } from '../../middleware/blog/blogAuth.js';
+import { blogAuthMiddleware as authMiddleware, optionalAuth } from '../../middleware/blog/blogAuth.js';
 import validate from '../../middleware/blog/validate.middleware.js';
 
 // Validators
@@ -38,6 +38,7 @@ import {
 // 取得文章列表
 router.get(
   '/',
+  optionalAuth,
   validateQueryParams,
   validate,
   getPosts
@@ -46,6 +47,7 @@ router.get(
 // 取得單一文章
 router.get(
   '/:postId',
+  optionalAuth,
   validatePostId,
   validate,
   getPostById
@@ -81,6 +83,7 @@ router.delete(
 // 取得文章的留言列表
 router.get(
   '/:postId/comments',
+  optionalAuth,
   validatePostId,
   validateQueryParams,
   validate,

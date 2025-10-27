@@ -67,12 +67,12 @@ export const formatPostData = (post, currentUserId = null) => {
     },
     
     // === 使用者互動狀態 ===
-    user_interaction: currentUserId ? {
+    user_interaction: {
       is_liked: post.is_liked === 1,
       is_bookmarked: post.is_bookmarked === 1,
       is_following_author: post.is_following_author === 1,
-      is_author: post.author_id === currentUserId
-    } : null,
+      is_author: currentUserId ? post.author_id === currentUserId : false
+    },
     
     // === 標籤 (相容多種格式) ===
     tags: post.tags 
@@ -110,10 +110,10 @@ export const formatCommentData = (comment, currentUserId = null) => {
       likes: parseInt(comment.like_count) || 0
     },
 
-    user_interaction: currentUserId ? {
+    user_interaction: {
       is_liked: comment.is_liked === 1,
-      is_author: comment.user_id === currentUserId
-    } : null
+      is_author: currentUserId ? comment.user_id === currentUserId : false
+    }
   };
 };
 
