@@ -152,7 +152,7 @@ export const getPostById = async (req, res) => {
     `, [postId]);
 
     const post = posts[0];
-    post.tags = tags.map(tag => tag.tagname);
+    post.tags = tags;
     post.photos = photos.map(photo => photo.url);
 
     const formattedPost = formatPostData(post, currentUserId);
