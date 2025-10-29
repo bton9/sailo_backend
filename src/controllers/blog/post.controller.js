@@ -173,7 +173,7 @@ export const createPost = async (req, res) => {
   const connection = await db.getConnection();
   
   try {
-    const { title, content, category, trip_id, tags = [], image_url } = req.body;
+    const { title, content, category, trip_id, tags = [] } = req.body;
     const userId = req.user.id;
 
     await connection.beginTransaction();
@@ -208,13 +208,6 @@ export const createPost = async (req, res) => {
           [postId, tagId]
         );
       }
-    }
-
-    if (image_url) {
-      await connection.query(
-        'INSERT INTO post_photos (post_id, url) VALUES (?, ?)',
-        [postId, image_url]
-      );
     }
 
     await connection.commit();

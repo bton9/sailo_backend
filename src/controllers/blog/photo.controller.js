@@ -1,5 +1,6 @@
 import db from '../../config/database.js';
 import { sendSuccess, sendError } from '../../utils/blog/helpers.js';
+import imagekit from '../../config/imagekit.js';
 
 /**
  * 上傳圖片
@@ -7,35 +8,44 @@ import { sendSuccess, sendError } from '../../utils/blog/helpers.js';
  */
 export const uploadPhoto = async (req, res) => {
   try {
-    if (!req.file) {
+    // 檢查是否有上傳檔案
+    if (!req.body.image && !req.file) {
       return sendError(res, '請上傳圖片檔案', 400);
     }
 
-    let imageUrl;
-    
-    if (req.file.filename) {
-      const protocol = req.protocol;
-      const host = req.get('host');
-      imageUrl = `${protocol}://${host}/uploads/blog/${req.file.filename}`;
+    let fileData;
+    let fileName;
+
+    // 處理 Base64 格式
+    if (req.body.image) {
+      const base64Data = req.body.image.replace(/^data:image\/\w+;base64,/, '');
+      fileData = base64Data;
+      fileName = `post-${Date.now()}.jpg`;
     }
-    else if (req.file.path) {
-      imageUrl = req.file.path;
-    }
-    else if (req.file.location) {
-      imageUrl = req.file.location;
-    }
-    else {
-      return sendError(res, '圖片上傳失敗', 500);
+    // 處理 FormData 格式（如果前端使用 FormData）
+    else if (req.file) {
+      fileData = req.file.buffer;
+      fileName = req.file.originalname;
     }
 
+    // 上傳到 ImageKit
+    const result = await imagekit.upload({
+      file: fileData,
+      fileName: fileName,
+      folder: 'blog',
+      useUniqueFileName: true,
+      tags: ['blog', 'post'],
+    });
+
     return sendSuccess(res, { 
-      url: imageUrl,
-      filename: req.file.filename || req.file.key
+      url: result.url,
+      fileId: result.fileId,
+      name: result.name
     }, '圖片上傳成功', 201);
 
   } catch (error) {
     console.error('上傳圖片失敗:', error);
-    return sendError(res, '上傳圖片失敗', 500);
+    return sendError(res, error.message || '上傳圖片失敗', 500);
   }
 };
 
