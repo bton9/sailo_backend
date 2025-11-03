@@ -11,7 +11,6 @@ import {
 
 // Middleware
 import { blogAuthMiddleware as authMiddleware, optionalAuth } from '../../middleware/blog/blogAuth.js';
-import { uploadSingle } from '../../middleware/upload.middleware.js';
 import validate from '../../middleware/blog/validate.middleware.js';
 
 // Validators
@@ -28,15 +27,7 @@ import {
 router.post(
   '/upload',
   authMiddleware,
-  uploadSingle,
   uploadPhoto
-);
-
-// 刪除圖片
-router.delete(
-  '/:photoId',
-  authMiddleware,
-  deletePhoto
 );
 
 // 取得文章的所有圖片
@@ -54,6 +45,13 @@ router.post(
   validatePostId,
   validate,
   addPhotoToPost
+);
+
+// 刪除圖片
+router.delete(
+  '/:photoId',
+  authMiddleware,
+  deletePhoto
 );
 
 export default router;
