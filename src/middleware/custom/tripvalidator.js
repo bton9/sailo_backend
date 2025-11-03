@@ -147,8 +147,8 @@ export const validateAddPlace = [
 
   body('type')
     .optional()
-    .isIn(['景點', '餐廳', '住宿', '交通'])
-    .withMessage('類型必須為: 景點, 餐廳, 住宿, 交通'),
+    .isIn(['景點', '餐廳', '住宿'])
+    .withMessage('類型必須為: 景點, 餐廳, 住宿'),
 
   body('note')
     .optional()
