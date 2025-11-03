@@ -1,9 +1,10 @@
 // ==================== 後端 API (Node.js + Express) ====================
 // 檔案: /api/routes/tripRoutes.js
 
-const express = require('express')
+import express from 'express'
 const router = express.Router()
-const db = require('../config/database') // 你的資料庫連線
+import { query } from '../../config/database.js' // 你的資料庫連線
+import { addTripDay } from '../../controllers/custom/tripDayController.js'
 
 // ==================== 1. 建立新行程 ====================
 router.post('/trips', async (req, res) => {
@@ -505,4 +506,4 @@ router.delete('/trips/:tripId', async (req, res) => {
   }
 })
 
-module.exports = router
+export default router

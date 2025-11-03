@@ -173,26 +173,88 @@ export async function getPlaceGallery(req, res) {
 }
 
 // ✅ 新增：刪除相簿圖片
-export async function deleteGalleryImage(req, res) {
-  const { media_id } = req.params
-  const { user_id } = req.body // 驗證是否為上傳者
-
+export const deleteGalleryImage = async (req, res) => {
   try {
-    // 可選：驗證權限
-    const checkSql = 'SELECT user_id FROM media WHERE media_id = ?'
-    const rows = await query(checkSql, [media_id])
+    const { media_id } = req.params
+    const { user_id, place_id } = req.body
 
-    if (!rows || rows.length === 0) {
-      return res.status(404).json({ success: false, message: '圖片不存在' })
+    console.log('收到刪除請求:', { media_id, user_id, place_id })
+
+    if (!user_id) {
+      return res.status(401).json({
+        success: false,
+        message: '請先登入',
+      })
     }
 
-    // 刪除圖片記錄
-    const deleteSql = 'DELETE FROM media WHERE media_id = ? AND is_cover = 0'
-    await query(deleteSql, [media_id])
+    // 查詢圖片資訊
+    const images = await query(
+      'SELECT user_id, place_id FROM media WHERE media_id = ?',
+      [media_id]
+    )
+    console.log('查詢結果:', images)
 
-    res.json({ success: true, message: '圖片已刪除' })
-  } catch (err) {
-    console.error('❌ 刪除圖片失敗:', err)
-    res.status(500).json({ success: false, message: '刪除失敗' })
+    if (!images || images.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: '圖片不存在',
+      })
+    }
+
+    const imageOwnerId = images[0].user_id
+    console.log('圖片上傳者:', imageOwnerId, '| 當前使用者:', user_id)
+
+    // 檢查權限: 是上傳者本人或管理員
+    const isOwner = imageOwnerId === user_id
+
+    let isAdmin = false
+    try {
+      const userInfo = await query('SELECT access FROM users WHERE id = ?', [
+        user_id,
+      ])
+
+      if (userInfo && userInfo.length > 0) {
+        isAdmin = userInfo[0].access === 'admin' || userInfo[0].access === 1
+      }
+
+      console.log('是否為管理員:', isAdmin)
+    } catch (err) {
+      console.log('無法檢查管理員權限:', err.message)
+    }
+
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({
+        success: false,
+        message: '無權限刪除此圖片(只有上傳者或管理員可以刪除)',
+      })
+    }
+
+    console.log('權限驗證通過,執行刪除...')
+
+    // 執行刪除
+    const result = await query('DELETE FROM media WHERE media_id = ?', [
+      media_id,
+    ])
+
+    console.log('🗑️ 刪除結果:', result)
+
+    if (result.affectedRows === 0) {
+      return res.status(500).json({
+        success: false,
+        message: '刪除失敗',
+      })
+    }
+
+    res.json({
+      success: true,
+      message: '圖片已刪除',
+      deleted_media_id: media_id,
+    })
+  } catch (error) {
+    console.error('刪除錯誤:', error)
+    res.status(500).json({
+      success: false,
+      message: '伺服器錯誤: ' + error.message,
+    })
   }
 }
