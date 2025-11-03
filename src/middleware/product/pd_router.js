@@ -4,6 +4,7 @@
 import productsRoutes from '../../routes/product/productsRoutes.js'
 import staticRouter from '../../routes/product/staticRoutes.js'
 import productReviewsRouter from '../../routes/product/productReviewsRouter.js'
+import ProductFavRouter from '../../routes/product/productFavRouter.js'
 
 /**
  * 統一路由中間件
@@ -14,6 +15,8 @@ const setupProductRoutes = (app) => {
   app.use('/api/products', productsRoutes)
 
   app.use('/api', productReviewsRouter)
+
+  app.use('/api', ProductFavRouter)
 
   // ==================== 靜態資源路由 ====================
   app.use(staticRouter)
