@@ -16,6 +16,12 @@ const pool = mysql.createPool({
 
 export async function query(sql, params = []) {
   try {
+    // 如果沒有參數，直接使用 query
+    if (params.length === 0) {
+      const [results] = await pool.query(sql)
+      return results
+    }
+    // 有參數時使用 execute (prepared statement)
     const [results] = await pool.execute(sql, params)
     return results
   } catch (error) {

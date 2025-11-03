@@ -1,4 +1,6 @@
 import express from 'express'
+import { createServer } from 'http'
+import { Server } from 'socket.io'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import session from 'express-session'
@@ -12,6 +14,11 @@ import authRoutesV2 from './src/routes/authRoutesV2.js' // OAuth 2.0 版本
 import userRoutes from './src/routes/userRoutes.js'
 import blogRoutes from './src/routes/blog/index.js' //blog用
 import setupProductRoutes from './src/middleware/product/pd_router.js' // 改名
+import customerServiceRoutes from './src/routes/chat/customerServiceRoutes.js' // 🆕 客服聊天路由
+import aiChatRoutes from './src/routes/chat/aiChatRoutes.js' // 🆕 AI 客服路由
+import { setupSocketHandlers } from './src/utils/chat/socketHandler.js' // 🆕 WebSocket 處理器
+import { setSocketIO } from './src/controllers/chat/adminCustomerServiceController.js' // 🆕 設定 Socket.IO
+import { validateOllamaConnection } from './src/config/ollama.js' // 🆕 Ollama 驗證
 
 // 行程規畫用
 import locationRoutes from './src/routes/location.js'
@@ -40,8 +47,45 @@ dotenv.config()
 // ============ 驗證 ImageKit 配置 ============
 validateImageKitConfig()
 
+// ============ 驗證 Ollama 連線 (非阻斷性) ============
+validateOllamaConnection()
+  .then((result) => {
+    if (result.success) {
+      console.log('✅ Ollama 連線成功')
+      if (result.models?.length > 0) {
+        console.log('   可用模型:', result.models.map((m) => m.name).join(', '))
+      }
+    } else {
+      console.warn('⚠️  Ollama 連線失敗:', result.message)
+      console.warn('   AI 客服功能將無法使用')
+      console.warn('   請確認 Ollama 已啟動: ollama serve')
+    }
+  })
+  .catch((error) => {
+    console.warn('⚠️  Ollama 驗證異常:', error.message)
+  })
+
 const app = express()
+const httpServer = createServer(app) // 🆕 建立 HTTP Server
 const PORT = process.env.PORT || 5000
+
+// ============ WebSocket (Socket.IO) 配置 ============
+const io = new Server(httpServer, {
+  cors: {
+    origin: [
+      process.env.FRONTEND_URL || 'http://localhost:3000',
+      'http://localhost:3001',
+    ],
+    credentials: true,
+    methods: ['GET', 'POST'],
+  },
+})
+
+// ============ 設置 Socket.IO 事件處理器 ============
+setupSocketHandlers(io)
+
+// ============ 將 Socket.IO 實例傳遞給需要的 Controller ============
+setSocketIO(io)
 
 // ============ Middleware ============
 app.use(
@@ -53,7 +97,9 @@ app.use(
     credentials: true, // 允許傳送 cookies
   })
 )
-app.use(express.json())
+// 增加 JSON body 大小限制到 10MB (支援 Base64 圖片上傳)
+app.use(express.json({ limit: '10mb' }))
+app.use(express.urlencoded({ limit: '10mb', extended: true }))
 app.use(cookieParser()) // 解析 cookies
 
 // ============ Session 配置 ============
@@ -88,6 +134,8 @@ app.use(passport.session()) // 啟用 Passport session 支援
 // app.use('/api/auth', authRoutes) // 舊版認證 (向後相容)
 app.use('/api/v2/auth', authRoutesV2) // OAuth 2.0 版本 (新)
 app.use('/api/v2/user', userRoutes) // OAuth 2.0 版本 (新)
+app.use('/api/customer-service', customerServiceRoutes) // 🆕 客服聊天 API
+app.use('/api/ai-chat', aiChatRoutes) // 🆕 AI 客服 API (Ollama)
 
 // ============ Health Check ============
 app.get('/health', (req, res) => {
@@ -109,8 +157,9 @@ app.use((err, req, res, next) => {
 })
 
 // ============ Start Server ============
-app.listen(PORT, () => {
-  console.log(`Backend server running on http://localhost:${PORT}`)
+httpServer.listen(PORT, () => {
+  console.log(`✅ Backend server running on http://localhost:${PORT}`)
+  console.log(`✅ WebSocket server running on ws://localhost:${PORT}`)
 })
 
 // === 部落格 ===
