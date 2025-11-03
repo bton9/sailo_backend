@@ -42,16 +42,4 @@ router.get('/health', (req, res) => {
   })
 })
 
-// ❌ 暫時註解：綠界金流測試 - 缺少 payment.service.js
-// 會造成3000被佔用
-// 需要時請建立 payment.service.js 並實作 getECPayParams 和 getHtmlFormContent
-// router.get('/ecpay', (req, res) => {
-//   const result = getECPayParams(990, '商品之一x2,商品之二x3,商品之三x4')
-//   const htmlContent = getHtmlFormContent(
-//     result.payload.action,
-//     result.payload.params
-//   )
-//   res.send(htmlContent)
-// })
-
 export default router

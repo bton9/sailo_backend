@@ -2,7 +2,7 @@ import pool from '../../config/database.js'
 
 /**
  * 購物車相關查詢（修正版 - 移除 is_primary 欄位）
- * 
+ *
  * 重要變更:
  * - 移除對 product_images.is_primary 的依賴
  * - 直接取得第一張圖片
@@ -345,80 +345,8 @@ export const orderQueries = {
   },
 }
 
-/**
- * 付款記錄查詢
- */
-export const paymentQueries = {
-  /**
-   * 建立付款記錄
-   * @param {Object} paymentData - 付款資料
-   * @returns {number} 付款記錄ID
-   */
-  async createPayment(paymentData) {
-    const { orderId, merchantTradeNo, paymentType, amount } = paymentData
-
-    const [result] = await pool.query(
-      `INSERT INTO payments 
-       (order_id, merchant_trade_no, payment_type, amount, payment_status) 
-       VALUES (?, ?, ?, ?, 0)`,
-      [orderId, merchantTradeNo, paymentType, amount]
-    )
-    return result.insertId
-  },
-
-  /**
-   * 更新付款狀態
-   * @param {string} merchantTradeNo - 商店交易編號
-   * @param {number} status - 付款狀態
-   * @param {Object} ecpayData - ECPay 回傳資料
-   * @returns {number} 影響的行數
-   */
-  async updatePaymentStatus(merchantTradeNo, status, ecpayData) {
-    const { ecpayTradeNo, rtnCode, rtnMsg } = ecpayData
-
-    const [result] = await pool.query(
-      `UPDATE payments 
-       SET payment_status = ?, 
-           ecpay_trade_no = ?, 
-           rtn_code = ?, 
-           rtn_msg = ?,
-           payment_date = NOW()
-       WHERE merchant_trade_no = ?`,
-      [status, ecpayTradeNo, rtnCode, rtnMsg, merchantTradeNo]
-    )
-    return result.affectedRows
-  },
-
-  /**
-   * 取得付款記錄（透過訂單ID）
-   * @param {number} orderId - 訂單ID
-   * @returns {Object|null} 付款記錄
-   */
-  async getPayment(orderId) {
-    const [rows] = await pool.query(
-      'SELECT * FROM payments WHERE order_id = ? ORDER BY created_at DESC LIMIT 1',
-      [orderId]
-    )
-    return rows[0]
-  },
-
-  /**
-   * 取得付款記錄（透過商店交易編號）
-   * @param {string} merchantTradeNo - 商店交易編號
-   * @returns {Object|null} 付款記錄
-   */
-  async getPaymentByTradeNo(merchantTradeNo) {
-    const [rows] = await pool.query(
-      'SELECT * FROM payments WHERE merchant_trade_no = ?',
-      [merchantTradeNo]
-    )
-    return rows[0]
-  },
-}
-
 export default {
   cartQueries,
   productQueries,
   orderQueries,
-  paymentQueries,
 }
