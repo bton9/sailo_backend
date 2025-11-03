@@ -16,3 +16,7 @@
 
 - 第三次合併完成
 - 大修JWT＋Refresh token+session
+
+## [v0.4] - 2025-11-03
+
+- 惠欣
