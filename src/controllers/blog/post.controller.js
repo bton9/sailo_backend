@@ -421,8 +421,8 @@ export const getUserLikedPosts = async (req, res) => {
     let sql = getPostsQuery(currentUserId);
 
     sql += `
-      INNER JOIN post_likes pl ON p.post_id = pl.post_id
-      WHERE pl.user_id = ? AND p.visible = TRUE
+      INNER JOIN post_likes plk ON p.post_id = plk.post_id
+      WHERE plk.user_id = ? AND p.visible = TRUE
       ORDER BY pl.created_at DESC
       LIMIT ? OFFSET ?
     `;
@@ -432,9 +432,9 @@ export const getUserLikedPosts = async (req, res) => {
 
     const [[{ total }]] = await db.query(`
       SELECT COUNT(*) as total 
-      FROM post_likes pl
-      INNER JOIN posts p ON pl.post_id = p.post_id
-      WHERE pl.user_id = ? AND p.visible = TRUE
+      FROM post_likes plk
+      INNER JOIN posts p ON plk.post_id = p.post_id
+      WHERE plk.user_id = ? AND p.visible = TRUE
     `, [userId]);
 
     return sendSuccess(res, {
