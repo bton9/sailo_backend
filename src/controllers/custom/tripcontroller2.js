@@ -35,7 +35,7 @@ export const copyTrip = async (req, res, next) => {
         cover_image_url, summary_text, is_public, location_id
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        `${trip.trip_name} - 複製`,
+        `${trip.trip_name}`,
         user_id,
         trip.description,
         trip.start_date,
