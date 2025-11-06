@@ -32,6 +32,7 @@ export const formatPostData = (post, currentUserId = null) => {
     content: post.content,
     category: post.category,
     trip_id: post.trip_id,
+    place_id: post.place_id,  // ✅ 新增
     visible: post.visible,
     view_count: post.view_count,
     created_at: post.created_at,
@@ -57,6 +58,17 @@ export const formatPostData = (post, currentUserId = null) => {
       days: post.trip_days,
       nights: post.trip_nights,
       locations: post.trip_locations || ''  // ⚠️ 保持字串格式（用「、」分隔）
+    } : null,
+
+    // ✅ 新增：景點資訊
+    place: post.place_id ? {
+      place_id: post.place_id,
+      name: post.place_name,
+      category: post.place_category,
+      location_name: post.place_location_name,
+      rating: post.place_rating,
+      cover_image: post.place_cover_image,
+      description: post.place_description
     } : null,
     
     // === 統計資訊 (確保數字類型) ===
