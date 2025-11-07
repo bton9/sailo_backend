@@ -70,14 +70,16 @@ export const getFollowers = async (req, res) => {
         u.name,
         u.nickname,
         u.avatar,
-        f.created_at as followed_at
+        f.created_at as followed_at,
+        (SELECT COUNT(*) FROM posts WHERE user_id = u.id AND visible = TRUE) as posts_count,
+        (SELECT COUNT(*) FROM follows f2 WHERE f2.following_id = u.id) as followers_count
     `;
 
     if (currentUserId) {
       sql += `,
         EXISTS(
-          SELECT 1 FROM follows 
-          WHERE follower_id = ? AND following_id = u.id
+          SELECT 1 FROM follows f3
+          WHERE f3.follower_id = ? AND f3.following_id = u.id
         ) AS is_following
       `;
     }
@@ -102,6 +104,8 @@ export const getFollowers = async (req, res) => {
       nickname: follower.nickname,
       avatar: follower.avatar,
       followed_at: follower.followed_at,
+      posts_count: follower.posts_count,           // ✅ 新增
+      followers_count: follower.followers_count,   // ✅ 新增
       is_following: currentUserId ? follower.is_following === 1 : null
     }));
 
@@ -145,14 +149,16 @@ export const getFollowing = async (req, res) => {
         u.name,
         u.nickname,
         u.avatar,
-        f.created_at as followed_at
+        f.created_at as followed_at,
+        (SELECT COUNT(*) FROM posts WHERE user_id = u.id AND visible = TRUE) as posts_count,
+        (SELECT COUNT(*) FROM follows f2 WHERE f2.following_id = u.id) as followers_count
     `;
 
     if (currentUserId) {
       sql += `,
         EXISTS(
-          SELECT 1 FROM follows 
-          WHERE follower_id = ? AND following_id = u.id
+          SELECT 1 FROM follows f3
+          WHERE f3.follower_id = ? AND f3.following_id = u.id
         ) AS is_following
       `;
     }
@@ -177,6 +183,8 @@ export const getFollowing = async (req, res) => {
       nickname: user.nickname,
       avatar: user.avatar,
       followed_at: user.followed_at,
+      posts_count: user.posts_count,           // ✅ 新增
+      followers_count: user.followers_count,   // ✅ 新增
       is_following: currentUserId ? user.is_following === 1 : null
     }));
 
