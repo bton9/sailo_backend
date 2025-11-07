@@ -58,7 +58,7 @@ export const toggleFollow = async (req, res) => {
 export const getFollowers = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { page, limit } = req.query;
+    const { page, limit , search} = req.query;
     const currentUserId = req.user?.id;
 
     const { formatPagination } = await import('../../utils/blog/helpers.js');
@@ -83,18 +83,33 @@ export const getFollowers = async (req, res) => {
         ) AS is_following
       `;
     }
+    
 
     sql += `
       FROM follows f
       INNER JOIN users u ON f.follower_id = u.id
       WHERE f.following_id = ?
+    `;
+
+    // ✅ 新增：搜尋條件
+    if (search) {
+      sql += ` AND (u.name LIKE ? OR u.nickname LIKE ?)`;
+    }
+
+    sql += `
       ORDER BY f.created_at DESC
       LIMIT ? OFFSET ?
     `;
 
-    const params = currentUserId 
-      ? [currentUserId, userId, validLimit, offset]
-      : [userId, validLimit, offset];
+    const searchPattern = search ? `%${search}%` : null;
+    
+    const params = [];
+    if (currentUserId) params.push(currentUserId);
+    params.push(userId);
+    if (search) {
+      params.push(searchPattern, searchPattern);
+    }
+    params.push(validLimit, offset);
 
     const [followers] = await db.query(sql, params);
 
@@ -109,10 +124,21 @@ export const getFollowers = async (req, res) => {
       is_following: currentUserId ? follower.is_following === 1 : null
     }));
 
-    const [[{ total }]] = await db.query(
-      'SELECT COUNT(*) as total FROM follows WHERE following_id = ?',
-      [userId]
-    );
+    let countSql = `
+      SELECT COUNT(*) as total 
+      FROM follows f
+      INNER JOIN users u ON f.follower_id = u.id
+      WHERE f.following_id = ?
+    `;
+    
+    const countParams = [userId];
+    
+    if (search) {
+      countSql += ` AND (u.name LIKE ? OR u.nickname LIKE ?)`;
+      countParams.push(searchPattern, searchPattern);
+    }
+    
+    const [[{ total }]] = await db.query(countSql, countParams);
 
     return sendSuccess(res, {
       followers: formattedFollowers,
@@ -137,7 +163,7 @@ export const getFollowers = async (req, res) => {
 export const getFollowing = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { page, limit } = req.query;
+    const { page, limit , search} = req.query;
     const currentUserId = req.user?.id;
 
     const { formatPagination } = await import('../../utils/blog/helpers.js');
@@ -167,13 +193,27 @@ export const getFollowing = async (req, res) => {
       FROM follows f
       INNER JOIN users u ON f.following_id = u.id
       WHERE f.follower_id = ?
+    `;
+
+    // ✅ 新增：搜尋條件
+    if (search) {
+      sql += ` AND (u.name LIKE ? OR u.nickname LIKE ?)`;
+    }
+
+    sql += `
       ORDER BY f.created_at DESC
       LIMIT ? OFFSET ?
     `;
 
-    const params = currentUserId 
-      ? [currentUserId, userId, validLimit, offset]
-      : [userId, validLimit, offset];
+    const searchPattern = search ? `%${search}%` : null;
+    
+    const params = [];
+    if (currentUserId) params.push(currentUserId);
+    params.push(userId);
+    if (search) {
+      params.push(searchPattern, searchPattern);
+    }
+    params.push(validLimit, offset);
 
     const [following] = await db.query(sql, params);
 
@@ -188,10 +228,21 @@ export const getFollowing = async (req, res) => {
       is_following: currentUserId ? user.is_following === 1 : null
     }));
 
-    const [[{ total }]] = await db.query(
-      'SELECT COUNT(*) as total FROM follows WHERE follower_id = ?',
-      [userId]
-    );
+    let countSql = `
+      SELECT COUNT(*) as total 
+      FROM follows f
+      INNER JOIN users u ON f.following_id = u.id
+      WHERE f.follower_id = ?
+    `;
+    
+    const countParams = [userId];
+    
+    if (search) {
+      countSql += ` AND (u.name LIKE ? OR u.nickname LIKE ?)`;
+      countParams.push(searchPattern, searchPattern);
+    }
+    
+    const [[{ total }]] = await db.query(countSql, countParams);
 
     return sendSuccess(res, {
       following: formattedFollowing,
