@@ -294,7 +294,7 @@ export const cancelOrder = async (req, res) => {
       })
     }
 
-    // 只有待付款或處理中的訂單可以取消
+    // 只有已下單或處理中的訂單可以取消
     if (order.order_status !== 0 && order.order_status !== 1) {
       return res.status(400).json({
         success: false,

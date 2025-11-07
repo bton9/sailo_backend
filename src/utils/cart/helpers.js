@@ -15,12 +15,17 @@ export const generateOrderNumber = () => {
  */
 export const calculateCartTotal = (items) => {
   if (!items || items.length === 0) return 0
-  
-  return items.reduce((total, item) => {
-    const unitPrice = item.unit_price || item.price || 0
+
+  const total = items.reduce((total, item) => {
+    // Support multiple property name formats
+    const unitPrice = item.unitPrice || item.unit_price || item.price || 0
     const quantity = item.quantity || 0
-    return total + (unitPrice * quantity)
+    const itemTotal = unitPrice * quantity
+
+    return total + itemTotal
   }, 0)
+
+  return total
 }
 
 /**
@@ -44,7 +49,9 @@ export const calculateShipping = (shippingMethod, subtotal) => {
 export const calculateOrderTotal = (items, shippingMethod = 'standard') => {
   const subtotal = calculateCartTotal(items)
   const shipping = calculateShipping(shippingMethod, subtotal)
-  return subtotal + shipping
+  const total = subtotal + shipping
+
+  return total
 }
 
 /**
@@ -64,19 +71,18 @@ export const validateQuantity = (quantity) => {
 export const formatOrderData = (order, details) => {
   // 訂單狀態對應
   const statusMap = {
-    0: 'pending',      // 待處理
-    1: 'processing',   // 處理中
-    2: 'shipped',      // 已出貨
-    3: 'completed',    // 已完成
-    4: 'cancelled',    // 已取消
+    0: 'pending', // 待處理
+    1: 'processing', // 處理中
+    2: 'shipped', // 已出貨
+    3: 'completed', // 已完成
+    4: 'cancelled', // 已取消
   }
 
   // 付款狀態對應
   const paymentStatusMap = {
-    0: 'unpaid',       // 未付款
-    1: 'paid',         // 已付款
-    2: 'failed',       // 付款失敗
-    3: 'refunded',     // 已退款
+    0: 'paid', // 已付款
+    1: 'failed', // 付款失敗
+    2: 'refunded', // 已退款
   }
 
   return {
@@ -86,7 +92,8 @@ export const formatOrderData = (order, details) => {
     status: statusMap[order.order_status] || 'pending',
     statusText: cartConfig.orderStatus[order.order_status] || '未知狀態',
     paymentStatus: paymentStatusMap[order.payment_status] || 'unpaid',
-    paymentStatusText: cartConfig.paymentStatus[order.payment_status] || '未知狀態',
+    paymentStatusText:
+      cartConfig.paymentStatus[order.payment_status] || '未知狀態',
     items: details.map((item) => ({
       id: item.id,
       productId: item.product_id,
@@ -99,7 +106,8 @@ export const formatOrderData = (order, details) => {
     })),
     total: order.total,
     paymentMethod: order.payment_method,
-    paymentMethodText: order.payment_method === 1 ? 'ECPay 線上付款' : '貨到付款',
+    paymentMethodText:
+      order.payment_method === 1 ? 'ECPay 線上付款' : '貨到付款',
     shippingMethod: order.shipping_method,
     shippingAddress: order.shipping_address,
     recipientName: order.recipient_name,
@@ -141,14 +149,14 @@ export const generateOrderSummary = (items) => {
   if (!items || items.length === 0) {
     return '訂單商品'
   }
-  
+
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
   const firstProductName = items[0].product_name || items[0].name || '商品'
-  
+
   if (items.length === 1) {
     return `${firstProductName} x${itemCount}`
   }
-  
+
   return `${firstProductName} 等 ${items.length} 項商品`
 }
 
@@ -156,7 +164,7 @@ export const generateOrderSummary = (items) => {
  * 檢查訂單是否可以取消
  */
 export const canCancelOrder = (orderStatus) => {
-  return orderStatus === 0 || orderStatus === 1 // 待付款或處理中
+  return orderStatus === 0 || orderStatus === 1 // 已下單或處理中
 }
 
 /**
