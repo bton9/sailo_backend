@@ -61,6 +61,7 @@ export const getPostsQuery = (currentUserId = null) => {
       p.content,
       p.category,
       p.trip_id,
+      p.place_id,
       p.visible,
       p.view_count,
       p.created_at,
@@ -80,13 +81,21 @@ export const getPostsQuery = (currentUserId = null) => {
       t.summary_text,
       DATEDIFF(t.end_date, t.start_date) + 1 AS trip_days,
       DATEDIFF(t.end_date, t.start_date) AS trip_nights,
+
+      -- ✅ 新增：景點基本資訊
+      pl.name AS place_name,
+      pl.category AS place_category,
+      pl.rating AS place_rating,
+      pl.description AS place_description,
+      loc.name AS place_location_name,
+      (SELECT url FROM media WHERE place_id = pl.place_id AND is_cover = 1 LIMIT 1) AS place_cover_image,
       
       -- 地點列表（從行程項目中取得不重複的城市名稱）
       (SELECT GROUP_CONCAT(DISTINCT l.name ORDER BY l.name SEPARATOR '、')
        FROM trip_items ti
        JOIN trip_days td ON ti.trip_day_id = td.trip_day_id
-       JOIN places pl ON ti.place_id = pl.place_id
-       JOIN locations l ON pl.location_id = l.location_id
+       JOIN places pl_trip ON ti.place_id = pl_trip.place_id 
+       JOIN locations l ON pl_trip.location_id = l.location_id
        WHERE td.trip_id = t.trip_id
       ) AS trip_locations,
       
@@ -113,6 +122,10 @@ export const getPostsQuery = (currentUserId = null) => {
     FROM posts p
     INNER JOIN users u ON p.user_id = u.id
     LEFT JOIN trips t ON p.trip_id = t.trip_id
+
+    -- ✅ 新增：景點 LEFT JOIN
+    LEFT JOIN places pl ON p.place_id = pl.place_id
+    LEFT JOIN locations loc ON pl.location_id = loc.location_id
   `;
 };
 

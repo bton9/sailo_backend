@@ -120,6 +120,7 @@ export const getPosts = async (req, res) => {
 export const getPostById = async (req, res) => {
   try {
     const { postId } = req.params;
+    const { increment_view } = req.query;
     const currentUserId = req.user?.id;
 
     let sql = getPostsQuery(currentUserId);
@@ -132,10 +133,13 @@ export const getPostById = async (req, res) => {
       return sendError(res, '找不到該文章', 404);
     }
 
-    await db.query(
-      'UPDATE posts SET view_count = view_count + 1 WHERE post_id = ?',
-      [postId]
-    );
+    // ✅ 修改：只在 increment_view=true 時才增加瀏覽次數
+    if (increment_view === 'true') {
+      await db.query(
+        'UPDATE posts SET view_count = view_count + 1 WHERE post_id = ?',
+        [postId]
+      );
+    }
 
     const [tags] = await db.query(`
       SELECT st.tag_id, st.tagname
@@ -173,15 +177,22 @@ export const createPost = async (req, res) => {
   const connection = await db.getConnection();
   
   try {
-    const { title, content, category, trip_id, tags = [] } = req.body;
+    const { title, content, category, trip_id, place_id, tags = [] } = req.body;
     const userId = req.user.id;
+
+
+    // ✅ 新增：防呆檢查
+    if (trip_id && place_id) {
+      await connection.rollback();
+      return sendError(res, '文章只能關聯行程或景點其中一個', 400);
+    }
 
     await connection.beginTransaction();
 
     const [result] = await connection.query(`
-      INSERT INTO posts (user_id, title, content, category, trip_id, visible)
-      VALUES (?, ?, ?, ?, ?, TRUE)
-    `, [userId, title, content, category, trip_id || null]);
+      INSERT INTO posts (user_id, title, content, category, trip_id, place_id, visible)
+      VALUES (?, ?, ?, ?, ?, ?, TRUE)
+    `, [userId, title, content, category, trip_id || null, place_id || null]);
 
     const postId = result.insertId;
 
@@ -231,7 +242,13 @@ export const updatePost = async (req, res) => {
   try {
     const { postId } = req.params;
     const userId = req.user.id;
-    const { title, content, category, trip_id, visible } = req.body;
+    const { title, content, category, trip_id, place_id, visible } = req.body;
+
+
+    // ✅ 新增：防呆檢查
+    if (trip_id && place_id) {
+      return sendError(res, '文章只能關聯行程或景點其中一個', 400);
+    }
 
     const [posts] = await db.query(
       'SELECT user_id FROM posts WHERE post_id = ?',
@@ -264,6 +281,11 @@ export const updatePost = async (req, res) => {
     if (trip_id !== undefined) {
       updates.push('trip_id = ?');
       params.push(trip_id || null);
+    }
+     // ✅ 新增：place_id 更新
+    if (place_id !== undefined) {
+      updates.push('place_id = ?');
+      params.push(place_id || null);
     }
     if (visible !== undefined) {
       updates.push('visible = ?');
@@ -403,8 +425,8 @@ export const getUserLikedPosts = async (req, res) => {
     let sql = getPostsQuery(currentUserId);
 
     sql += `
-      INNER JOIN post_likes pl ON p.post_id = pl.post_id
-      WHERE pl.user_id = ? AND p.visible = TRUE
+      INNER JOIN post_likes plk ON p.post_id = plk.post_id
+      WHERE plk.user_id = ? AND p.visible = TRUE
       ORDER BY pl.created_at DESC
       LIMIT ? OFFSET ?
     `;
@@ -414,9 +436,9 @@ export const getUserLikedPosts = async (req, res) => {
 
     const [[{ total }]] = await db.query(`
       SELECT COUNT(*) as total 
-      FROM post_likes pl
-      INNER JOIN posts p ON pl.post_id = p.post_id
-      WHERE pl.user_id = ? AND p.visible = TRUE
+      FROM post_likes plk
+      INNER JOIN posts p ON plk.post_id = p.post_id
+      WHERE plk.user_id = ? AND p.visible = TRUE
     `, [userId]);
 
     return sendSuccess(res, {

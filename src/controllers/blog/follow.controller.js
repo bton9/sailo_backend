@@ -58,7 +58,7 @@ export const toggleFollow = async (req, res) => {
 export const getFollowers = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { page, limit } = req.query;
+    const { page, limit , search} = req.query;
     const currentUserId = req.user?.id;
 
     const { formatPagination } = await import('../../utils/blog/helpers.js');
@@ -70,29 +70,46 @@ export const getFollowers = async (req, res) => {
         u.name,
         u.nickname,
         u.avatar,
-        f.created_at as followed_at
+        f.created_at as followed_at,
+        (SELECT COUNT(*) FROM posts WHERE user_id = u.id AND visible = TRUE) as posts_count,
+        (SELECT COUNT(*) FROM follows f2 WHERE f2.following_id = u.id) as followers_count
     `;
 
     if (currentUserId) {
       sql += `,
         EXISTS(
-          SELECT 1 FROM follows 
-          WHERE follower_id = ? AND following_id = u.id
+          SELECT 1 FROM follows f3
+          WHERE f3.follower_id = ? AND f3.following_id = u.id
         ) AS is_following
       `;
     }
+    
 
     sql += `
       FROM follows f
       INNER JOIN users u ON f.follower_id = u.id
       WHERE f.following_id = ?
+    `;
+
+    // ✅ 新增：搜尋條件
+    if (search) {
+      sql += ` AND (u.name LIKE ? OR u.nickname LIKE ?)`;
+    }
+
+    sql += `
       ORDER BY f.created_at DESC
       LIMIT ? OFFSET ?
     `;
 
-    const params = currentUserId 
-      ? [currentUserId, userId, validLimit, offset]
-      : [userId, validLimit, offset];
+    const searchPattern = search ? `%${search}%` : null;
+    
+    const params = [];
+    if (currentUserId) params.push(currentUserId);
+    params.push(userId);
+    if (search) {
+      params.push(searchPattern, searchPattern);
+    }
+    params.push(validLimit, offset);
 
     const [followers] = await db.query(sql, params);
 
@@ -102,13 +119,26 @@ export const getFollowers = async (req, res) => {
       nickname: follower.nickname,
       avatar: follower.avatar,
       followed_at: follower.followed_at,
+      posts_count: follower.posts_count,           // ✅ 新增
+      followers_count: follower.followers_count,   // ✅ 新增
       is_following: currentUserId ? follower.is_following === 1 : null
     }));
 
-    const [[{ total }]] = await db.query(
-      'SELECT COUNT(*) as total FROM follows WHERE following_id = ?',
-      [userId]
-    );
+    let countSql = `
+      SELECT COUNT(*) as total 
+      FROM follows f
+      INNER JOIN users u ON f.follower_id = u.id
+      WHERE f.following_id = ?
+    `;
+    
+    const countParams = [userId];
+    
+    if (search) {
+      countSql += ` AND (u.name LIKE ? OR u.nickname LIKE ?)`;
+      countParams.push(searchPattern, searchPattern);
+    }
+    
+    const [[{ total }]] = await db.query(countSql, countParams);
 
     return sendSuccess(res, {
       followers: formattedFollowers,
@@ -133,7 +163,7 @@ export const getFollowers = async (req, res) => {
 export const getFollowing = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { page, limit } = req.query;
+    const { page, limit , search} = req.query;
     const currentUserId = req.user?.id;
 
     const { formatPagination } = await import('../../utils/blog/helpers.js');
@@ -145,14 +175,16 @@ export const getFollowing = async (req, res) => {
         u.name,
         u.nickname,
         u.avatar,
-        f.created_at as followed_at
+        f.created_at as followed_at,
+        (SELECT COUNT(*) FROM posts WHERE user_id = u.id AND visible = TRUE) as posts_count,
+        (SELECT COUNT(*) FROM follows f2 WHERE f2.following_id = u.id) as followers_count
     `;
 
     if (currentUserId) {
       sql += `,
         EXISTS(
-          SELECT 1 FROM follows 
-          WHERE follower_id = ? AND following_id = u.id
+          SELECT 1 FROM follows f3
+          WHERE f3.follower_id = ? AND f3.following_id = u.id
         ) AS is_following
       `;
     }
@@ -161,13 +193,27 @@ export const getFollowing = async (req, res) => {
       FROM follows f
       INNER JOIN users u ON f.following_id = u.id
       WHERE f.follower_id = ?
+    `;
+
+    // ✅ 新增：搜尋條件
+    if (search) {
+      sql += ` AND (u.name LIKE ? OR u.nickname LIKE ?)`;
+    }
+
+    sql += `
       ORDER BY f.created_at DESC
       LIMIT ? OFFSET ?
     `;
 
-    const params = currentUserId 
-      ? [currentUserId, userId, validLimit, offset]
-      : [userId, validLimit, offset];
+    const searchPattern = search ? `%${search}%` : null;
+    
+    const params = [];
+    if (currentUserId) params.push(currentUserId);
+    params.push(userId);
+    if (search) {
+      params.push(searchPattern, searchPattern);
+    }
+    params.push(validLimit, offset);
 
     const [following] = await db.query(sql, params);
 
@@ -177,13 +223,26 @@ export const getFollowing = async (req, res) => {
       nickname: user.nickname,
       avatar: user.avatar,
       followed_at: user.followed_at,
+      posts_count: user.posts_count,           // ✅ 新增
+      followers_count: user.followers_count,   // ✅ 新增
       is_following: currentUserId ? user.is_following === 1 : null
     }));
 
-    const [[{ total }]] = await db.query(
-      'SELECT COUNT(*) as total FROM follows WHERE follower_id = ?',
-      [userId]
-    );
+    let countSql = `
+      SELECT COUNT(*) as total 
+      FROM follows f
+      INNER JOIN users u ON f.following_id = u.id
+      WHERE f.follower_id = ?
+    `;
+    
+    const countParams = [userId];
+    
+    if (search) {
+      countSql += ` AND (u.name LIKE ? OR u.nickname LIKE ?)`;
+      countParams.push(searchPattern, searchPattern);
+    }
+    
+    const [[{ total }]] = await db.query(countSql, countParams);
 
     return sendSuccess(res, {
       following: formattedFollowing,
