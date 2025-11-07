@@ -71,7 +71,7 @@ export const validateQuantity = (quantity) => {
 export const formatOrderData = (order, details) => {
   // 訂單狀態對應
   const statusMap = {
-    0: 'pending', // 待處理
+    0: 'ordered', // 待處理
     1: 'processing', // 處理中
     2: 'shipped', // 已出貨
     3: 'completed', // 已完成
@@ -89,9 +89,9 @@ export const formatOrderData = (order, details) => {
     id: order.id,
     orderNumber: `#ORD-${order.id.toString().padStart(10, '0')}`,
     date: moment(order.created_at).format('YYYY年MM月DD日'),
-    status: statusMap[order.order_status] || 'pending',
+    status: statusMap[order.order_status] || 'ordered',
     statusText: cartConfig.orderStatus[order.order_status] || '未知狀態',
-    paymentStatus: paymentStatusMap[order.payment_status] || 'unpaid',
+    paymentStatus: paymentStatusMap[order.payment_status] || 'paid',
     paymentStatusText:
       cartConfig.paymentStatus[order.payment_status] || '未知狀態',
     items: details.map((item) => ({
