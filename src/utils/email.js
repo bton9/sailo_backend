@@ -483,7 +483,7 @@ export async function sendPasswordResetOTPEmail(email, otp, userName) {
             overflow: hidden;
           }
           .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #3e3e3e;
             color: #ffffff;
             padding: 30px;
             text-align: center;
@@ -496,7 +496,7 @@ export async function sendPasswordResetOTPEmail(email, otp, userName) {
             padding: 40px 30px;
           }
           .otp-box {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #3e3e3e;
             color: #ffffff;
             font-size: 36px;
             font-weight: bold;
@@ -509,7 +509,7 @@ export async function sendPasswordResetOTPEmail(email, otp, userName) {
           }
           .info-box {
             background: #f8f9fa;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #3e3e3e;
             padding: 15px 20px;
             margin: 20px 0;
             border-radius: 4px;
@@ -541,7 +541,7 @@ export async function sendPasswordResetOTPEmail(email, otp, userName) {
         <div class="container">
           <!-- 標題區 -->
           <div class="header">
-            <h1>🔒 密碼重置驗證碼</h1>
+            <h1>密碼重置驗證碼</h1>
           </div>
           
           <!-- 內容區 -->

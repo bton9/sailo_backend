@@ -28,12 +28,14 @@ import {
   updateRoomStatus,
   assignAgent,
   transferFromAI,
+  submitRating,
 } from '../../controllers/chat/customerServiceController.js'
 import {
   getRooms,
   acceptRoom,
   closeRoom,
   getStats,
+  getAgentRating,
 } from '../../controllers/chat/adminCustomerServiceController.js'
 
 const router = express.Router()
@@ -325,5 +327,60 @@ router.post(
  * }
  */
 router.get('/admin/stats', authenticate, requireRole('admin'), getStats)
+
+/**
+ * GET /api/customer-service/admin/agent-rating/:agentId
+ *
+ * 查詢客服人員滿意度評分統計
+ * 需要 admin 權限
+ *
+ * Response:
+ * {
+ *   "success": true,
+ *   "rating": {
+ *     "avg_rating": 4.5,
+ *     "total_ratings": 20,
+ *     "distribution": {
+ *       "five_stars": 12,
+ *       "four_stars": 5,
+ *       "three_stars": 2,
+ *       "two_stars": 1,
+ *       "one_star": 0
+ *     }
+ *   }
+ * }
+ */
+router.get(
+  '/admin/agent-rating/:agentId',
+  authenticate,
+  requireRole('admin'),
+  getAgentRating
+)
+
+/**
+ * POST /api/customer-service/rooms/:roomId/rating
+ *
+ * 提交客服滿意度評分
+ * 需要登入
+ *
+ * Request Body:
+ * {
+ *   "rating": 5,           // 必填，1-5 星
+ *   "comment": "服務很好"   // 選填，評價留言
+ * }
+ *
+ * Response:
+ * {
+ *   "success": true,
+ *   "message": "感謝您的評分！"
+ * }
+ *
+ * 限制:
+ * - 只能為已關閉的聊天室評分
+ * - 只能為自己的聊天室評分
+ * - 一個聊天室只能評分一次
+ * - 評分必須在 1-5 之間
+ */
+router.post('/rooms/:roomId/rating', submitRating)
 
 export default router

@@ -44,11 +44,16 @@ export async function createRefreshToken(userId, sessionId, options = {}) {
   try {
     const { userAgent = null, ipAddress = null, expiresInDays = 30 } = options
 
+    // 產生唯一的 JWT ID (jti) 防止重複
+    const jti = crypto.randomBytes(16).toString('hex')
+
     // 產生 JWT Refresh Token
     const refreshToken = generateRefreshToken({
       userId,
       sessionId,
       type: 'refresh',
+      jti, // 🔧 加入唯一識別碼
+      iat: Math.floor(Date.now() / 1000), // 🔧 加入簽發時間
     })
 
     // 產生裝置指紋
@@ -57,6 +62,12 @@ export async function createRefreshToken(userId, sessionId, options = {}) {
     // 計算過期時間
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + expiresInDays)
+
+    // 🔧 防止重複：先檢查並刪除可能存在的相同 Token
+    await query(`DELETE FROM refresh_tokens WHERE token = ? AND user_id = ?`, [
+      refreshToken,
+      userId,
+    ])
 
     // 儲存 Refresh Token 到資料庫
     const result = await query(
@@ -188,8 +199,12 @@ export async function rotateRefreshToken(oldRefreshToken, options = {}) {
 
     const { user_id: userId, session_id: sessionId } = tokenData
 
-    // 撤銷舊的 Refresh Token
-    await revokeRefreshToken(oldRefreshToken)
+    // 🔧 先刪除該 Session 所有舊的 Refresh Tokens (避免重複)
+    await query(
+      `DELETE FROM refresh_tokens 
+       WHERE session_id = ? AND user_id = ?`,
+      [sessionId, userId]
+    )
 
     // 產生新的 Refresh Token
     const { refreshToken: newRefreshToken, expiresAt } =
@@ -198,7 +213,7 @@ export async function rotateRefreshToken(oldRefreshToken, options = {}) {
     console.log('✅ Refresh Token 輪替成功:', {
       userId,
       sessionId,
-      oldTokenRevoked: true,
+      oldTokenDeleted: true,
       newTokenCreated: true,
     })
 

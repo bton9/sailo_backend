@@ -321,15 +321,26 @@ const closeRoom = async (req, res) => {
     console.log('✅ 關閉成功')
 
     // ============================================
+    // 🆕 取得客服人員資訊 (用於前端顯示)
+    // ============================================
+    const [agentInfo] = await connection.query(
+      'SELECT id, nickname, name FROM users WHERE id = ?',
+      [agentId]
+    )
+    const agentName = agentInfo[0]?.nickname || agentInfo[0]?.name || '客服人員'
+
+    // ============================================
     // 🆕 透過 WebSocket 通知使用者聊天室已關閉
     // ============================================
     if (io) {
       io.to(`room_${roomId}`).emit('room_closed', {
         roomId: parseInt(roomId),
+        agentId: agentId,
+        agentName: agentName,
         message: '客服已結束此對話',
         closedAt: new Date().toISOString(),
       })
-      console.log(`📢 WebSocket 通知: 聊天室 ${roomId} 已關閉`)
+      console.log(`📢 WebSocket 通知: 聊天室 ${roomId} 已關閉，請求評分`)
     }
 
     res.json({
@@ -421,6 +432,77 @@ const getStats = async (req, res) => {
 }
 
 /**
+ * 獲取客服人員滿意度評分統計
+ * GET /api/customer-service/admin/agent-rating/:agentId
+ *
+ * 功能說明:
+ * - 計算指定客服人員的平均評分
+ * - 統計總評分次數
+ * - 計算各星級分布
+ *
+ * @param {number} agentId - 客服人員ID（從路徑參數取得）
+ * @returns {Object} 評分統計資料
+ */
+const getAgentRating = async (req, res) => {
+  try {
+    const { agentId } = req.params
+
+    console.log('⭐ 查詢客服評分統計:', { agentId })
+
+    // ============================================
+    // 查詢評分統計
+    // ============================================
+    const [ratingStats] = await db.query(
+      `SELECT 
+        COUNT(*) as total_ratings,
+        COALESCE(AVG(rating), 0) as avg_rating,
+        COALESCE(SUM(CASE WHEN rating = 5 THEN 1 ELSE 0 END), 0) as five_stars,
+        COALESCE(SUM(CASE WHEN rating = 4 THEN 1 ELSE 0 END), 0) as four_stars,
+        COALESCE(SUM(CASE WHEN rating = 3 THEN 1 ELSE 0 END), 0) as three_stars,
+        COALESCE(SUM(CASE WHEN rating = 2 THEN 1 ELSE 0 END), 0) as two_stars,
+        COALESCE(SUM(CASE WHEN rating = 1 THEN 1 ELSE 0 END), 0) as one_star
+      FROM customer_service_ratings
+      WHERE agent_id = ?`,
+      [agentId]
+    )
+
+    const stats = ratingStats[0]
+
+    // 格式化平均評分（保留一位小數）
+    const avgRating =
+      stats.total_ratings > 0 ? parseFloat(stats.avg_rating).toFixed(1) : '0.0'
+
+    console.log('✅ 評分統計:', {
+      agentId,
+      avgRating,
+      totalRatings: stats.total_ratings,
+    })
+
+    res.json({
+      success: true,
+      rating: {
+        avg_rating: parseFloat(avgRating),
+        total_ratings: stats.total_ratings,
+        distribution: {
+          five_stars: stats.five_stars,
+          four_stars: stats.four_stars,
+          three_stars: stats.three_stars,
+          two_stars: stats.two_stars,
+          one_star: stats.one_star,
+        },
+      },
+    })
+  } catch (error) {
+    console.error('❌ 查詢評分統計失敗:', error)
+    res.status(500).json({
+      success: false,
+      message: '查詢評分統計失敗',
+      error: error.message,
+    })
+  }
+}
+
+/**
  * AI 客服預留功能
  *
  * 未來可擴充的端點：
@@ -429,4 +511,4 @@ const getStats = async (req, res) => {
  * - POST /api/customer-service/admin/ai/config - AI 設定
  */
 
-export { getRooms, acceptRoom, closeRoom, getStats }
+export { getRooms, acceptRoom, closeRoom, getStats, getAgentRating }

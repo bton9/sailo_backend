@@ -307,7 +307,18 @@ export async function refreshAccessToken(req, res) {
     })
 
     // ============================================
-    // 步驟 4: 更新 Cookies
+    // 步驟 4: 更新 Session 的 Access Token Hash
+    // ============================================
+    const { hashAccessToken } = await import('../services/sessionService.js')
+    const newAccessTokenHash = hashAccessToken(newAccessToken)
+
+    await query('UPDATE sessions SET access_token_hash = ? WHERE id = ?', [
+      newAccessTokenHash,
+      sessionId,
+    ])
+
+    // ============================================
+    // 步驟 5: 更新 Cookies
     // ============================================
     res.cookie(ACCESS_TOKEN_COOKIE, newAccessToken, {
       ...COOKIE_OPTIONS,
@@ -319,7 +330,11 @@ export async function refreshAccessToken(req, res) {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 天
     })
 
-    console.log('✅ Token 刷新成功:', { userId, sessionId })
+    console.log('✅ Token 刷新成功 (含 Access Token Hash 更新):', {
+      userId,
+      sessionId,
+      newAccessTokenHash: newAccessTokenHash.substring(0, 16) + '...',
+    })
 
     res.json({
       success: true,

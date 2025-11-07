@@ -168,21 +168,25 @@ export async function sendAIMessage(req, res) {
     ])
 
     // 呼叫 AI 生成回應
-    let aiResponse, tokensUsed, shouldTransfer
+    // 🆕 v4.0.0: 傳遞 userId 以支援資料庫查詢
+    let aiResponse, tokensUsed, shouldTransfer, queryExecuted
 
     try {
       const result = await generateAIResponse(
         message.trim(),
-        conversationHistory
+        conversationHistory,
+        userId // 🆕 傳遞使用者 ID
       )
       aiResponse = result.response
       tokensUsed = result.tokens
       shouldTransfer = result.shouldTransfer
+      queryExecuted = result.queryExecuted || false // 🆕 記錄是否執行了資料庫查詢
     } catch (error) {
       console.error('❌ AI 生成回應失敗:', error)
       aiResponse = getErrorMessage(error)
       tokensUsed = 0
       shouldTransfer = true // 發生錯誤時建議轉人工
+      queryExecuted = false
     }
 
     // 儲存對話記錄
@@ -217,6 +221,7 @@ export async function sendAIMessage(req, res) {
         aiResponse,
         tokensUsed,
         shouldTransfer,
+        queryExecuted, // 🆕 v4.0.0: 返回是否執行了資料庫查詢
         createdAt: new Date(),
       },
     })

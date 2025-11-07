@@ -19,6 +19,7 @@
  */
 
 import { OLLAMA_CONFIG } from '../config/ollama.js'
+import { executeUserQuery, suggestQueryType } from './databaseQueryService.js'
 
 /**
  * 呼叫 Ollama Chat API
@@ -94,21 +95,51 @@ export async function callOllamaChat(messages, options = {}) {
 /**
  * 生成 AI 客服回應
  *
+ * 🆕 v4.0.0: 新增資料庫查詢功能
+ * - 自動偵測使用者是否需要查詢資料庫
+ * - 執行安全的資料庫查詢
+ * - 將查詢結果整合到 AI 回應中
+ *
  * @param {string} userMessage - 使用者訊息
  * @param {Array} conversationHistory - 對話歷史 [{role, content}, ...]
- * @returns {Promise<{response: string, tokens: number, shouldTransfer: boolean}>}
+ * @param {number} userId - 使用者 ID（用於資料庫查詢）
+ * @returns {Promise<{response: string, tokens: number, shouldTransfer: boolean, queryExecuted: boolean}>}
  */
 export async function generateAIResponse(
   userMessage,
-  conversationHistory = []
+  conversationHistory = [],
+  userId = null
 ) {
   try {
-    // 建構完整對話上下文
+    let queryResult = null
+    let queryExecuted = false
+
+    // 🆕 步驟 1: 檢查是否需要查詢資料庫
+    if (userId) {
+      const suggestedQuery = suggestQueryType(userMessage)
+
+      if (suggestedQuery) {
+        console.log('🔍 偵測到資料庫查詢需求:', suggestedQuery)
+
+        try {
+          queryResult = await executeUserQuery(suggestedQuery, userId)
+          queryExecuted = true
+          console.log('✅ 資料庫查詢成功')
+        } catch (error) {
+          console.error('❌ 資料庫查詢失敗:', error)
+          queryResult = '抱歉，查詢資料時發生錯誤。'
+        }
+      }
+    }
+
+    // 步驟 2: 建構完整對話上下文
     const messages = [
       // 系統提示詞
       {
         role: 'system',
-        content: OLLAMA_CONFIG.SYSTEM_PROMPT,
+        content: queryResult
+          ? `${OLLAMA_CONFIG.SYSTEM_PROMPT}\n\n【重要】以下是從資料庫查詢到的使用者資料，請根據這些資料回答使用者的問題：\n${queryResult}`
+          : OLLAMA_CONFIG.SYSTEM_PROMPT,
       },
       // 歷史對話 (最多保留 10 輪)
       ...conversationHistory.slice(-20),
@@ -119,16 +150,17 @@ export async function generateAIResponse(
       },
     ]
 
-    // 呼叫 Ollama API
+    // 步驟 3: 呼叫 Ollama API
     const { response, tokens } = await callOllamaChat(messages)
 
-    // 分析是否需要轉接人工
+    // 步驟 4: 分析是否需要轉接人工
     const shouldTransfer = analyzeTransferIntent(userMessage, response)
 
     return {
       response,
       tokens,
       shouldTransfer,
+      queryExecuted, // 🆕 返回是否執行了資料庫查詢
     }
   } catch (error) {
     console.error('❌ 生成 AI 回應失敗:', error)

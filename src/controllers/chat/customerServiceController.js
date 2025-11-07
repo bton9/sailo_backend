@@ -708,3 +708,123 @@ export async function transferFromAI(req, res) {
     })
   }
 }
+
+/**
+ * 提交客服滿意度評分
+ *
+ * 流程:
+ * 1. 驗證聊天室是否存在且已關閉
+ * 2. 驗證評分有效性 (1-5 星)
+ * 3. 檢查是否已評分 (一個聊天室只能評分一次)
+ * 4. 寫入評分資料
+ *
+ * @route POST /api/customer-service/rooms/:roomId/rating
+ * @access Private (需登入)
+ * @body {number} rating - 評分 (1-5)
+ * @body {string} comment - 評價留言 (選填)
+ */
+export async function submitRating(req, res) {
+  try {
+    const userId = req.user?.userId || req.user?.fullUser?.id
+    const { roomId } = req.params
+    const { rating, comment = null } = req.body
+
+    console.log('⭐ 使用者提交評分:', { userId, roomId, rating, comment })
+
+    // ============================================
+    // 步驟 1: 驗證評分有效性
+    // ============================================
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({
+        success: false,
+        message: '評分必須在 1-5 之間',
+      })
+    }
+
+    // ============================================
+    // 步驟 2: 檢查聊天室是否存在
+    // ============================================
+    const rooms = await query(
+      'SELECT * FROM customer_service_rooms WHERE id = ?',
+      [roomId]
+    )
+
+    if (rooms.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: '聊天室不存在',
+      })
+    }
+
+    const room = rooms[0]
+
+    // ============================================
+    // 步驟 3: 驗證權限 (只有聊天室的使用者可以評分)
+    // ============================================
+    if (room.user_id !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: '您沒有權限為此聊天室評分',
+      })
+    }
+
+    // ============================================
+    // 步驟 4: 檢查聊天室是否已關閉
+    // ============================================
+    if (room.status !== 'closed') {
+      return res.status(400).json({
+        success: false,
+        message: '聊天室尚未關閉，無法評分',
+      })
+    }
+
+    // ============================================
+    // 步驟 5: 檢查客服人員是否存在
+    // ============================================
+    if (!room.agent_id) {
+      return res.status(400).json({
+        success: false,
+        message: '此聊天室沒有客服人員，無法評分',
+      })
+    }
+
+    // ============================================
+    // 步驟 6: 檢查是否已評分
+    // ============================================
+    const existingRatings = await query(
+      'SELECT * FROM customer_service_ratings WHERE room_id = ?',
+      [roomId]
+    )
+
+    if (existingRatings.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: '您已經為此聊天室評分過了',
+      })
+    }
+
+    // ============================================
+    // 步驟 7: 寫入評分資料
+    // ============================================
+    await query(
+      `INSERT INTO customer_service_ratings 
+       (room_id, user_id, agent_id, rating, comment) 
+       VALUES (?, ?, ?, ?, ?)`,
+      [roomId, userId, room.agent_id, rating, comment]
+    )
+
+    console.log('✅ 評分提交成功')
+
+    res.json({
+      success: true,
+      message: '感謝您的評分！',
+    })
+  } catch (error) {
+    console.error('❌ 提交評分失敗:', error)
+    res.status(500).json({
+      success: false,
+      message: '提交評分失敗',
+      error: error.message,
+    })
+  }
+}
