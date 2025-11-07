@@ -62,7 +62,7 @@ export const getCart = async (req, res) => {
  */
 export const addToCart = async (req, res) => {
   try {
-    const userId = req.body.userId || req.user?.userId
+    const userId = req.body.userId || req.user?.user_id || req.user?.id
     const { productId, quantity } = req.body
 
     if (!userId) {
