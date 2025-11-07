@@ -120,6 +120,7 @@ export const getPosts = async (req, res) => {
 export const getPostById = async (req, res) => {
   try {
     const { postId } = req.params;
+    const { increment_view } = req.query;
     const currentUserId = req.user?.id;
 
     let sql = getPostsQuery(currentUserId);
@@ -132,10 +133,13 @@ export const getPostById = async (req, res) => {
       return sendError(res, '找不到該文章', 404);
     }
 
-    await db.query(
-      'UPDATE posts SET view_count = view_count + 1 WHERE post_id = ?',
-      [postId]
-    );
+    // ✅ 修改：只在 increment_view=true 時才增加瀏覽次數
+    if (increment_view === 'true') {
+      await db.query(
+        'UPDATE posts SET view_count = view_count + 1 WHERE post_id = ?',
+        [postId]
+      );
+    }
 
     const [tags] = await db.query(`
       SELECT st.tag_id, st.tagname
