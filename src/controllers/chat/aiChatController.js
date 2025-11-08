@@ -128,6 +128,70 @@ export async function sendAIMessage(req, res) {
       })
     }
 
+    // 🆕 檢測特殊指令：修改密碼
+    const changePasswordKeywords = [
+      '修改密碼',
+      '更改密碼',
+      '改密碼',
+      '換密碼',
+      '重設密碼',
+      '我想修改密碼',
+      '我要改密碼',
+      '想要修改密碼',
+      '想要改密碼',
+      'change password',
+      'update password',
+      'reset password',
+    ]
+
+    const wantsChangePassword = changePasswordKeywords.some((keyword) =>
+      message.toLowerCase().includes(keyword.toLowerCase())
+    )
+
+    console.log('🔍 [AI Chat] 檢查密碼修改意圖:', {
+      userMessage: message,
+      wantsChangePassword,
+      matchedKeywords: changePasswordKeywords.filter((k) =>
+        message.toLowerCase().includes(k.toLowerCase())
+      ),
+    })
+
+    // 如果使用者想修改密碼，返回特殊指令
+    if (wantsChangePassword) {
+      console.log('✅ [AI Chat] 偵測到密碼修改意圖，返回特殊指令')
+
+      const aiResponse =
+        '我注意到您想修改密碼。\n\n為了您的帳號安全，密碼修改需要在會員中心進行。我現在就為您導航到密碼修改頁面！'
+
+      // 儲存對話記錄
+      const messageResult = await query(
+        `INSERT INTO ai_chat_messages 
+         (room_id, user_id, user_message, ai_response, tokens_used, model_version, is_transfer_request) 
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [roomId, userId, message.trim(), aiResponse, 0, 'llama3.1:8b', false]
+      )
+
+      const responseData = {
+        success: true,
+        message: {
+          id: messageResult.insertId,
+          roomId,
+          userMessage: message.trim(),
+          aiResponse,
+          tokensUsed: 0,
+          shouldTransfer: false,
+          queryExecuted: false,
+          // 🆕 特殊指令標記
+          specialAction: 'NAVIGATE_CHANGE_PASSWORD',
+          navigationPath: '/site/membercenter?tab=password',
+          createdAt: new Date(),
+        },
+      }
+
+      console.log('📤 [AI Chat] 返回特殊指令回應:', responseData)
+      return res.json(responseData)
+    }
+
     // 驗證聊天室擁有者
     const rooms = await query(
       'SELECT * FROM ai_chat_rooms WHERE id = ? AND user_id = ? LIMIT 1',

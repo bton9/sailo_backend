@@ -201,17 +201,7 @@ export function analyzeTransferIntent(userMessage, aiResponse) {
   ]
 
   // 敏感操作關鍵字
-  const sensitiveKeywords = [
-    '退款',
-    '退錢',
-    '退費',
-    '取消訂單',
-    '修改訂單',
-    '個人資料',
-    '密碼',
-    '信用卡',
-    '帳號',
-  ]
+  const sensitiveKeywords = ['退款', '退錢', '退費', '信用卡']
 
   // 🆕 v3.2.0: 只檢查使用者訊息，不檢查 AI 回應
   const userWantsHuman = userKeywords.some((keyword) =>
