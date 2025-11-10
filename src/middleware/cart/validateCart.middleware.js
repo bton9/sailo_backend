@@ -24,11 +24,6 @@ export const handleValidationErrors = (req, res, next) => {
  * 驗證加入購物車請求
  */
 export const validateAddToCart = [
-  body('userId')
-    .notEmpty()
-    .withMessage('用戶ID不能為空')
-    .isInt({ min: 1 })
-    .withMessage('用戶ID必須是正整數'),
   body('productId')
     .notEmpty()
     .withMessage('商品ID不能為空')
@@ -41,10 +36,7 @@ export const validateAddToCart = [
     .withMessage('數量必須在1-99之間')
     .custom(validateQuantity)
     .withMessage('數量格式不正確'),
-  body('specs')
-    .optional()
-    .isString()
-    .withMessage('規格必須是字串'),
+  body('specs').optional().isString().withMessage('規格必須是字串'),
   handleValidationErrors,
 ]
 
@@ -89,11 +81,6 @@ export const validateRemoveItem = [
  * 驗證建立訂單請求
  */
 export const validateCreateOrder = [
-  body('userId')
-    .notEmpty()
-    .withMessage('用戶ID不能為空')
-    .isInt({ min: 1 })
-    .withMessage('用戶ID必須是正整數'),
   body('items')
     .isArray({ min: 1 })
     .withMessage('訂單商品不能為空')
@@ -114,9 +101,9 @@ export const validateCreateOrder = [
     .custom(validatePhone)
     .withMessage('手機號碼格式不正確'),
   body('shippingInfo.email')
-  .optional({ checkFalsy: true })  // ← 加上 checkFalsy: true，允許空字串
-  .custom(validateEmail)
-  .withMessage('電子郵件格式不正確'),
+    .optional({ checkFalsy: true }) // 允許空字串
+    .custom(validateEmail)
+    .withMessage('電子郵件格式不正確'),
   body('shippingMethod')
     .notEmpty()
     .withMessage('配送方式不能為空')
@@ -154,10 +141,7 @@ export const validateUserId = [
     .optional()
     .isInt({ min: 1 })
     .withMessage('用戶ID必須是正整數'),
-  body('userId')
-    .optional()
-    .isInt({ min: 1 })
-    .withMessage('用戶ID必須是正整數'),
+  body('userId').optional().isInt({ min: 1 }).withMessage('用戶ID必須是正整數'),
   handleValidationErrors,
 ]
 
