@@ -8,7 +8,8 @@ import cartConfig from '../../config/cart.config.js'
 export const getCart = async (req, res) => {
   try {
     // 支援兩種方式: URL 參數或從 JWT 取得
-    const userId = req.params.userId || req.query.userId || req.user?.userId
+    const userId =
+      req.params.userId || req.query.userId || req.userId || req.user?.userId
 
     if (!userId) {
       return res.status(400).json({
@@ -62,7 +63,7 @@ export const getCart = async (req, res) => {
  */
 export const addToCart = async (req, res) => {
   try {
-    const userId = req.body.userId || req.user?.user_id || req.user?.id
+    const userId = req.userId || req.user?.userId
     const { productId, quantity } = req.body
 
     if (!userId) {
@@ -271,7 +272,7 @@ export const removeCartItem = async (req, res) => {
  */
 export const clearCart = async (req, res) => {
   try {
-    const userId = req.params.userId || req.user?.userId
+    const userId = req.params.userId || req.userId || req.user?.userId
 
     if (!userId) {
       return res.status(400).json({
