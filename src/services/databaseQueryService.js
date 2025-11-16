@@ -60,14 +60,33 @@ const ALLOWED_QUERIES = {
 
   profile_update_time: {
     description: '查詢個人資料最後修改時間',
-    sql: `SELECT name, updated_at 
+    sql: `SELECT name, nickname, email, updated_at, created_at 
           FROM users 
           WHERE id = ?`,
     params: ['userId'],
     format: (result) => {
       if (!result || result.length === 0) return '找不到資料'
       const user = result[0]
-      return `您最後一次修改個人資料的時間是 ${new Date(user.updated_at).toLocaleString('zh-TW')}`
+      const updatedDate = new Date(user.updated_at)
+      const createdDate = new Date(user.created_at)
+      const now = new Date()
+
+      // 計算時間差（天數）
+      const daysSinceUpdate = Math.floor(
+        (now - updatedDate) / (1000 * 60 * 60 * 24)
+      )
+      const daysSinceCreation = Math.floor(
+        (now - createdDate) / (1000 * 60 * 60 * 24)
+      )
+
+      // 判斷是否曾經修改過
+      const hasBeenModified = updatedDate.getTime() !== createdDate.getTime()
+
+      if (hasBeenModified) {
+        return `您最後一次修改個人資料的時間是：${updatedDate.toLocaleString('zh-TW')}（${daysSinceUpdate === 0 ? '今天' : daysSinceUpdate === 1 ? '昨天' : `${daysSinceUpdate} 天前`}）`
+      } else {
+        return `您尚未修改過個人資料。帳號建立於 ${createdDate.toLocaleString('zh-TW')}（${daysSinceCreation} 天前），資料維持原始狀態。`
+      }
     },
   },
 
@@ -209,31 +228,45 @@ export function getAvailableQueries() {
 export function suggestQueryType(userMessage) {
   const message = userMessage.toLowerCase()
 
-  // 暱稱相關
+  // 暱稱相關（優先度較高，避免被個人資料覆蓋）
   if (
     message.includes('暱稱') &&
     (message.includes('修改') ||
       message.includes('更新') ||
+      message.includes('改過') ||
+      message.includes('什麼時候') ||
       message.includes('時間'))
   ) {
     return 'nickname_history'
   }
 
-  // 個人資料相關
+  // 個人資料最後修改時間（優先度最高，明確詢問修改時間）
   if (
-    (message.includes('個人資料') || message.includes('資料')) &&
+    (message.includes('個人資料') ||
+      message.includes('資料') ||
+      message.includes('個人訊息') ||
+      message.includes('我的資料')) &&
     (message.includes('修改') ||
       message.includes('更新') ||
+      message.includes('改過') ||
+      message.includes('最後') ||
+      message.includes('上次') ||
+      message.includes('什麼時候') ||
+      message.includes('哪時候') ||
       message.includes('時間'))
   ) {
     return 'profile_update_time'
   }
 
-  // 完整個人資料
+  // 完整個人資料（不包含時間關鍵字）
   if (
-    message.includes('我的資料') ||
-    message.includes('個人資料') ||
-    message.includes('基本資料')
+    !message.includes('時間') &&
+    !message.includes('修改') &&
+    !message.includes('更新') &&
+    (message.includes('我的資料') ||
+      message.includes('個人資料') ||
+      message.includes('基本資料') ||
+      message.includes('查詢資料'))
   ) {
     return 'user_profile'
   }
@@ -253,13 +286,17 @@ export function suggestQueryType(userMessage) {
     message.includes('帳號') &&
     (message.includes('建立') ||
       message.includes('註冊') ||
-      message.includes('多久'))
+      message.includes('多久') ||
+      message.includes('什麼時候'))
   ) {
     return 'account_created_time'
   }
 
   // AI 對話記錄
-  if (message.includes('對話') && message.includes('記錄')) {
+  if (
+    (message.includes('對話') || message.includes('聊天')) &&
+    message.includes('記錄')
+  ) {
     return 'recent_ai_chats'
   }
 
