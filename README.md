@@ -10,6 +10,11 @@ Sailo Backend 是一套支援旅遊行程規劃平台「Sailo」的後端服務�
 
 整體專案採用 MVC 結構。Routes 負責 API 路由與 Token 保護、Controllers 處理邏輯、Models 對應資料表。專案的主要資料表包含 users、places、trips、trip_days、favorites、place_comments、place_replies 等。每個 API 都使用標準 RESTful 設計，例如 /api/auth/login、/api/places/:id、/api/trips/:tripId/day、/api/favorites 等，讓前端開發者能容易取得資料與管理行程。
 
-在專案部署前，須建立 .env 設定環境變數，包括資料庫連線、JWT 秘鑰、ImageKit API 金鑰。啟動方式為 npm install 安裝所有依賴，並使用 npm run start 或 npm run dev 啟動後端伺服器。專案結構如下：config（資料庫與 ImageKit 設定）、controllers、models、middlewares、routes、server.js。
+在專案部署前，須建立 .env 
+設定環境變數，包括資料庫連線、JWT 秘鑰、ImageKit API 金鑰。啟動方式為 npm install 安裝所有依賴，並使用 
+
+npm run dev 啟動後端伺服器。
+
+專案結構如下：config（資料庫與 ImageKit 設定）、controllers、models、middlewares、routes、server.js。
 
 Sailo Backend 承載整個旅遊平台的資料處理核心，負責行程邏輯、使用者資訊、圖片儲存、地圖位置資料與社群留言互動，前後端分離架構讓前端能夠順暢地使用 API 建構出完整的使用者旅遊規劃體驗。
