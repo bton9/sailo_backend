@@ -14,6 +14,5 @@ Sailo Backend 是一套支援旅遊行程規劃平台「Sailo」的後端服務�
 
 npm run dev 啟動後端伺服器。
 
-專案結構如下：config（資料庫與 ImageKit 設定）、controllers、models、middlewares、routes、server.js。
 
 Sailo Backend 承載整個旅遊平台的資料處理核心，負責行程邏輯、使用者資訊、圖片儲存、地圖位置資料與社群留言互動，前後端分離架構讓前端能夠順暢地使用 API 建構出完整的使用者旅遊規劃體驗。
