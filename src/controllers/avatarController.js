@@ -141,7 +141,7 @@ export async function uploadAvatar(req, res) {
       })
     }
 
-    console.log('📁 收到上傳請求:', {
+    console.log(' 收到上傳請求:', {
       filename: req.file.originalname,
       size: req.file.size,
       mimetype: req.file.mimetype,

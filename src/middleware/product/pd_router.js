@@ -1,5 +1,5 @@
 // ============================================
-// 📁 src/middleware/pd_routes.js
+//  src/middleware/pd_routes.js
 // ============================================
 import productsRoutes from '../../routes/product/productsRoutes.js'
 import staticRouter from '../../routes/product/staticRoutes.js'
