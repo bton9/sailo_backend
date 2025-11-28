@@ -7,7 +7,7 @@ export const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
     // 加入這些 log
-    console.log('❌ 驗證失敗!')
+    console.log(' 驗證失敗!')
     console.log('收到的資料:', req.body)
     console.log('錯誤詳情:', errors.array())
 

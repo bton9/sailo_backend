@@ -137,7 +137,7 @@ export async function login(req, res) {
       })
 
       if (!verified) {
-        console.log('❌ 2FA 驗證碼錯誤')
+        console.log(' 2FA 驗證碼錯誤')
         return res.status(401).json({
           success: false,
           requires2FA: true,
@@ -228,7 +228,7 @@ export async function login(req, res) {
       // 不再回傳 token，改用 httpOnly cookie
     })
   } catch (error) {
-    console.error('❌ Login error:', error)
+    console.error(' Login error:', error)
     res.status(500).json({
       success: false,
       message: '伺服器錯誤，請稍後再試',
@@ -341,7 +341,7 @@ export async function refreshAccessToken(req, res) {
       message: 'Token 已刷新',
     })
   } catch (error) {
-    console.error('❌ Refresh token error:', error)
+    console.error(' Refresh token error:', error)
     res.status(500).json({
       success: false,
       message: '伺服器錯誤，請稍後再試',
@@ -380,7 +380,7 @@ export async function logout(req, res) {
       message: '登出成功',
     })
   } catch (error) {
-    console.error('❌ Logout error:', error)
+    console.error(' Logout error:', error)
     res.status(500).json({
       success: false,
       message: '伺服器錯誤，請稍後再試',
@@ -457,7 +457,7 @@ export async function verify(req, res) {
       user: userData,
     })
   } catch (error) {
-    console.error('❌ Token verify error:', error)
+    console.error(' Token verify error:', error)
     res.status(401).json({
       valid: false,
       message: 'Token 驗證失敗',
@@ -525,7 +525,7 @@ export async function register(req, res) {
       message: '註冊成功，請登入',
     })
   } catch (error) {
-    console.error('❌ Register error:', error)
+    console.error(' Register error:', error)
     res.status(500).json({
       success: false,
       message: '伺服器錯誤，請稍後再試',
@@ -642,7 +642,7 @@ export async function forgotPassword(req, res) {
     const emailSent = await sendPasswordResetOTPEmail(email, otp, user.name)
 
     if (!emailSent) {
-      console.error('❌ Failed to send OTP email to:', email)
+      console.error(' Failed to send OTP email to:', email)
       return res.status(500).json({
         success: false,
         message: '郵件發送失敗，請稍後再試',
@@ -654,7 +654,7 @@ export async function forgotPassword(req, res) {
       message: '驗證碼已發送到您的信箱，請在 10 分鐘內完成驗證',
     })
   } catch (error) {
-    console.error('❌ Forgot password error:', error)
+    console.error(' Forgot password error:', error)
     res.status(500).json({
       success: false,
       message: '伺服器錯誤，請稍後再試',
@@ -780,7 +780,7 @@ export async function verifyOTP(req, res) {
       verified: true,
     })
   } catch (error) {
-    console.error('❌ Verify OTP error:', error)
+    console.error(' Verify OTP error:', error)
     res.status(500).json({
       success: false,
       message: '伺服器錯誤，請稍後再試',
@@ -937,7 +937,7 @@ export async function resetPassword(req, res) {
       message: '密碼重置成功，請使用新密碼登入',
     })
   } catch (error) {
-    console.error('❌ Reset password error:', error)
+    console.error(' Reset password error:', error)
     res.status(500).json({
       success: false,
       message: '伺服器錯誤，請稍後再試',
@@ -976,7 +976,7 @@ export async function googleCallback(req, res) {
 
     if (!user) {
       // Google 登入失敗
-      console.error('❌ Google callback: No user found')
+      console.error(' Google callback: No user found')
       return res.redirect(
         `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=auth_failed`
       )
@@ -1071,7 +1071,7 @@ export async function googleCallback(req, res) {
           console.log('🔄 使用 OAuth state 的重導向路徑:', redirectPath)
         }
       } catch (e) {
-        console.error('❌ 無法解析 OAuth state:', e)
+        console.error(' 無法解析 OAuth state:', e)
       }
     }
 
@@ -1081,7 +1081,7 @@ export async function googleCallback(req, res) {
     console.log('🔄 最終重導向到:', redirectUrl)
     res.redirect(redirectUrl)
   } catch (error) {
-    console.error('❌ Google callback error:', error)
+    console.error(' Google callback error:', error)
     res.redirect(
       `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=server_error`
     )
@@ -1205,7 +1205,7 @@ export async function enable2FA(req, res) {
       backupCodes: backupCodes,
     })
   } catch (error) {
-    console.error('❌ Enable 2FA error:', error)
+    console.error(' Enable 2FA error:', error)
     res.status(500).json({
       success: false,
       message: '伺服器錯誤，請稍後再試',
@@ -1319,7 +1319,7 @@ export async function verify2FA(req, res) {
       message: 'Google Authenticator 已成功啟用',
     })
   } catch (error) {
-    console.error('❌ Verify 2FA error:', error)
+    console.error(' Verify 2FA error:', error)
     res.status(500).json({
       success: false,
       message: '伺服器錯誤，請稍後再試',
@@ -1419,7 +1419,7 @@ export async function disable2FA(req, res) {
       message: 'Google Authenticator 已停用',
     })
   } catch (error) {
-    console.error('❌ Disable 2FA error:', error)
+    console.error(' Disable 2FA error:', error)
     res.status(500).json({
       success: false,
       message: '伺服器錯誤，請稍後再試',
@@ -1479,7 +1479,7 @@ export async function get2FAStatus(req, res) {
       hasBackupCodes: user.backup_codes ? true : false,
     })
   } catch (error) {
-    console.error('❌ Get 2FA status error:', error)
+    console.error(' Get 2FA status error:', error)
     res.status(500).json({
       success: false,
       message: '伺服器錯誤，請稍後再試',

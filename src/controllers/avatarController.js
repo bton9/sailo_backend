@@ -103,7 +103,7 @@ export async function getImageKitAuth(req, res) {
       urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT,
     })
   } catch (error) {
-    console.error('❌ 產生 ImageKit 認證參數失敗:', error)
+    console.error(' 產生 ImageKit 認證參數失敗:', error)
 
     res.status(500).json({
       success: false,
@@ -213,7 +213,7 @@ export async function uploadAvatar(req, res) {
       thumbnail: uploadResponse.thumbnailUrl, // 縮圖 URL（可選）
     })
   } catch (error) {
-    console.error('❌ 上傳頭像失敗:', error)
+    console.error(' 上傳頭像失敗:', error)
 
     // 回傳錯誤訊息
     res.status(500).json({
@@ -287,7 +287,7 @@ export async function deleteAvatar(req, res) {
       message: '頭像已刪除',
     })
   } catch (error) {
-    console.error('❌ 刪除頭像失敗:', error)
+    console.error(' 刪除頭像失敗:', error)
 
     res.status(500).json({
       success: false,

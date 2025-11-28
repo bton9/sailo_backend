@@ -69,7 +69,7 @@ export async function updateNickname(req, res) {
       },
     })
   } catch (error) {
-    console.error('❌ Update nickname error:', error)
+    console.error(' Update nickname error:', error)
     res.status(500).json({
       success: false,
       message: '伺服器錯誤，請稍後再試',
@@ -201,7 +201,7 @@ export async function updateProfile(req, res) {
       },
     })
   } catch (error) {
-    console.error('❌ Update profile error:', error)
+    console.error(' Update profile error:', error)
     res.status(500).json({
       success: false,
       message: '伺服器錯誤，請稍後再試',
@@ -337,7 +337,7 @@ export async function updatePassword(req, res) {
       message: '密碼更新成功',
     })
   } catch (error) {
-    console.error('❌ Update password error:', error)
+    console.error(' Update password error:', error)
     res.status(500).json({
       success: false,
       message: '伺服器錯誤，請稍後再試',

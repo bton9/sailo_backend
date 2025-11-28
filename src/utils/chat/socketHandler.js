@@ -87,7 +87,7 @@ export function setupSocketHandlers(io) {
       )
       next()
     } catch (error) {
-      console.error('❌ Socket 認證失敗:', error.message)
+      console.error(' Socket 認證失敗:', error.message)
       next(new Error('Authentication error'))
     }
   })
@@ -170,7 +170,7 @@ export function setupSocketHandlers(io) {
           message: '已加入聊天室',
         })
       } catch (error) {
-        console.error('❌ 加入聊天室失敗:', error)
+        console.error(' 加入聊天室失敗:', error)
         socket.emit('error', {
           message: '加入聊天室失敗',
           event: 'join_room',
@@ -208,7 +208,7 @@ export function setupSocketHandlers(io) {
           message: '已離開聊天室',
         })
       } catch (error) {
-        console.error('❌ 離開聊天室失敗:', error)
+        console.error(' 離開聊天室失敗:', error)
         socket.emit('error', {
           message: '離開聊天室失敗',
           event: 'leave_room',
@@ -365,7 +365,7 @@ export function setupSocketHandlers(io) {
           }
         }
       } catch (error) {
-        console.error('❌ 發送訊息失敗:', error)
+        console.error(' 發送訊息失敗:', error)
         socket.emit('error', {
           message: '發送訊息失敗',
           event: 'send_message',
@@ -414,7 +414,7 @@ export function setupSocketHandlers(io) {
           timestamp: new Date(),
         })
       } catch (error) {
-        console.error('❌ 標記已讀失敗:', error)
+        console.error(' 標記已讀失敗:', error)
       }
     })
 
@@ -509,7 +509,7 @@ export function setupSocketHandlers(io) {
     // 錯誤處理
     // ============================================
     socket.on('error', (error) => {
-      console.error(`❌ Socket 錯誤 (User ${userId}):`, error)
+      console.error(` Socket 錯誤 (User ${userId}):`, error)
     })
   })
 

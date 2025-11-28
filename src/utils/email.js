@@ -40,7 +40,7 @@ export async function verifyEmailConnection() {
     console.log('✅ Email server is ready to send messages')
     return true
   } catch (error) {
-    console.error('❌ Email server connection failed:', error.message)
+    console.error(' Email server connection failed:', error.message)
     return false
   }
 }
@@ -223,7 +223,7 @@ ${resetUrl}
     console.log('✅ Password reset email sent:', info.messageId)
     return true
   } catch (error) {
-    console.error('❌ Failed to send password reset email:', error)
+    console.error(' Failed to send password reset email:', error)
     return false
   }
 }
@@ -351,7 +351,7 @@ export async function sendVerificationEmail(
     console.log('✅ Verification email sent:', info.messageId)
     return true
   } catch (error) {
-    console.error('❌ Failed to send verification email:', error)
+    console.error(' Failed to send verification email:', error)
     return false
   }
 }
@@ -432,7 +432,7 @@ export async function sendWelcomeEmail(email, userName) {
     console.log('✅ Welcome email sent to:', email)
     return true
   } catch (error) {
-    console.error('❌ Failed to send welcome email:', error)
+    console.error(' Failed to send welcome email:', error)
     return false
   }
 }
@@ -608,7 +608,7 @@ export async function sendPasswordResetOTPEmail(email, otp, userName) {
     console.log('✅ Password reset OTP email sent to:', email)
     return true
   } catch (error) {
-    console.error('❌ Failed to send password reset OTP email:', error)
+    console.error(' Failed to send password reset OTP email:', error)
     return false
   }
 }

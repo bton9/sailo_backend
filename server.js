@@ -144,7 +144,7 @@ app.get('/health', (req, res) => {
 
 // ============ Error Handling ============
 app.use((err, req, res, next) => {
-  console.error('❌ Server Error:', err)
+  console.error(' Server Error:', err)
   console.error('Error Stack:', err.stack)
   console.error('Request URL:', req.url)
   console.error('Request Method:', req.method)

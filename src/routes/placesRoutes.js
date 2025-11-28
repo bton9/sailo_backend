@@ -46,7 +46,7 @@ router.get('/with-location/:id', async (req, res) => {
 
     res.json({ success: true, data: rows[0] })
   } catch (err) {
-    console.error('❌ SQL Error:', err.message)
+    console.error(' SQL Error:', err.message)
     res
       .status(500)
       .json({ success: false, message: '伺服器錯誤', error: err.message })
@@ -73,7 +73,7 @@ router.get('/:id', async (req, res) => {
 
     res.json({ success: true, data: rows[0] })
   } catch (err) {
-    console.error('❌ SQL Error:', err.message)
+    console.error(' SQL Error:', err.message)
     res
       .status(500)
       .json({ success: false, message: '伺服器錯誤', error: err.message })
@@ -107,7 +107,7 @@ router.get('/user/:user_id/favorites', async (req, res) => {
     const rows = await query(sql, [user_id])
     res.json({ success: true, favorites: rows })
   } catch (err) {
-    console.error('❌ SQL Error:', err.message)
+    console.error(' SQL Error:', err.message)
     res
       .status(500)
       .json({ success: false, message: '資料庫錯誤', error: err.message })

@@ -88,7 +88,7 @@ export async function createOrGetAIRoom(req, res) {
       isNew: true,
     })
   } catch (error) {
-    console.error('❌ 建立 AI 聊天室失敗:', error)
+    console.error(' 建立 AI 聊天室失敗:', error)
     res.status(500).json({
       success: false,
       message: '建立聊天室失敗',
@@ -246,7 +246,7 @@ export async function sendAIMessage(req, res) {
       shouldTransfer = result.shouldTransfer
       queryExecuted = result.queryExecuted || false // 🆕 記錄是否執行了資料庫查詢
     } catch (error) {
-      console.error('❌ AI 生成回應失敗:', error)
+      console.error(' AI 生成回應失敗:', error)
       aiResponse = getErrorMessage(error)
       tokensUsed = 0
       shouldTransfer = true // 發生錯誤時建議轉人工
@@ -290,7 +290,7 @@ export async function sendAIMessage(req, res) {
       },
     })
   } catch (error) {
-    console.error('❌ 發送 AI 訊息失敗:', error)
+    console.error(' 發送 AI 訊息失敗:', error)
     res.status(500).json({
       success: false,
       message: '發送訊息失敗',
@@ -341,7 +341,7 @@ export async function getAIMessages(req, res) {
       messages,
     })
   } catch (error) {
-    console.error('❌ 取得 AI 訊息失敗:', error)
+    console.error(' 取得 AI 訊息失敗:', error)
     res.status(500).json({
       success: false,
       message: '取得訊息失敗',
@@ -459,7 +459,7 @@ export async function transferToHuman(req, res) {
       customerServiceRoom: newCSRoom[0],
     })
   } catch (error) {
-    console.error('❌ 轉接人工客服失敗:', error)
+    console.error(' 轉接人工客服失敗:', error)
     res.status(500).json({
       success: false,
       message: '轉接失敗',
@@ -495,7 +495,7 @@ export async function getUserAIRooms(req, res) {
       rooms,
     })
   } catch (error) {
-    console.error('❌ 取得 AI 聊天室列表失敗:', error)
+    console.error(' 取得 AI 聊天室列表失敗:', error)
     res.status(500).json({
       success: false,
       message: '取得聊天室列表失敗',

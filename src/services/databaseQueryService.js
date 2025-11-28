@@ -201,7 +201,7 @@ export async function executeUserQuery(queryType, userId) {
 
     return formattedResult
   } catch (error) {
-    console.error('❌ 資料庫查詢失敗:', error)
+    console.error(' 資料庫查詢失敗:', error)
     throw error
   }
 }

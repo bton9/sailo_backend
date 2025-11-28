@@ -98,7 +98,7 @@ export async function createRefreshToken(userId, sessionId, options = {}) {
       expiresAt,
     }
   } catch (error) {
-    console.error('❌ 建立 Refresh Token 失敗:', error)
+    console.error(' 建立 Refresh Token 失敗:', error)
     throw new Error('Failed to create refresh token')
   }
 }
@@ -167,7 +167,7 @@ export async function validateRefreshToken(refreshToken, options = {}) {
 
     return tokenData
   } catch (error) {
-    console.error('❌ 驗證 Refresh Token 失敗:', error)
+    console.error(' 驗證 Refresh Token 失敗:', error)
     return null
   }
 }
@@ -224,7 +224,7 @@ export async function rotateRefreshToken(oldRefreshToken, options = {}) {
       expiresAt,
     }
   } catch (error) {
-    console.error('❌ Refresh Token 輪替失敗:', error)
+    console.error(' Refresh Token 輪替失敗:', error)
     return null
   }
 }
@@ -252,7 +252,7 @@ export async function revokeRefreshToken(refreshToken) {
       return false
     }
   } catch (error) {
-    console.error('❌ 撤銷 Refresh Token 失敗:', error)
+    console.error(' 撤銷 Refresh Token 失敗:', error)
     return false
   }
 }
@@ -279,7 +279,7 @@ export async function revokeSessionRefreshTokens(sessionId) {
     })
     return count
   } catch (error) {
-    console.error('❌ 撤銷 Session Refresh Tokens 失敗:', error)
+    console.error(' 撤銷 Session Refresh Tokens 失敗:', error)
     return 0
   }
 }
@@ -303,7 +303,7 @@ export async function revokeUserRefreshTokens(userId) {
     console.log('✅ 已撤銷使用者所有 Refresh Tokens:', { userId, count })
     return count
   } catch (error) {
-    console.error('❌ 撤銷使用者 Refresh Tokens 失敗:', error)
+    console.error(' 撤銷使用者 Refresh Tokens 失敗:', error)
     return 0
   }
 }
@@ -330,7 +330,7 @@ export async function getUserActiveRefreshTokens(userId) {
 
     return tokens
   } catch (error) {
-    console.error('❌ 取得使用者 Refresh Tokens 失敗:', error)
+    console.error(' 取得使用者 Refresh Tokens 失敗:', error)
     return []
   }
 }
@@ -353,7 +353,7 @@ export async function cleanupExpiredRefreshTokens() {
     console.log('✅ 已清理過期 Refresh Tokens:', { count })
     return count
   } catch (error) {
-    console.error('❌ 清理過期 Refresh Tokens 失敗:', error)
+    console.error(' 清理過期 Refresh Tokens 失敗:', error)
     return 0
   }
 }
@@ -401,7 +401,7 @@ export async function detectAndRevokeSuspiciousTokens(userId) {
       revokedCount: 0,
     }
   } catch (error) {
-    console.error('❌ 偵測可疑 Token 失敗:', error)
+    console.error(' 偵測可疑 Token 失敗:', error)
     return { suspicious: false, revokedCount: 0 }
   }
 }

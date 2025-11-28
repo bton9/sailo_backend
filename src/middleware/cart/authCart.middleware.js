@@ -47,7 +47,7 @@ export const requireAuth = (req, res, next) => {
 
     next()
   } catch (error) {
-    console.error('❌ Authentication error:', error)
+    console.error(' Authentication error:', error)
     return res.status(401).json({
       success: false,
       message: '身份驗證失敗',
@@ -137,7 +137,7 @@ export const validateCartOwnership = (req, res, next) => {
 
     next()
   } catch (error) {
-    console.error('❌ Ownership validation error:', error)
+    console.error(' Ownership validation error:', error)
     return res.status(500).json({
       success: false,
       message: '驗證失敗',

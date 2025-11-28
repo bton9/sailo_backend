@@ -69,7 +69,7 @@ export const removeFavorite = async (req, res, next) => {
 
     success(res, null, '取消收藏成功')
   } catch (err) {
-    console.error('❌ 取消收藏錯誤:', err)
+    console.error(' 取消收藏錯誤:', err)
     next(err)
   }
 }

@@ -32,7 +32,7 @@ export function generateToken(payload) {
       issuer: 'sailo-app',
     })
   } catch (error) {
-    console.error('❌ Token 產生失敗:', error)
+    console.error(' Token 產生失敗:', error)
     throw new Error('Token generation failed')
   }
 }
@@ -49,7 +49,7 @@ export function generateRefreshToken(payload) {
       issuer: 'sailo-app',
     })
   } catch (error) {
-    console.error('❌ Refresh Token 產生失敗:', error)
+    console.error(' Refresh Token 產生失敗:', error)
     throw new Error('Refresh token generation failed')
   }
 }
@@ -71,7 +71,7 @@ export function verifyToken(token) {
     } else if (error.name === 'JsonWebTokenError') {
       console.warn('⚠️ Token 無效')
     } else {
-      console.error('❌ Token 驗證失敗:', error)
+      console.error(' Token 驗證失敗:', error)
     }
     return null
   }
@@ -86,7 +86,7 @@ export function decodeToken(token) {
   try {
     return jwt.decode(token)
   } catch (error) {
-    console.error('❌ Token 解析失敗:', error)
+    console.error(' Token 解析失敗:', error)
     return null
   }
 }

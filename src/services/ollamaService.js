@@ -81,7 +81,7 @@ export async function callOllamaChat(messages, options = {}) {
       tokens: tokensUsed,
     }
   } catch (error) {
-    console.error('❌ Ollama API 呼叫失敗:', error)
+    console.error(' Ollama API 呼叫失敗:', error)
 
     // 錯誤類型判斷
     if (error.name === 'AbortError') {
@@ -126,7 +126,7 @@ export async function generateAIResponse(
           queryExecuted = true
           console.log('✅ 資料庫查詢成功')
         } catch (error) {
-          console.error('❌ 資料庫查詢失敗:', error)
+          console.error(' 資料庫查詢失敗:', error)
           queryResult = '抱歉，查詢資料時發生錯誤。'
         }
       }
@@ -163,7 +163,7 @@ export async function generateAIResponse(
       queryExecuted, // 🆕 返回是否執行了資料庫查詢
     }
   } catch (error) {
-    console.error('❌ 生成 AI 回應失敗:', error)
+    console.error(' 生成 AI 回應失敗:', error)
     throw error
   }
 }
@@ -213,7 +213,7 @@ export function analyzeTransferIntent(userMessage, aiResponse) {
     userMessage.includes(keyword)
   )
 
-  // ❌ 移除 AI 回應檢測，避免誤觸發
+  //  移除 AI 回應檢測，避免誤觸發
   // const aiSuggestsTransfer = aiTransferKeywords.some((keyword) =>
   //   aiResponse.includes(keyword)
   // )

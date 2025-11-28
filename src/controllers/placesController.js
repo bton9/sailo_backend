@@ -39,8 +39,10 @@ export async function getPlaces(req, res) {
     const rows = await query(sql, params)
     res.json({ success: true, data: rows })
   } catch (err) {
-    console.error('❌ SQL Error:', err.message)
-    res.status(500).json({ success: false, message: '資料庫錯誤', error: err.message })
+    console.error(' SQL Error:', err.message)
+    res
+      .status(500)
+      .json({ success: false, message: '資料庫錯誤', error: err.message })
   }
 }
 
@@ -68,7 +70,7 @@ export async function getPlaceById(req, res) {
     }
     res.json({ success: true, data: rows[0] })
   } catch (err) {
-    console.error('❌ SQL Error:', err.message)
+    console.error(' SQL Error:', err.message)
     res
       .status(500)
       .json({ success: false, message: '資料庫錯誤', error: err.message })

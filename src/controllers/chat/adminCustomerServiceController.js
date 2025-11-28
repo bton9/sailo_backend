@@ -135,7 +135,7 @@ const getRooms = async (req, res) => {
       },
     })
   } catch (error) {
-    console.error('❌ 查詢聊天室列表失敗:', error)
+    console.error(' 查詢聊天室列表失敗:', error)
     res.status(500).json({
       success: false,
       message: '查詢聊天室列表失敗',
@@ -246,7 +246,7 @@ const acceptRoom = async (req, res) => {
     })
   } catch (error) {
     await connection.rollback()
-    console.error('❌ 接單失敗:', error)
+    console.error(' 接單失敗:', error)
     res.status(500).json({
       success: false,
       message: '接單失敗',
@@ -349,7 +349,7 @@ const closeRoom = async (req, res) => {
     })
   } catch (error) {
     await connection.rollback()
-    console.error('❌ 關閉聊天室失敗:', error)
+    console.error(' 關閉聊天室失敗:', error)
     res.status(500).json({
       success: false,
       message: '關閉聊天室失敗',
@@ -422,7 +422,7 @@ const getStats = async (req, res) => {
       stats: stats,
     })
   } catch (error) {
-    console.error('❌ 查詢統計資訊失敗:', error)
+    console.error(' 查詢統計資訊失敗:', error)
     res.status(500).json({
       success: false,
       message: '查詢統計資訊失敗',
@@ -493,7 +493,7 @@ const getAgentRating = async (req, res) => {
       },
     })
   } catch (error) {
-    console.error('❌ 查詢評分統計失敗:', error)
+    console.error(' 查詢評分統計失敗:', error)
     res.status(500).json({
       success: false,
       message: '查詢評分統計失敗',

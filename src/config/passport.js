@@ -151,7 +151,7 @@ passport.use(
           isNewUser: true, // 新使用者
         })
       } catch (error) {
-        console.error('❌ Google OAuth strategy error:', error)
+        console.error(' Google OAuth strategy error:', error)
         return done(error, null)
       }
     }
@@ -189,7 +189,7 @@ passport.deserializeUser(async (id, done) => {
       access: user.access,
     })
   } catch (error) {
-    console.error('❌ Deserialize user error:', error)
+    console.error(' Deserialize user error:', error)
     done(error, null)
   }
 })

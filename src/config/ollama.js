@@ -153,7 +153,7 @@ export async function checkModelExists(modelName = OLLAMA_CONFIG.MODEL) {
 
     return response.ok
   } catch (error) {
-    console.error('❌ 檢查模型失敗:', error)
+    console.error(' 檢查模型失敗:', error)
     return false
   }
 }

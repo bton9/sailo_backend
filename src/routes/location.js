@@ -11,7 +11,7 @@ router.get('/', async (req, res) => {
 
     res.json({ success: true, data: rows })
   } catch (err) {
-    console.error('❌ SQL Error:', err.message)
+    console.error(' SQL Error:', err.message)
     res.status(500).json({
       success: false,
       message: '伺服器錯誤',
@@ -34,7 +34,7 @@ router.get('/:id', async (req, res) => {
 
     res.json({ success: true, data: rows[0] })
   } catch (err) {
-    console.error('❌ SQL Error:', err.message)
+    console.error(' SQL Error:', err.message)
     res
       .status(500)
       .json({ success: false, message: '伺服器錯誤', error: err.message })

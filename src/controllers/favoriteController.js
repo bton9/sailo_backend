@@ -62,8 +62,8 @@ export const getUserFavorites = async (req, res) => {
     console.log('✅ 最終結果:', favorites)
     return res.json({ success: true, favorites })
   } catch (err) {
-    console.error('❌ getUserFavorites error:', err)
-    console.error('❌ Error stack:', err.stack)
+    console.error(' getUserFavorites error:', err)
+    console.error(' Error stack:', err.stack)
     return res.status(500).json({
       success: false,
       message: 'Internal server error',
@@ -122,8 +122,8 @@ export const getListPlaces = async (req, res) => {
 
     return res.json({ success: true, places: placesWithMedia })
   } catch (err) {
-    console.error('❌ getListPlaces error:', err)
-    console.error('❌ Error stack:', err.stack)
+    console.error(' getListPlaces error:', err)
+    console.error(' Error stack:', err.stack)
     return res.status(500).json({
       success: false,
       message: 'Internal server error',
@@ -168,8 +168,8 @@ export const toggleFavorite = async (req, res) => {
       return res.json({ success: true, action: 'added' })
     }
   } catch (err) {
-    console.error('❌ toggleFavorite error:', err)
-    console.error('❌ Error stack:', err.stack)
+    console.error(' toggleFavorite error:', err)
+    console.error(' Error stack:', err.stack)
     return res.status(500).json({
       success: false,
       message: 'Internal server error',
@@ -203,8 +203,8 @@ export const createList = async (req, res) => {
       description: description || null,
     })
   } catch (err) {
-    console.error('❌ createList error:', err)
-    console.error('❌ Error stack:', err.stack)
+    console.error(' createList error:', err)
+    console.error(' Error stack:', err.stack)
     return res.status(500).json({
       success: false,
       message: 'Internal server error',
@@ -219,7 +219,7 @@ export const deleteList = async (req, res) => {
   if (!userId || !listId) {
     return res.status(400).json({
       success: false,
-      message: '❌ 缺少 userId 或 listId',
+      message: ' 缺少 userId 或 listId',
     })
   }
 
@@ -233,7 +233,7 @@ export const deleteList = async (req, res) => {
     if (!list) {
       return res.status(404).json({
         success: false,
-        message: '❌ 找不到該使用者的收藏清單',
+        message: ' 找不到該使用者的收藏清單',
       })
     }
 
@@ -248,7 +248,7 @@ export const deleteList = async (req, res) => {
       message: `✅ 使用者 ${userId} 的收藏清單（ID: ${listId}）刪除成功`,
     })
   } catch (err) {
-    console.error('❌ deleteList error:', err)
+    console.error(' deleteList error:', err)
     return res.status(500).json({
       success: false,
       message: '伺服器錯誤，無法刪除收藏清單',

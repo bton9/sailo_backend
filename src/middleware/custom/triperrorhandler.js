@@ -3,7 +3,7 @@
  */
 
 const tripErrorHandler = (err, req, res, next) => {
-  console.error('❌ Trip API Error:', err)
+  console.error('Trip API Error:', err)
 
   // 資料庫錯誤
   if (err.code === 'ER_DUP_ENTRY') {

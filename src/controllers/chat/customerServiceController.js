@@ -114,7 +114,7 @@ export async function createOrGetRoom(req, res) {
       isNew: true,
     })
   } catch (error) {
-    console.error('❌ 建立聊天室失敗:', error)
+    console.error(' 建立聊天室失敗:', error)
     res.status(500).json({
       success: false,
       message: '建立聊天室失敗',
@@ -166,7 +166,7 @@ export async function getUserRooms(req, res) {
       rooms,
     })
   } catch (error) {
-    console.error('❌ 取得聊天室失敗:', error)
+    console.error(' 取得聊天室失敗:', error)
     res.status(500).json({
       success: false,
       message: '取得聊天室失敗',
@@ -291,7 +291,7 @@ export async function getRoomMessages(req, res) {
       },
     })
   } catch (error) {
-    console.error('❌ 取得訊息失敗:', error)
+    console.error(' 取得訊息失敗:', error)
     res.status(500).json({
       success: false,
       message: '取得訊息失敗',
@@ -384,7 +384,7 @@ export async function getAllHistory(req, res) {
       total: rooms.length,
     })
   } catch (error) {
-    console.error('❌ 取得歷史記錄失敗:', error)
+    console.error(' 取得歷史記錄失敗:', error)
     res.status(500).json({
       success: false,
       message: '取得歷史記錄失敗',
@@ -424,7 +424,7 @@ export async function uploadChatImage(req, res) {
     )
 
     if (room.length === 0) {
-      console.log('❌ 無權存取聊天室:', { roomId, userId })
+      console.log(' 無權存取聊天室:', { roomId, userId })
       return res.status(403).json({
         success: false,
         message: '無權存取此聊天室',
@@ -473,7 +473,7 @@ export async function uploadChatImage(req, res) {
       messageId: result.insertId,
     })
   } catch (error) {
-    console.error('❌ 圖片上傳失敗:', error)
+    console.error(' 圖片上傳失敗:', error)
     res.status(500).json({
       success: false,
       message: '圖片上傳失敗',
@@ -537,7 +537,7 @@ export async function updateRoomStatus(req, res) {
       status,
     })
   } catch (error) {
-    console.error('❌ 更新狀態失敗:', error)
+    console.error(' 更新狀態失敗:', error)
     res.status(500).json({
       success: false,
       message: '更新狀態失敗',
@@ -601,7 +601,7 @@ export async function assignAgent(req, res) {
       agent: agent[0],
     })
   } catch (error) {
-    console.error('❌ 分配客服失敗:', error)
+    console.error(' 分配客服失敗:', error)
     res.status(500).json({
       success: false,
       message: '分配客服失敗',
@@ -700,7 +700,7 @@ export async function transferFromAI(req, res) {
       roomId,
     })
   } catch (error) {
-    console.error('❌ AI 轉人工失敗:', error)
+    console.error(' AI 轉人工失敗:', error)
     res.status(500).json({
       success: false,
       message: 'AI 轉人工失敗',
@@ -820,7 +820,7 @@ export async function submitRating(req, res) {
       message: '感謝您的評分！',
     })
   } catch (error) {
-    console.error('❌ 提交評分失敗:', error)
+    console.error(' 提交評分失敗:', error)
     res.status(500).json({
       success: false,
       message: '提交評分失敗',

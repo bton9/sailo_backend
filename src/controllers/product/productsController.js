@@ -104,7 +104,7 @@ export const getProductCount = async (req, res) => {
       count: countResult[0].count,
     })
   } catch (error) {
-    console.error('❌ 查詢產品總數時出錯:', error)
+    console.error(' 查詢產品總數時出錯:', error)
     res.status(500).json({
       success: false,
       error: '查詢產品總數失敗',
@@ -226,7 +226,7 @@ export const getProducts = async (req, res) => {
       total: processedProducts.length,
     })
   } catch (error) {
-    console.error('❌ 查詢產品列表時出錯:', error)
+    console.error(' 查詢產品列表時出錯:', error)
     res.status(500).json({
       success: false,
       error: '查詢產品列表失敗',
@@ -299,7 +299,7 @@ export const getProductById = async (req, res) => {
       data: product,
     })
   } catch (error) {
-    console.error('❌ 查詢產品時出錯:', error)
+    console.error(' 查詢產品時出錯:', error)
     res.status(500).json({
       success: false,
       error: '查詢產品失敗',
@@ -328,7 +328,7 @@ export const getCategories = async (req, res) => {
       data: categories,
     })
   } catch (error) {
-    console.error('❌ 查詢分類列表時出錯:', error)
+    console.error(' 查詢分類列表時出錯:', error)
     res.status(500).json({
       success: false,
       error: '查詢分類列表失敗',
@@ -368,7 +368,7 @@ export const getPopularProducts = async (req, res) => {
       data: processedProducts,
     })
   } catch (error) {
-    console.error('❌ 查詢熱門產品時出錯:', error)
+    console.error(' 查詢熱門產品時出錯:', error)
     res.status(500).json({
       success: false,
       error: '查詢熱門產品失敗',

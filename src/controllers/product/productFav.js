@@ -51,7 +51,7 @@ export const checkFavoriteStatus = async (req, res) => {
       isFavorite: existing.length > 0,
     })
   } catch (error) {
-    console.error('❌ 檢查收藏狀態時出錯:', error)
+    console.error(' 檢查收藏狀態時出錯:', error)
     res.status(500).json({
       success: false,
       error: '檢查收藏狀態失敗',
@@ -117,7 +117,7 @@ export const toggleFavorite = async (req, res) => {
       })
     }
   } catch (error) {
-    console.error('❌ 切換收藏狀態時出錯:', error)
+    console.error(' 切換收藏狀態時出錯:', error)
     res.status(500).json({
       success: false,
       error: '操作失敗',
@@ -164,7 +164,7 @@ export const getUserFavorites = async (req, res) => {
       total: processedFavorites.length,
     })
   } catch (error) {
-    console.error('❌ 查詢收藏列表時出錯:', error)
+    console.error(' 查詢收藏列表時出錯:', error)
     res.status(500).json({
       success: false,
       error: '查詢收藏列表失敗',

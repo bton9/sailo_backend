@@ -18,7 +18,7 @@ export function setupStaticRoutes(app) {
 
     fs.readFile(filepath, (err, data) => {
       if (err) {
-        console.error(`❌ Error reading file ${filename}:`, err)
+        console.error(` Error reading file ${filename}:`, err)
         return res.status(500).json({ error: 'Error reading file' })
       }
 

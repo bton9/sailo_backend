@@ -123,7 +123,7 @@ export async function authenticate(req, res, next) {
     // 繼續執行下一個中介層或路由處理器
     next()
   } catch (error) {
-    console.error('❌ Authentication error:', error)
+    console.error(' Authentication error:', error)
     res.status(500).json({
       success: false,
       message: '伺服器錯誤',

@@ -114,7 +114,7 @@ export const createReview = async (req, res) => {
       },
     })
   } catch (error) {
-    console.error('❌ 新增評論時出錯:', error)
+    console.error(' 新增評論時出錯:', error)
     res.status(500).json({
       success: false,
       error: '新增評論失敗',
@@ -199,7 +199,7 @@ export const updateReview = async (req, res) => {
       },
     })
   } catch (error) {
-    console.error('❌ 更新評論時出錯:', error)
+    console.error(' 更新評論時出錯:', error)
     res.status(500).json({
       success: false,
       error: '更新評論失敗',
@@ -248,7 +248,7 @@ export const deleteReview = async (req, res) => {
       message: '評論刪除成功',
     })
   } catch (error) {
-    console.error('❌ 刪除評論時出錯:', error)
+    console.error(' 刪除評論時出錯:', error)
     res.status(500).json({
       success: false,
       error: '刪除評論失敗',
@@ -319,7 +319,7 @@ export const checkReviewPermission = async (req, res) => {
       canReview: true,
     })
   } catch (error) {
-    console.error('❌ 檢查評論權限時出錯:', error)
+    console.error(' 檢查評論權限時出錯:', error)
     res.status(500).json({
       success: false,
       error: '檢查評論權限失敗',
@@ -386,7 +386,7 @@ export const markReviewHelpful = async (req, res) => {
       message: '感謝您的反饋',
     })
   } catch (error) {
-    console.error('❌ 標記評論時出錯:', error)
+    console.error(' 標記評論時出錯:', error)
     res.status(500).json({
       success: false,
       error: '操作失敗',
@@ -427,7 +427,7 @@ export const getUserPurchases = async (req, res) => {
       })),
     })
   } catch (error) {
-    console.error('❌ 取得購買記錄時出錯:', error)
+    console.error(' 取得購買記錄時出錯:', error)
     res.status(500).json({
       success: false,
       error: '取得購買記錄失敗',
