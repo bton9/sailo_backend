@@ -51,7 +51,7 @@ validateImageKitConfig()
 validateOllamaConnection()
   .then((result) => {
     if (result.success) {
-      console.log('✅ Ollama 連線成功')
+      console.log(' Ollama 連線成功')
       if (result.models?.length > 0) {
         console.log('   可用模型:', result.models.map((m) => m.name).join(', '))
       }
@@ -121,7 +121,7 @@ app.use(
 // ============ 靜態檔案服務 ============
 // 提供 uploads 目錄中的檔案訪問（用於頭像圖片）
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
-console.log('✅ 靜態檔案目錄:', path.join(__dirname, 'uploads'))
+console.log(' 靜態檔案目錄:', path.join(__dirname, 'uploads'))
 
 // ============ ProductRoutes ============
 setupProductRoutes(app)
@@ -158,8 +158,8 @@ app.use((err, req, res, next) => {
 
 // ============ Start Server ============
 httpServer.listen(PORT, () => {
-  console.log(`✅ Backend server running on http://localhost:${PORT}`)
-  console.log(`✅ WebSocket server running on ws://localhost:${PORT}`)
+  console.log(` Backend server running on http://localhost:${PORT}`)
+  console.log(` WebSocket server running on ws://localhost:${PORT}`)
 })
 
 // === 部落格 ===

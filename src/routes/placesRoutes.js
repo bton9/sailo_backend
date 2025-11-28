@@ -15,7 +15,7 @@ const router = express.Router()
 // 取得全部景點
 router.get('/', getPlaces)
 
-// ✅ 單一景點（含地點名稱與封面）
+//  單一景點（含地點名稱與封面）
 router.get('/with-location/:id', async (req, res) => {
   const placeId = req.params.id
 
@@ -85,13 +85,13 @@ router.get('/:id', async (req, res) => {
 // 封面圖片上傳（原有功能）
 router.post('/upload', uploadImageMiddleware, handleImageUpload)
 
-// ✅ 新增：上傳到相簿
+//  新增：上傳到相簿
 router.post('/gallery/upload', uploadImageMiddleware, handleGalleryUpload)
 
-// ✅ 新增：取得景點相簿
+//  新增：取得景點相簿
 router.get('/:place_id/gallery', getPlaceGallery)
 
-// ✅ 新增：刪除相簿圖片
+//  新增：刪除相簿圖片
 router.delete('/gallery/:media_id', deleteGalleryImage)
 
 // ============ 收藏相關路由 ============

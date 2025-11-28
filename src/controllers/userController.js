@@ -56,7 +56,7 @@ export async function updateNickname(req, res) {
       userId,
     ])
 
-    console.log(`✅ 使用者 ${userId} 更新暱稱為: ${nickname}`)
+    console.log(` 使用者 ${userId} 更新暱稱為: ${nickname}`)
 
     // ============================================
     // 步驟 4: 回傳更新後的資料
@@ -185,7 +185,7 @@ export async function updateProfile(req, res) {
       ]
     )
 
-    console.log(`✅ 使用者 ${userId} 更新個人資料`)
+    console.log(` 使用者 ${userId} 更新個人資料`)
 
     // ============================================
     // 步驟 4: 回傳更新後的資料
@@ -327,7 +327,7 @@ export async function updatePassword(req, res) {
       userId,
     ])
 
-    console.log(`✅ 使用者 ${userId} 密碼已更新`)
+    console.log(` 使用者 ${userId} 密碼已更新`)
 
     // ============================================
     // 步驟 8: 回傳成功訊息

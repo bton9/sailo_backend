@@ -3,7 +3,7 @@ import { query } from '../config/database.js'
 
 const router = express.Router()
 
-// ✅ 新增: 取得所有地區
+//  新增: 取得所有地區
 router.get('/', async (req, res) => {
   try {
     const sql = 'SELECT location_id, name FROM locations ORDER BY name'

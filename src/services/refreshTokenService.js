@@ -85,7 +85,7 @@ export async function createRefreshToken(userId, sessionId, options = {}) {
       ]
     )
 
-    console.log('✅ Refresh Token 建立成功:', {
+    console.log(' Refresh Token 建立成功:', {
       tokenId: result.insertId,
       userId,
       sessionId,
@@ -159,7 +159,7 @@ export async function validateRefreshToken(refreshToken, options = {}) {
       }
     }
 
-    console.log('✅ Refresh Token 驗證成功:', {
+    console.log(' Refresh Token 驗證成功:', {
       tokenId: tokenData.id,
       userId: tokenData.user_id,
       sessionId: tokenData.session_id,
@@ -210,7 +210,7 @@ export async function rotateRefreshToken(oldRefreshToken, options = {}) {
     const { refreshToken: newRefreshToken, expiresAt } =
       await createRefreshToken(userId, sessionId, options)
 
-    console.log('✅ Refresh Token 輪替成功:', {
+    console.log(' Refresh Token 輪替成功:', {
       userId,
       sessionId,
       oldTokenDeleted: true,
@@ -245,7 +245,7 @@ export async function revokeRefreshToken(refreshToken) {
     )
 
     if (result.affectedRows > 0) {
-      console.log('✅ Refresh Token 已撤銷')
+      console.log(' Refresh Token 已撤銷')
       return true
     } else {
       console.warn('⚠️ Refresh Token 不存在或已撤銷')
@@ -273,7 +273,7 @@ export async function revokeSessionRefreshTokens(sessionId) {
     )
 
     const count = result.affectedRows
-    console.log('✅ 已撤銷 Session 的所有 Refresh Tokens:', {
+    console.log(' 已撤銷 Session 的所有 Refresh Tokens:', {
       sessionId,
       count,
     })
@@ -300,7 +300,7 @@ export async function revokeUserRefreshTokens(userId) {
     )
 
     const count = result.affectedRows
-    console.log('✅ 已撤銷使用者所有 Refresh Tokens:', { userId, count })
+    console.log(' 已撤銷使用者所有 Refresh Tokens:', { userId, count })
     return count
   } catch (error) {
     console.error(' 撤銷使用者 Refresh Tokens 失敗:', error)
@@ -350,7 +350,7 @@ export async function cleanupExpiredRefreshTokens() {
     )
 
     const count = result.affectedRows
-    console.log('✅ 已清理過期 Refresh Tokens:', { count })
+    console.log(' 已清理過期 Refresh Tokens:', { count })
     return count
   } catch (error) {
     console.error(' 清理過期 Refresh Tokens 失敗:', error)

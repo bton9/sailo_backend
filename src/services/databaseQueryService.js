@@ -197,7 +197,7 @@ export async function executeUserQuery(queryType, userId) {
     // 格式化結果
     const formattedResult = queryConfig.format(result)
 
-    console.log('✅ 查詢完成:', queryType)
+    console.log(' 查詢完成:', queryType)
 
     return formattedResult
   } catch (error) {

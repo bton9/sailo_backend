@@ -2,7 +2,7 @@ import multer from 'multer'
 import { query } from '../config/database.js'
 import imagekitTrip from '../config/custom/imagekittrip.js'
 
-// ✅ 改用記憶體儲存，不再儲存到本地檔案系統
+//  改用記憶體儲存，不再儲存到本地檔案系統
 const storage = multer.memoryStorage()
 
 // 檔案篩選器
@@ -23,7 +23,7 @@ export const uploadImageMiddleware = multer({
   },
 }).single('image')
 
-// ✅ 封面圖片上傳（使用 ImageKit）
+//  封面圖片上傳（使用 ImageKit）
 export async function handleImageUpload(req, res) {
   try {
     const { place_id } = req.body
@@ -48,7 +48,7 @@ export async function handleImageUpload(req, res) {
       tags: ['place', 'cover', `place_${place_id}`],
     })
 
-    const url = uploadResponse.url // ✅ 使用 ImageKit URL
+    const url = uploadResponse.url //  使用 ImageKit URL
 
     // 更新資料庫
     const sql = `
@@ -58,7 +58,7 @@ export async function handleImageUpload(req, res) {
     `
     await query(sql, [place_id, url, place_id])
 
-    console.log('✅ 景點封面圖片上傳成功:', url)
+    console.log(' 景點封面圖片上傳成功:', url)
 
     res.json({
       success: true,
@@ -76,7 +76,7 @@ export async function handleImageUpload(req, res) {
   }
 }
 
-// ✅ 新增：上傳到相簿（使用 ImageKit）
+//  新增：上傳到相簿（使用 ImageKit）
 export async function handleGalleryUpload(req, res) {
   try {
     const { place_id, user_id } = req.body
@@ -122,14 +122,14 @@ export async function handleGalleryUpload(req, res) {
       user_id || null,
       place_id,
       place_category,
-      uploadResponse.url, // ✅ 儲存 ImageKit URL
+      uploadResponse.url, //  儲存 ImageKit URL
     ])
 
-    console.log('✅ 景點相簿圖片上傳成功:', uploadResponse.url)
+    console.log(' 景點相簿圖片上傳成功:', uploadResponse.url)
 
     res.json({
       success: true,
-      url: uploadResponse.url, // ✅ 回傳 ImageKit URL
+      url: uploadResponse.url, //  回傳 ImageKit URL
       media_id: result.insertId,
       fileId: uploadResponse.fileId,
       thumbnailUrl: uploadResponse.thumbnailUrl,
@@ -145,7 +145,7 @@ export async function handleGalleryUpload(req, res) {
   }
 }
 
-// ✅ 新增：取得景點相簿
+//  新增：取得景點相簿
 export async function getPlaceGallery(req, res) {
   const { place_id } = req.params
 
@@ -172,7 +172,7 @@ export async function getPlaceGallery(req, res) {
   }
 }
 
-// ✅ 新增：刪除相簿圖片
+//  新增：刪除相簿圖片
 export const deleteGalleryImage = async (req, res) => {
   try {
     const { media_id } = req.params

@@ -1,6 +1,6 @@
-import db from '../../config/database.js';
-import { sendSuccess, sendError } from '../../utils/blog/helpers.js';
-import blogConfig from '../../config/blog.config.js';
+import db from '../../config/database.js'
+import { sendSuccess, sendError } from '../../utils/blog/helpers.js'
+import blogConfig from '../../config/blog.config.js'
 
 /**
  * 追蹤/取消追蹤使用者
@@ -8,48 +8,46 @@ import blogConfig from '../../config/blog.config.js';
  */
 export const toggleFollow = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const followerId = req.user.id;
+    const { userId } = req.params
+    const followerId = req.user.id
 
     if (parseInt(userId) === followerId) {
       if (!blogConfig.interaction.allowSelfFollow) {
-        return sendError(res, '無法追蹤自己', 400);
+        return sendError(res, '無法追蹤自己', 400)
       }
     }
 
-    const [users] = await db.query(
-      'SELECT id FROM users WHERE id = ?',
-      [userId]
-    );
+    const [users] = await db.query('SELECT id FROM users WHERE id = ?', [
+      userId,
+    ])
 
     if (users.length === 0) {
-      return sendError(res, '找不到該使用者', 404);
+      return sendError(res, '找不到該使用者', 404)
     }
 
     const [existingFollows] = await db.query(
       'SELECT follow_id FROM follows WHERE follower_id = ? AND following_id = ?',
       [followerId, userId]
-    );
+    )
 
     if (existingFollows.length > 0) {
       await db.query(
         'DELETE FROM follows WHERE follower_id = ? AND following_id = ?',
         [followerId, userId]
-      );
-      return sendSuccess(res, { is_following: false }, '已取消追蹤');
+      )
+      return sendSuccess(res, { is_following: false }, '已取消追蹤')
     } else {
       await db.query(
         'INSERT INTO follows (follower_id, following_id) VALUES (?, ?)',
         [followerId, userId]
-      );
-      return sendSuccess(res, { is_following: true }, '已追蹤');
+      )
+      return sendSuccess(res, { is_following: true }, '已追蹤')
     }
-
   } catch (error) {
-    console.error('追蹤使用者失敗:', error);
-    return sendError(res, '追蹤使用者失敗', 500);
+    console.error('追蹤使用者失敗:', error)
+    return sendError(res, '追蹤使用者失敗', 500)
   }
-};
+}
 
 /**
  * 取得使用者的追蹤者列表
@@ -57,12 +55,12 @@ export const toggleFollow = async (req, res) => {
  */
 export const getFollowers = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const { page, limit , search} = req.query;
-    const currentUserId = req.user?.id;
+    const { userId } = req.params
+    const { page, limit, search } = req.query
+    const currentUserId = req.user?.id
 
-    const { formatPagination } = await import('../../utils/blog/helpers.js');
-    const { offset, limit: validLimit } = formatPagination(page, limit);
+    const { formatPagination } = await import('../../utils/blog/helpers.js')
+    const { offset, limit: validLimit } = formatPagination(page, limit)
 
     let sql = `
       SELECT 
@@ -73,7 +71,7 @@ export const getFollowers = async (req, res) => {
         f.created_at as followed_at,
         (SELECT COUNT(*) FROM posts WHERE user_id = u.id AND visible = TRUE) as posts_count,
         (SELECT COUNT(*) FROM follows f2 WHERE f2.following_id = u.id) as followers_count
-    `;
+    `
 
     if (currentUserId) {
       sql += `,
@@ -81,64 +79,63 @@ export const getFollowers = async (req, res) => {
           SELECT 1 FROM follows f3
           WHERE f3.follower_id = ? AND f3.following_id = u.id
         ) AS is_following
-      `;
+      `
     }
-    
 
     sql += `
       FROM follows f
       INNER JOIN users u ON f.follower_id = u.id
       WHERE f.following_id = ?
-    `;
+    `
 
-    // ✅ 新增：搜尋條件
+    //  新增：搜尋條件
     if (search) {
-      sql += ` AND (u.name LIKE ? OR u.nickname LIKE ?)`;
+      sql += ` AND (u.name LIKE ? OR u.nickname LIKE ?)`
     }
 
     sql += `
       ORDER BY f.created_at DESC
       LIMIT ? OFFSET ?
-    `;
+    `
 
-    const searchPattern = search ? `%${search}%` : null;
-    
-    const params = [];
-    if (currentUserId) params.push(currentUserId);
-    params.push(userId);
+    const searchPattern = search ? `%${search}%` : null
+
+    const params = []
+    if (currentUserId) params.push(currentUserId)
+    params.push(userId)
     if (search) {
-      params.push(searchPattern, searchPattern);
+      params.push(searchPattern, searchPattern)
     }
-    params.push(validLimit, offset);
+    params.push(validLimit, offset)
 
-    const [followers] = await db.query(sql, params);
+    const [followers] = await db.query(sql, params)
 
-    const formattedFollowers = followers.map(follower => ({
+    const formattedFollowers = followers.map((follower) => ({
       id: follower.id,
       name: follower.name,
       nickname: follower.nickname,
       avatar: follower.avatar,
       followed_at: follower.followed_at,
-      posts_count: follower.posts_count,           // ✅ 新增
-      followers_count: follower.followers_count,   // ✅ 新增
-      is_following: currentUserId ? follower.is_following === 1 : null
-    }));
+      posts_count: follower.posts_count, //  新增
+      followers_count: follower.followers_count, //  新增
+      is_following: currentUserId ? follower.is_following === 1 : null,
+    }))
 
     let countSql = `
       SELECT COUNT(*) as total 
       FROM follows f
       INNER JOIN users u ON f.follower_id = u.id
       WHERE f.following_id = ?
-    `;
-    
-    const countParams = [userId];
-    
+    `
+
+    const countParams = [userId]
+
     if (search) {
-      countSql += ` AND (u.name LIKE ? OR u.nickname LIKE ?)`;
-      countParams.push(searchPattern, searchPattern);
+      countSql += ` AND (u.name LIKE ? OR u.nickname LIKE ?)`
+      countParams.push(searchPattern, searchPattern)
     }
-    
-    const [[{ total }]] = await db.query(countSql, countParams);
+
+    const [[{ total }]] = await db.query(countSql, countParams)
 
     return sendSuccess(res, {
       followers: formattedFollowers,
@@ -146,15 +143,14 @@ export const getFollowers = async (req, res) => {
         total,
         page: parseInt(page) || 1,
         limit: validLimit,
-        totalPages: Math.ceil(total / validLimit)
-      }
-    });
-
+        totalPages: Math.ceil(total / validLimit),
+      },
+    })
   } catch (error) {
-    console.error('取得追蹤者列表失敗:', error);
-    return sendError(res, '取得追蹤者列表失敗', 500);
+    console.error('取得追蹤者列表失敗:', error)
+    return sendError(res, '取得追蹤者列表失敗', 500)
   }
-};
+}
 
 /**
  * 取得使用者追蹤中的列表
@@ -162,12 +158,12 @@ export const getFollowers = async (req, res) => {
  */
 export const getFollowing = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const { page, limit , search} = req.query;
-    const currentUserId = req.user?.id;
+    const { userId } = req.params
+    const { page, limit, search } = req.query
+    const currentUserId = req.user?.id
 
-    const { formatPagination } = await import('../../utils/blog/helpers.js');
-    const { offset, limit: validLimit } = formatPagination(page, limit);
+    const { formatPagination } = await import('../../utils/blog/helpers.js')
+    const { offset, limit: validLimit } = formatPagination(page, limit)
 
     let sql = `
       SELECT 
@@ -178,7 +174,7 @@ export const getFollowing = async (req, res) => {
         f.created_at as followed_at,
         (SELECT COUNT(*) FROM posts WHERE user_id = u.id AND visible = TRUE) as posts_count,
         (SELECT COUNT(*) FROM follows f2 WHERE f2.following_id = u.id) as followers_count
-    `;
+    `
 
     if (currentUserId) {
       sql += `,
@@ -186,63 +182,63 @@ export const getFollowing = async (req, res) => {
           SELECT 1 FROM follows f3
           WHERE f3.follower_id = ? AND f3.following_id = u.id
         ) AS is_following
-      `;
+      `
     }
 
     sql += `
       FROM follows f
       INNER JOIN users u ON f.following_id = u.id
       WHERE f.follower_id = ?
-    `;
+    `
 
-    // ✅ 新增：搜尋條件
+    //  新增：搜尋條件
     if (search) {
-      sql += ` AND (u.name LIKE ? OR u.nickname LIKE ?)`;
+      sql += ` AND (u.name LIKE ? OR u.nickname LIKE ?)`
     }
 
     sql += `
       ORDER BY f.created_at DESC
       LIMIT ? OFFSET ?
-    `;
+    `
 
-    const searchPattern = search ? `%${search}%` : null;
-    
-    const params = [];
-    if (currentUserId) params.push(currentUserId);
-    params.push(userId);
+    const searchPattern = search ? `%${search}%` : null
+
+    const params = []
+    if (currentUserId) params.push(currentUserId)
+    params.push(userId)
     if (search) {
-      params.push(searchPattern, searchPattern);
+      params.push(searchPattern, searchPattern)
     }
-    params.push(validLimit, offset);
+    params.push(validLimit, offset)
 
-    const [following] = await db.query(sql, params);
+    const [following] = await db.query(sql, params)
 
-    const formattedFollowing = following.map(user => ({
+    const formattedFollowing = following.map((user) => ({
       id: user.id,
       name: user.name,
       nickname: user.nickname,
       avatar: user.avatar,
       followed_at: user.followed_at,
-      posts_count: user.posts_count,           // ✅ 新增
-      followers_count: user.followers_count,   // ✅ 新增
-      is_following: currentUserId ? user.is_following === 1 : null
-    }));
+      posts_count: user.posts_count, //  新增
+      followers_count: user.followers_count, //  新增
+      is_following: currentUserId ? user.is_following === 1 : null,
+    }))
 
     let countSql = `
       SELECT COUNT(*) as total 
       FROM follows f
       INNER JOIN users u ON f.following_id = u.id
       WHERE f.follower_id = ?
-    `;
-    
-    const countParams = [userId];
-    
+    `
+
+    const countParams = [userId]
+
     if (search) {
-      countSql += ` AND (u.name LIKE ? OR u.nickname LIKE ?)`;
-      countParams.push(searchPattern, searchPattern);
+      countSql += ` AND (u.name LIKE ? OR u.nickname LIKE ?)`
+      countParams.push(searchPattern, searchPattern)
     }
-    
-    const [[{ total }]] = await db.query(countSql, countParams);
+
+    const [[{ total }]] = await db.query(countSql, countParams)
 
     return sendSuccess(res, {
       following: formattedFollowing,
@@ -250,15 +246,14 @@ export const getFollowing = async (req, res) => {
         total,
         page: parseInt(page) || 1,
         limit: validLimit,
-        totalPages: Math.ceil(total / validLimit)
-      }
-    });
-
+        totalPages: Math.ceil(total / validLimit),
+      },
+    })
   } catch (error) {
-    console.error('取得追蹤中列表失敗:', error);
-    return sendError(res, '取得追蹤中列表失敗', 500);
+    console.error('取得追蹤中列表失敗:', error)
+    return sendError(res, '取得追蹤中列表失敗', 500)
   }
-};
+}
 
 /**
  * 取得使用者統計資料
@@ -266,46 +261,45 @@ export const getFollowing = async (req, res) => {
  */
 export const getUserStats = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { userId } = req.params
 
     const [users] = await db.query(
       'SELECT id, name, nickname, avatar FROM users WHERE id = ?',
       [userId]
-    );
+    )
 
     if (users.length === 0) {
-      return sendError(res, '找不到該使用者', 404);
+      return sendError(res, '找不到該使用者', 404)
     }
 
     const [[postCount]] = await db.query(
       'SELECT COUNT(*) as total FROM posts WHERE user_id = ? AND visible = TRUE',
       [userId]
-    );
+    )
 
     const [[followerCount]] = await db.query(
       'SELECT COUNT(*) as total FROM follows WHERE following_id = ?',
       [userId]
-    );
+    )
 
     const [[followingCount]] = await db.query(
       'SELECT COUNT(*) as total FROM follows WHERE follower_id = ?',
       [userId]
-    );
+    )
 
     return sendSuccess(res, {
       user: users[0],
       stats: {
         posts: postCount.total,
         followers: followerCount.total,
-        following: followingCount.total
-      }
-    });
-
+        following: followingCount.total,
+      },
+    })
   } catch (error) {
-    console.error('取得使用者統計失敗:', error);
-    return sendError(res, '取得使用者統計失敗', 500);
+    console.error('取得使用者統計失敗:', error)
+    return sendError(res, '取得使用者統計失敗', 500)
   }
-};
+}
 
 /**
  * 檢查是否追蹤某使用者
@@ -313,36 +307,34 @@ export const getUserStats = async (req, res) => {
  */
 export const checkFollowStatus = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const followerId = req.user?.id;
+    const { userId } = req.params
+    const followerId = req.user?.id
 
     // 檢查目標使用者是否存在
-    const [users] = await db.query(
-      'SELECT id FROM users WHERE id = ?',
-      [userId]
-    );
+    const [users] = await db.query('SELECT id FROM users WHERE id = ?', [
+      userId,
+    ])
 
     if (users.length === 0) {
-      return sendError(res, '找不到該使用者', 404);
+      return sendError(res, '找不到該使用者', 404)
     }
 
-    // ✅ 新增：未登入直接回傳 false
+    //  新增：未登入直接回傳 false
     if (!followerId) {
-      return sendSuccess(res, { is_following: false });
+      return sendSuccess(res, { is_following: false })
     }
 
     // 檢查是否已追蹤
     const [result] = await db.query(
       'SELECT COUNT(*) as is_following FROM follows WHERE follower_id = ? AND following_id = ?',
       [followerId, userId]
-    );
+    )
 
     return sendSuccess(res, {
-      is_following: result[0].is_following > 0
-    });
-
+      is_following: result[0].is_following > 0,
+    })
   } catch (error) {
-    console.error('檢查追蹤狀態失敗:', error);
-    return sendError(res, '檢查追蹤狀態失敗', 500);
+    console.error('檢查追蹤狀態失敗:', error)
+    return sendError(res, '檢查追蹤狀態失敗', 500)
   }
-};
+}

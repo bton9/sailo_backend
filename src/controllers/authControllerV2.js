@@ -145,7 +145,7 @@ export async function login(req, res) {
         })
       }
 
-      console.log('✅ 2FA 驗證通過')
+      console.log(' 2FA 驗證通過')
     }
 
     // ============================================
@@ -215,7 +215,7 @@ export async function login(req, res) {
       google_authenticator_enabled: user.google_authenticator_enabled,
     }
 
-    console.log('✅ 登入成功:', {
+    console.log(' 登入成功:', {
       userId: user.id,
       email: user.email,
       sessionId: sessionResult.sessionId,
@@ -330,7 +330,7 @@ export async function refreshAccessToken(req, res) {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 天
     })
 
-    console.log('✅ Token 刷新成功 (含 Access Token Hash 更新):', {
+    console.log(' Token 刷新成功 (含 Access Token Hash 更新):', {
       userId,
       sessionId,
       newAccessTokenHash: newAccessTokenHash.substring(0, 16) + '...',
@@ -367,7 +367,7 @@ export async function logout(req, res) {
     if (sessionToken) {
       // 撤銷 Session 和關聯的 Refresh Tokens
       await revokeSession(sessionToken)
-      console.log('✅ Session 已撤銷')
+      console.log(' Session 已撤銷')
     }
 
     // 清除所有 Auth Cookies
@@ -518,7 +518,7 @@ export async function register(req, res) {
       ]
     )
 
-    console.log('✅ 註冊成功 - User ID:', result.insertId)
+    console.log(' 註冊成功 - User ID:', result.insertId)
 
     res.json({
       success: true,
@@ -633,7 +633,7 @@ export async function forgotPassword(req, res) {
       [email, otp, expiresAt]
     )
 
-    console.log('✅ Password reset OTP created for:', email)
+    console.log(' Password reset OTP created for:', email)
     console.log('🔐 OTP:', otp, '(有效期 10 分鐘)')
 
     // ========================================
@@ -772,7 +772,7 @@ export async function verifyOTP(req, res) {
       [record.id]
     )
 
-    console.log('✅ OTP verified successfully for:', email)
+    console.log(' OTP verified successfully for:', email)
 
     res.json({
       success: true,
@@ -929,7 +929,7 @@ export async function resetPassword(req, res) {
     await query('DELETE FROM sessions WHERE user_id = ?', [user.id])
     await query('DELETE FROM refresh_tokens WHERE user_id = ?', [user.id])
 
-    console.log('✅ Password reset successful for:', user.email)
+    console.log(' Password reset successful for:', user.email)
     console.log('🔒 All sessions and refresh tokens revoked for user:', user.id)
 
     res.json({
@@ -1050,7 +1050,7 @@ export async function googleCallback(req, res) {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 天
     })
 
-    console.log('✅ Google login successful for:', user.email)
+    console.log(' Google login successful for:', user.email)
     console.log('🍪 Tokens stored in httpOnly cookies')
     console.log('🍪 Cookie options:', cookieOptions)
 
@@ -1196,7 +1196,7 @@ export async function enable2FA(req, res) {
       [secret.base32, JSON.stringify(backupCodes), userId]
     )
 
-    console.log('✅ 2FA 密鑰已生成，等待驗證')
+    console.log(' 2FA 密鑰已生成，等待驗證')
 
     res.json({
       success: true,
@@ -1312,7 +1312,7 @@ export async function verify2FA(req, res) {
       [userId]
     )
 
-    console.log('✅ 2FA 驗證成功，已啟用 - User ID:', userId)
+    console.log(' 2FA 驗證成功，已啟用 - User ID:', userId)
 
     res.json({
       success: true,
@@ -1412,7 +1412,7 @@ export async function disable2FA(req, res) {
       [userId]
     )
 
-    console.log('✅ 2FA 已停用 - User ID:', userId)
+    console.log(' 2FA 已停用 - User ID:', userId)
 
     res.json({
       success: true,

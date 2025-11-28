@@ -158,7 +158,7 @@ export async function sendAIMessage(req, res) {
 
     // 如果使用者想修改密碼，返回特殊指令
     if (wantsChangePassword) {
-      console.log('✅ [AI Chat] 偵測到密碼修改意圖，返回特殊指令')
+      console.log(' [AI Chat] 偵測到密碼修改意圖，返回特殊指令')
 
       const aiResponse =
         '我注意到您想修改密碼。\n\n為了您的帳號安全，密碼修改需要在會員中心進行。我現在就為您導航到密碼修改頁面！'

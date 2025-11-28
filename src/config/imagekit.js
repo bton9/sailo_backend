@@ -55,7 +55,7 @@ export function validateImageKitConfig() {
     return false
   }
 
-  console.log('✅ ImageKit 配置檢查通過')
+  console.log(' ImageKit 配置檢查通過')
   return true
 }
 

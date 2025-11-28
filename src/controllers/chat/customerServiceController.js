@@ -431,7 +431,7 @@ export async function uploadChatImage(req, res) {
       })
     }
 
-    console.log('✅ 聊天室驗證通過:', room[0])
+    console.log(' 聊天室驗證通過:', room[0])
 
     // ============================================
     // 步驟 2: 上傳圖片到 ImageKit
@@ -444,7 +444,7 @@ export async function uploadChatImage(req, res) {
       tags: [`room_${roomId}`, `user_${userId}`],
     })
 
-    console.log('✅ ImageKit 上傳成功:', {
+    console.log(' ImageKit 上傳成功:', {
       url: uploadResult.url,
       size: uploadResult.size,
     })
@@ -463,7 +463,7 @@ export async function uploadChatImage(req, res) {
        VALUES (${roomId}, ${userId}, 'image', '${uploadResult.url}', '${safeFileName}', ${fileSize ? fileSize : 'NULL'}, ${thumbnailUrl ? `'${thumbnailUrl}'` : 'NULL'})`
     )
 
-    console.log('✅ 訊息儲存成功:', result.insertId)
+    console.log(' 訊息儲存成功:', result.insertId)
 
     res.json({
       success: true,
@@ -813,7 +813,7 @@ export async function submitRating(req, res) {
       [roomId, userId, room.agent_id, rating, comment]
     )
 
-    console.log('✅ 評分提交成功')
+    console.log(' 評分提交成功')
 
     res.json({
       success: true,

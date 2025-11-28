@@ -24,7 +24,7 @@ let io = null
 
 export function setSocketIO(ioInstance) {
   io = ioInstance
-  console.log('✅ Socket.IO 實例已設定到 adminCustomerServiceController')
+  console.log(' Socket.IO 實例已設定到 adminCustomerServiceController')
 }
 
 /**
@@ -123,7 +123,7 @@ const getRooms = async (req, res) => {
 
     const [rooms] = await db.query(query, queryParams)
 
-    console.log('✅ 找到聊天室數量:', rooms.length)
+    console.log(' 找到聊天室數量:', rooms.length)
 
     res.json({
       success: true,
@@ -208,7 +208,7 @@ const acceptRoom = async (req, res) => {
 
     await connection.commit()
 
-    console.log('✅ 接單成功')
+    console.log(' 接單成功')
 
     // ============================================
     // 🆕 透過 WebSocket 即時發送「客服已加入對話」訊息
@@ -318,7 +318,7 @@ const closeRoom = async (req, res) => {
 
     await connection.commit()
 
-    console.log('✅ 關閉成功')
+    console.log(' 關閉成功')
 
     // ============================================
     // 🆕 取得客服人員資訊 (用於前端顯示)
@@ -415,7 +415,7 @@ const getStats = async (req, res) => {
       avg_response_time: Math.round(avgResponseTime[0].avg_time || 0),
     }
 
-    console.log('✅ 統計資訊:', stats)
+    console.log(' 統計資訊:', stats)
 
     res.json({
       success: true,
@@ -472,7 +472,7 @@ const getAgentRating = async (req, res) => {
     const avgRating =
       stats.total_ratings > 0 ? parseFloat(stats.avg_rating).toFixed(1) : '0.0'
 
-    console.log('✅ 評分統計:', {
+    console.log(' 評分統計:', {
       agentId,
       avgRating,
       totalRatings: stats.total_ratings,

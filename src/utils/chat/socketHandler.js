@@ -82,9 +82,7 @@ export function setupSocketHandlers(io) {
       socket.userEmail = decoded.email
       socket.userAccess = decoded.access
 
-      console.log(
-        `✅ Socket 認證成功: User ${socket.userId} (${decoded.email})`
-      )
+      console.log(` Socket 認證成功: User ${socket.userId} (${decoded.email})`)
       next()
     } catch (error) {
       console.error(' Socket 認證失敗:', error.message)
@@ -513,7 +511,7 @@ export function setupSocketHandlers(io) {
     })
   })
 
-  console.log('✅ WebSocket 事件處理器已設置')
+  console.log(' WebSocket 事件處理器已設置')
 }
 
 /**

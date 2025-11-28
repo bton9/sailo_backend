@@ -156,7 +156,7 @@ export const validateAddPlace = [
     .isLength({ max: 500 })
     .withMessage('備註最多 500 字'),
 
-  // ✅ 修改為可選（允許 null 或空值）
+  //  修改為可選（允許 null 或空值）
   body('start_time')
     .optional({ nullable: true, checkFalsy: true })
     .matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/)

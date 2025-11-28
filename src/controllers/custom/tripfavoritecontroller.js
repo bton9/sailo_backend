@@ -45,7 +45,7 @@ export const addFavorite = async (req, res, next) => {
 // ==================== 2️⃣ 移除收藏 ====================
 export const removeFavorite = async (req, res, next) => {
   try {
-    // ✅ 支援兩種方式: URL 參數或 body
+    //  支援兩種方式: URL 參數或 body
     const userId = req.params.userId || req.body.user_id
     const tripId = req.params.tripId || req.body.trip_id
 
@@ -56,7 +56,7 @@ export const removeFavorite = async (req, res, next) => {
       return error(res, '缺少必要參數', 400)
     }
 
-    // ✅ 使用 pool.execute
+    //  使用 pool.execute
     const [result] = await pool.execute(
       'DELETE FROM trip_favorites WHERE user_id = ? AND trip_id = ?',
       [userId, tripId]

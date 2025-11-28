@@ -27,7 +27,7 @@ const processImageUrls = (products) => {
 }
 
 /**
- * ✅ 檢查商品是否已收藏
+ *  檢查商品是否已收藏
  */
 export const checkFavoriteStatus = async (req, res) => {
   try {
@@ -61,7 +61,7 @@ export const checkFavoriteStatus = async (req, res) => {
 }
 
 /**
- * ✅ 切換產品收藏狀態 (改進版)
+ *  切換產品收藏狀態 (改進版)
  */
 export const toggleFavorite = async (req, res) => {
   try {

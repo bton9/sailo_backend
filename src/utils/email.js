@@ -37,7 +37,7 @@ const transporter = nodemailer.createTransport({
 export async function verifyEmailConnection() {
   try {
     await transporter.verify()
-    console.log('✅ Email server is ready to send messages')
+    console.log(' Email server is ready to send messages')
     return true
   } catch (error) {
     console.error(' Email server connection failed:', error.message)
@@ -220,7 +220,7 @@ ${resetUrl}
       html: htmlContent,
     })
 
-    console.log('✅ Password reset email sent:', info.messageId)
+    console.log(' Password reset email sent:', info.messageId)
     return true
   } catch (error) {
     console.error(' Failed to send password reset email:', error)
@@ -348,7 +348,7 @@ export async function sendVerificationEmail(
       html: htmlContent,
     })
 
-    console.log('✅ Verification email sent:', info.messageId)
+    console.log(' Verification email sent:', info.messageId)
     return true
   } catch (error) {
     console.error(' Failed to send verification email:', error)
@@ -429,7 +429,7 @@ export async function sendWelcomeEmail(email, userName) {
       html: htmlContent,
     })
 
-    console.log('✅ Welcome email sent to:', email)
+    console.log(' Welcome email sent to:', email)
     return true
   } catch (error) {
     console.error(' Failed to send welcome email:', error)
@@ -605,7 +605,7 @@ export async function sendPasswordResetOTPEmail(email, otp, userName) {
       html: htmlContent,
     })
 
-    console.log('✅ Password reset OTP email sent to:', email)
+    console.log(' Password reset OTP email sent to:', email)
     return true
   } catch (error) {
     console.error(' Failed to send password reset OTP email:', error)

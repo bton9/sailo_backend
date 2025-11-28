@@ -68,7 +68,7 @@ passport.use(
           // ========================================
           const user = users[0]
 
-          console.log('✅ Existing Google user found:', user.email)
+          console.log(' Existing Google user found:', user.email)
 
           // 更新最後登入時間與頭像 (如果有變更)
           await query(
@@ -140,7 +140,7 @@ passport.use(
 
         const newUserId = result.insertId
 
-        console.log('✅ New user created successfully:', newUserId)
+        console.log(' New user created successfully:', newUserId)
 
         return done(null, {
           id: newUserId,

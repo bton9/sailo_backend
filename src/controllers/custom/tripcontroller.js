@@ -82,7 +82,7 @@ export const createTrip = async (req, res, next) => {
 export const getUserTrips = async (req, res, next) => {
   try {
     const { userId } = req.params
-    const { sort = 'created_at' } = req.query // ✅ 預設使用 created_at
+    const { sort = 'created_at' } = req.query //  預設使用 created_at
 
     // 允許的排序欄位 (只保留你資料庫有的欄位)
     const allowedSortFields = ['created_at', 'start_date', 'trip_name']
@@ -118,7 +118,7 @@ export const getTripDetail = async (req, res, next) => {
     // 取得行程基本資料
     const [trips] = await pool.execute(
       `SELECT t.*, l.name as location_name
-       FROM trips t                                    -- ✅ 確保是 trips
+       FROM trips t                                    --  確保是 trips
        LEFT JOIN locations l ON t.location_id = l.location_id
        WHERE t.trip_id = ?`,
       [tripId]
@@ -145,7 +145,7 @@ export const getTripDetail = async (req, res, next) => {
           p.latitude,
           p.longitude,
           p.google_place_id
-        FROM trip_items ti                            -- ✅ 確保是 trip_items
+        FROM trip_items ti                            --  確保是 trip_items
         LEFT JOIN places p ON ti.place_id = p.place_id
         WHERE ti.trip_day_id = ?
         ORDER BY ti.sort_order`,

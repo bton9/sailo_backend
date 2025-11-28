@@ -2,7 +2,7 @@
 import pool from '../../config/database.js'
 
 /**
- * ✅ 檢查用戶是否購買過商品 (使用 cart_detail)
+ *  檢查用戶是否購買過商品 (使用 cart_detail)
  */
 const checkUserPurchase = async (userId, productId) => {
   try {
@@ -25,7 +25,7 @@ const checkUserPurchase = async (userId, productId) => {
 }
 
 /**
- * ✅ 新增評論 (需要登入且購買過)
+ *  新增評論 (需要登入且購買過)
  */
 export const createReview = async (req, res) => {
   try {
@@ -124,7 +124,7 @@ export const createReview = async (req, res) => {
 }
 
 /**
- * ✅ 編輯評論 (只能編輯自己的)
+ *  編輯評論 (只能編輯自己的)
  */
 export const updateReview = async (req, res) => {
   try {
@@ -209,7 +209,7 @@ export const updateReview = async (req, res) => {
 }
 
 /**
- * ✅ 刪除評論 (只能刪除自己的) - 軟刪除
+ *  刪除評論 (只能刪除自己的) - 軟刪除
  */
 export const deleteReview = async (req, res) => {
   try {
@@ -258,7 +258,7 @@ export const deleteReview = async (req, res) => {
 }
 
 /**
- * ✅ 檢查用戶是否可以評論此商品
+ *  檢查用戶是否可以評論此商品
  */
 export const checkReviewPermission = async (req, res) => {
   try {
@@ -329,7 +329,7 @@ export const checkReviewPermission = async (req, res) => {
 }
 
 /**
- * ✅ 標記評論為有幫助
+ *  標記評論為有幫助
  */
 export const markReviewHelpful = async (req, res) => {
   try {
@@ -396,7 +396,7 @@ export const markReviewHelpful = async (req, res) => {
 }
 
 /**
- * ✅ 取得用戶的購買記錄 (用於測試/除錯)
+ *  取得用戶的購買記錄 (用於測試/除錯)
  */
 export const getUserPurchases = async (req, res) => {
   try {

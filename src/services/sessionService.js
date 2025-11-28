@@ -118,7 +118,7 @@ export async function createSession(userId, accessToken, options = {}) {
       ]
     )
 
-    console.log('✅ Session 建立成功:', {
+    console.log(' Session 建立成功:', {
       sessionId: result.insertId,
       userId,
       expiresAt,
@@ -176,7 +176,7 @@ export async function validateSession(sessionToken, accessToken = null) {
       session.id,
     ])
 
-    console.log('✅ Session 驗證成功:', {
+    console.log(' Session 驗證成功:', {
       sessionId: session.id,
       userId: session.user_id,
     })
@@ -205,7 +205,7 @@ export async function extendSession(sessionId, extendHours = 24) {
       [newExpiresAt, sessionId]
     )
 
-    console.log('✅ Session 延長成功:', { sessionId, newExpiresAt })
+    console.log(' Session 延長成功:', { sessionId, newExpiresAt })
     return true
   } catch (error) {
     console.error(' 延長 Session 失敗:', error)
@@ -236,7 +236,7 @@ export async function revokeSession(sessionToken) {
       [sessionToken]
     )
 
-    console.log('✅ Session 已撤銷:', { sessionToken })
+    console.log(' Session 已撤銷:', { sessionToken })
     return true
   } catch (error) {
     console.error(' 撤銷 Session 失敗:', error)
@@ -267,7 +267,7 @@ export async function revokeAllUserSessions(userId) {
     )
 
     const count = result.affectedRows
-    console.log('✅ 已撤銷使用者所有 Sessions:', { userId, count })
+    console.log(' 已撤銷使用者所有 Sessions:', { userId, count })
     return count
   } catch (error) {
     console.error(' 撤銷所有 Sessions 失敗:', error)
@@ -321,7 +321,7 @@ export async function cleanupExpiredSessions() {
     )
 
     const count = result.affectedRows
-    console.log('✅ 已清理過期 Sessions:', { count })
+    console.log(' 已清理過期 Sessions:', { count })
     return count
   } catch (error) {
     console.error(' 清理過期 Sessions 失敗:', error)

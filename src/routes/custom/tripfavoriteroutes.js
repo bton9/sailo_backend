@@ -15,14 +15,14 @@ const router = express.Router()
 router.post('/', validateFavorite, tripFavoriteController.addFavorite)
 
 /**
- * @route   DELETE /api/trip-favorites/:userId/:tripId  ✅ 新增這個
+ * @route   DELETE /api/trip-favorites/:userId/:tripId   新增這個
  * @desc    取消收藏 (使用 URL 參數)
  * @access  Public
  */
 router.delete('/:userId/:tripId', tripFavoriteController.removeFavorite)
 
 /**
- * @route   DELETE /api/trip-favorites  ✅ 保留這個 (使用 body)
+ * @route   DELETE /api/trip-favorites   保留這個 (使用 body)
  * @desc    取消收藏 (使用 body)
  * @access  Public (之後可加入認證)
  */

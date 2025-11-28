@@ -1,6 +1,6 @@
 /**
  * Blog SQL 查詢輔助函式
- * 
+ *
  * 本檔案包含所有 Blog 相關的 SQL 查詢字串
  * - getCommentsQuery: 取得留言列表
  * - getPostsQuery: 取得文章列表（含行程、標籤、圖片）
@@ -12,11 +12,11 @@
  * 取得留言列表的 SQL (含 JOIN users)
  */
 export const getCommentsQuery = (currentUserId = null) => {
-  const interactionFields = currentUserId 
+  const interactionFields = currentUserId
     ? `
       EXISTS(SELECT 1 FROM comment_likes WHERE comment_id = c.comment_id AND user_id = ${currentUserId}) AS is_liked`
     : `
-      0 AS is_liked`;
+      0 AS is_liked`
 
   return `
     SELECT 
@@ -36,14 +36,14 @@ export const getCommentsQuery = (currentUserId = null) => {
 
     FROM comments c
     INNER JOIN users u ON c.user_id = u.id
-  `;
-};
+  `
+}
 
 /**
  * 取得文章列表的 SQL (含完整行程資訊)
  */
 export const getPostsQuery = (currentUserId = null) => {
-  const interactionFields = currentUserId 
+  const interactionFields = currentUserId
     ? `
       EXISTS(SELECT 1 FROM post_likes WHERE post_id = p.post_id AND user_id = ${currentUserId}) AS is_liked,
       EXISTS(SELECT 1 FROM bookmarks WHERE post_id = p.post_id AND user_id = ${currentUserId}) AS is_bookmarked,
@@ -51,9 +51,9 @@ export const getPostsQuery = (currentUserId = null) => {
     : `
       0 AS is_liked,
       0 AS is_bookmarked,
-      0 AS is_following_author`;
+      0 AS is_following_author`
 
-  return  `
+  return `
     SELECT 
       -- 文章基本資訊
       p.post_id,
@@ -82,7 +82,7 @@ export const getPostsQuery = (currentUserId = null) => {
       DATEDIFF(t.end_date, t.start_date) + 1 AS trip_days,
       DATEDIFF(t.end_date, t.start_date) AS trip_nights,
 
-      -- ✅ 新增：景點基本資訊
+      --  新增：景點基本資訊
       pl.name AS place_name,
       pl.category AS place_category,
       pl.rating AS place_rating,
@@ -123,9 +123,8 @@ export const getPostsQuery = (currentUserId = null) => {
     INNER JOIN users u ON p.user_id = u.id
     LEFT JOIN trips t ON p.trip_id = t.trip_id
 
-    -- ✅ 新增：景點 LEFT JOIN
+    --  新增：景點 LEFT JOIN
     LEFT JOIN places pl ON p.place_id = pl.place_id
     LEFT JOIN locations loc ON pl.location_id = loc.location_id
-  `;
-};
-
+  `
+}

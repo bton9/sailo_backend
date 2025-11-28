@@ -16,8 +16,8 @@ export const getUserFavorites = async (req, res) => {
        WHERE user_id = ?`,
       [userId]
     )
-    console.log('✅ lists:', lists)
-    console.log('✅ lists type:', Array.isArray(lists))
+    console.log(' lists:', lists)
+    console.log(' lists type:', Array.isArray(lists))
 
     if (!lists || lists.length === 0) {
       return res.json({ success: true, favorites: [] })
@@ -25,7 +25,7 @@ export const getUserFavorites = async (req, res) => {
 
     // 2️⃣ 取得每個清單的景點數量
     const listIds = lists.map((l) => l.list_id)
-    console.log('✅ listIds:', listIds)
+    console.log(' listIds:', listIds)
 
     let countMap = {}
     if (listIds.length > 0) {
@@ -37,7 +37,7 @@ export const getUserFavorites = async (req, res) => {
 
       console.log('🔍 執行計數查詢:', countQuery)
       const counts = await query(countQuery, listIds)
-      console.log('✅ counts:', counts)
+      console.log(' counts:', counts)
 
       // 建立 list_id -> count 的對應
       if (counts && Array.isArray(counts)) {
@@ -46,7 +46,7 @@ export const getUserFavorites = async (req, res) => {
         })
       }
     }
-    console.log('✅ countMap:', countMap)
+    console.log(' countMap:', countMap)
 
     // 3️⃣ 合併每個清單的景點數量
     const favorites = lists.map((list) => {
@@ -59,7 +59,7 @@ export const getUserFavorites = async (req, res) => {
       }
     })
 
-    console.log('✅ 最終結果:', favorites)
+    console.log(' 最終結果:', favorites)
     return res.json({ success: true, favorites })
   } catch (err) {
     console.error(' getUserFavorites error:', err)
@@ -88,7 +88,7 @@ export const getListPlaces = async (req, res) => {
        WHERE flp.list_id = ?`,
       [listId]
     )
-    console.log('✅ places:', places)
+    console.log(' places:', places)
 
     if (!places || places.length === 0) {
       return res.json({ success: true, places: [] })
@@ -104,7 +104,7 @@ export const getListPlaces = async (req, res) => {
        WHERE place_id IN (${placeholders}) AND is_cover = 1`,
       placeIds
     )
-    console.log('✅ media:', media)
+    console.log(' media:', media)
 
     // 建立 place_id -> cover_image 的對應
     const mediaMap = {}
@@ -149,7 +149,7 @@ export const toggleFavorite = async (req, res) => {
        WHERE list_id = ? AND place_id = ?`,
       [listId, placeId]
     )
-    console.log('✅ exists:', exists)
+    console.log(' exists:', exists)
     if (exists && exists.length > 0) {
       // 移除收藏
       await query(
@@ -194,7 +194,7 @@ export const createList = async (req, res) => {
        VALUES (?, ?, ?)`,
       [userId, name, description || null]
     )
-    console.log('✅ createList result:', result)
+    console.log(' createList result:', result)
 
     return res.json({
       success: true,
@@ -245,7 +245,7 @@ export const deleteList = async (req, res) => {
 
     return res.json({
       success: true,
-      message: `✅ 使用者 ${userId} 的收藏清單（ID: ${listId}）刪除成功`,
+      message: ` 使用者 ${userId} 的收藏清單（ID: ${listId}）刪除成功`,
     })
   } catch (err) {
     console.error(' deleteList error:', err)

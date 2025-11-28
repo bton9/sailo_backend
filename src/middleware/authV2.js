@@ -115,7 +115,7 @@ export async function authenticate(req, res, next) {
       fullUser: user,
     }
 
-    console.log('✅ 使用者驗證成功:', {
+    console.log(' 使用者驗證成功:', {
       userId: user.id,
       email: user.email,
     })

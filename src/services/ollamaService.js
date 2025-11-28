@@ -71,7 +71,7 @@ export async function callOllamaChat(messages, options = {}) {
     const aiResponse = data.message?.content || ''
     const tokensUsed = (data.eval_count || 0) + (data.prompt_eval_count || 0)
 
-    console.log('✅ Ollama 回應成功:', {
+    console.log(' Ollama 回應成功:', {
       responseLength: aiResponse.length,
       tokensUsed,
     })
@@ -124,7 +124,7 @@ export async function generateAIResponse(
         try {
           queryResult = await executeUserQuery(suggestedQuery, userId)
           queryExecuted = true
-          console.log('✅ 資料庫查詢成功')
+          console.log(' 資料庫查詢成功')
         } catch (error) {
           console.error(' 資料庫查詢失敗:', error)
           queryResult = '抱歉，查詢資料時發生錯誤。'

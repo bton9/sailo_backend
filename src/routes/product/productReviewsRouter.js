@@ -6,7 +6,7 @@ import {
   deleteReview,
   checkReviewPermission,
   markReviewHelpful,
-} from '../../controllers/product/productReviewController.js' // ✅ 修正：檔案名稱對應
+} from '../../controllers/product/productReviewController.js' //  修正：檔案名稱對應
 
 const router = express.Router()
 

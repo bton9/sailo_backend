@@ -26,7 +26,7 @@ export const validateImageKitTripConfig = () => {
     return false
   }
 
-  console.log('✅ ImageKit (行程封面) 設定完成')
+  console.log(' ImageKit (行程封面) 設定完成')
   return true
 }
 
