@@ -67,9 +67,9 @@ export function verifyToken(token) {
     return decoded
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
-      console.warn('⚠️ Token 已過期')
+      console.warn(' Token 已過期')
     } else if (error.name === 'JsonWebTokenError') {
-      console.warn('⚠️ Token 無效')
+      console.warn(' Token 無效')
     } else {
       console.error(' Token 驗證失敗:', error)
     }

@@ -290,7 +290,7 @@ export const getProductById = async (req, res) => {
             : [],
       }))
     } catch (reviewError) {
-      console.log('⚠️ 查詢評論時出錯:', reviewError.message)
+      console.log(' 查詢評論時出錯:', reviewError.message)
       product.reviews = []
     }
 

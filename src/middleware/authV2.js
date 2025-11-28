@@ -183,7 +183,7 @@ export async function authenticateOptional(req, res, next) {
     next()
   } catch (error) {
     // 發生錯誤時視為訪客
-    console.warn('⚠️ Optional authentication error:', error)
+    console.warn(' Optional authentication error:', error)
     req.user = null
     next()
   }

@@ -591,7 +591,7 @@ export async function forgotPassword(req, res) {
     // 避免攻擊者透過此 API 探測有效的 Email 地址
     if (users.length === 0) {
       console.log(
-        '⚠️ Password reset OTP requested for non-existent email:',
+        ' Password reset OTP requested for non-existent email:',
         email
       )
       return res.json({

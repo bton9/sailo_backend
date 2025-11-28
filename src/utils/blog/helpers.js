@@ -62,7 +62,7 @@ export const formatPostData = (post, currentUserId = null) => {
           summary_text: post.summary_text,
           days: post.trip_days,
           nights: post.trip_nights,
-          locations: post.trip_locations || '', // ⚠️ 保持字串格式（用「、」分隔）
+          locations: post.trip_locations || '', //  保持字串格式（用「、」分隔）
         }
       : null,
 

@@ -21,7 +21,7 @@ export const validateImageKitTripConfig = () => {
   const missing = requiredVars.filter((varName) => !process.env[varName])
 
   if (missing.length > 0) {
-    console.warn(`⚠️  缺少 ImageKit 環境變數: ${missing.join(', ')}`)
+    console.warn(`  缺少 ImageKit 環境變數: ${missing.join(', ')}`)
     console.warn('   行程封面圖上傳功能將無法使用')
     return false
   }

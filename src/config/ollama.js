@@ -117,7 +117,7 @@ export async function validateOllamaConnection() {
     )
 
     if (!hasTargetModel) {
-      console.warn(`⚠️  警告: 找不到模型 ${OLLAMA_CONFIG.MODEL}`)
+      console.warn(`  警告: 找不到模型 ${OLLAMA_CONFIG.MODEL}`)
       console.warn('   可用模型:', models.map((m) => m.name).join(', '))
     }
 

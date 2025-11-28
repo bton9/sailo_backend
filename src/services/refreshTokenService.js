@@ -134,7 +134,7 @@ export async function validateRefreshToken(refreshToken, options = {}) {
     )
 
     if (tokens.length === 0) {
-      console.warn('⚠️ Refresh Token 不存在、已撤銷或已過期')
+      console.warn(' Refresh Token 不存在、已撤銷或已過期')
       return null
     }
 
@@ -142,7 +142,7 @@ export async function validateRefreshToken(refreshToken, options = {}) {
 
     // 檢查關聯的 Session 是否仍然有效
     if (!tokenData.session_active) {
-      console.warn('⚠️ 關聯的 Session 已失效')
+      console.warn(' 關聯的 Session 已失效')
       // 撤銷此 Refresh Token
       await revokeRefreshToken(refreshToken)
       return null
@@ -152,7 +152,7 @@ export async function validateRefreshToken(refreshToken, options = {}) {
     if (strictDeviceCheck && (userAgent || ipAddress)) {
       const currentFingerprint = generateDeviceFingerprint(userAgent, ipAddress)
       if (tokenData.device_fingerprint !== currentFingerprint) {
-        console.warn('⚠️ 裝置指紋不匹配，可能是盜用行為')
+        console.warn(' 裝置指紋不匹配，可能是盜用行為')
         // 安全起見，撤銷此 Token
         await revokeRefreshToken(refreshToken)
         return null
@@ -193,7 +193,7 @@ export async function rotateRefreshToken(oldRefreshToken, options = {}) {
     const tokenData = await validateRefreshToken(oldRefreshToken, options)
 
     if (!tokenData) {
-      console.warn('⚠️ 無法輪替：Refresh Token 無效')
+      console.warn(' 無法輪替：Refresh Token 無效')
       return null
     }
 
@@ -248,7 +248,7 @@ export async function revokeRefreshToken(refreshToken) {
       console.log(' Refresh Token 已撤銷')
       return true
     } else {
-      console.warn('⚠️ Refresh Token 不存在或已撤銷')
+      console.warn(' Refresh Token 不存在或已撤銷')
       return false
     }
   } catch (error) {
@@ -383,7 +383,7 @@ export async function detectAndRevokeSuspiciousTokens(userId) {
     )
 
     if (suspiciousTokens.length > 0) {
-      console.warn('⚠️ 偵測到可疑活動:', { userId, sessions: suspiciousTokens })
+      console.warn(' 偵測到可疑活動:', { userId, sessions: suspiciousTokens })
 
       // 撤銷這些可疑的 Tokens
       for (const suspicious of suspiciousTokens) {

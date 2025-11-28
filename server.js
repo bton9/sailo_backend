@@ -56,13 +56,13 @@ validateOllamaConnection()
         console.log('   可用模型:', result.models.map((m) => m.name).join(', '))
       }
     } else {
-      console.warn('⚠️  Ollama 連線失敗:', result.message)
+      console.warn('  Ollama 連線失敗:', result.message)
       console.warn('   AI 客服功能將無法使用')
       console.warn('   請確認 Ollama 已啟動: ollama serve')
     }
   })
   .catch((error) => {
-    console.warn('⚠️  Ollama 驗證異常:', error.message)
+    console.warn('  Ollama 驗證異常:', error.message)
   })
 
 const app = express()

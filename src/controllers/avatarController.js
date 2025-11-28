@@ -164,11 +164,11 @@ export async function uploadAvatar(req, res) {
           console.log(' 已刪除舊頭像:', rows.avatar_file_id)
         } catch (err) {
           // 如果刪除失敗（例如檔案已不存在），記錄但繼續執行
-          console.error('⚠️ 刪除舊頭像失敗:', err.message)
+          console.error(' 刪除舊頭像失敗:', err.message)
         }
       }
     } catch (err) {
-      console.error('⚠️ 查詢舊頭像失敗:', err)
+      console.error(' 查詢舊頭像失敗:', err)
       // 繼續執行，不中斷上傳流程
     }
 
@@ -268,7 +268,7 @@ export async function deleteAvatar(req, res) {
         await imagekit.deleteFile(fileId)
         console.log(' 已從 ImageKit 刪除頭像:', fileId)
       } catch (err) {
-        console.error('⚠️ ImageKit 刪除失敗:', err.message)
+        console.error(' ImageKit 刪除失敗:', err.message)
         // 即使 ImageKit 刪除失敗，仍繼續清空資料庫
       }
     }

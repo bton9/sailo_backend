@@ -156,7 +156,7 @@ export async function validateSession(sessionToken, accessToken = null) {
     )
 
     if (sessions.length === 0) {
-      console.warn('⚠️ Session 不存在或已過期')
+      console.warn(' Session 不存在或已過期')
       return null
     }
 
@@ -166,7 +166,7 @@ export async function validateSession(sessionToken, accessToken = null) {
     if (accessToken) {
       const accessTokenHash = hashAccessToken(accessToken)
       if (session.access_token_hash !== accessTokenHash) {
-        console.warn('⚠️ Access Token Hash 不匹配')
+        console.warn(' Access Token Hash 不匹配')
         return null
       }
     }

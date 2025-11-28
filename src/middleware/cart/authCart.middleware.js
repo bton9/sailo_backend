@@ -79,7 +79,7 @@ export const optionalAuth = (req, res, next) => {
     next()
   } catch (error) {
     // 即使驗證失敗也繼續，因為這是可選的
-    console.warn('⚠️ Optional auth failed:', error.message)
+    console.warn(' Optional auth failed:', error.message)
     next()
   }
 }

@@ -174,7 +174,7 @@ export async function sendPasswordResetEmail(email, resetToken, userName) {
             </p>
             
             <div class="warning">
-              <p><strong>⚠️ 重要提示：</strong></p>
+              <p><strong> 重要提示：</strong></p>
               <p>• 此連結將在 <strong>1 小時後</strong> 失效</p>
               <p>• 如果您沒有提出此請求，請忽略此郵件</p>
               <p>• 為了帳戶安全，請勿將此連結分享給他人</p>
@@ -570,7 +570,7 @@ export async function sendPasswordResetOTPEmail(email, otp, userName) {
             <!-- 安全提醒 -->
             <div class="warning-box">
               <p style="margin: 0;">
-                <strong>⚠️ 安全提醒：</strong><br>
+                <strong> 安全提醒：</strong><br>
                 • 請勿將驗證碼分享給任何人<br>
                 • SailoTravel 不會主動要求您提供驗證碼<br>
                 • 如果您未申請密碼重置，請忽略此郵件
