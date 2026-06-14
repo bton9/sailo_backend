@@ -1,18 +1,216 @@
-Sailo Backend 專案的後台 儲存庫
-Sailo Backend 是一套支援旅遊行程規劃平台「Sailo」的後端服務。整個後端系統使用 Node.js 與 Express 建構，資料儲存以 MySQL 為核心。後端負責處理會員註冊與登入、行程管理、景點資料、收藏清單、留言回覆、圖片上傳與地圖定位數據等所有邏輯，並透過 RESTful API 提供給前端串接。在會員驗證方面，系統使用 JWT（JSON Web Token）搭配 bcrypt 進行安全性加密。所有登入後的請求都會經過 Token Middleware 驗證，確保每個操作都是合法使用者進行。
+# Sailo Backend  旅遊行程規劃平台 API
 
-在景點資料部分，後端資料庫儲存旅遊景點的名稱、描述、類別、地區編號、Google 地圖的定位資訊、精準經緯度與平均評分。這些資訊提供前端使用 Leaflet API 顯示地圖位置，也能透過 Google Maps 連結進行導航與查看評論。圖片上傳使用 ImageKit 服務，後端提供上傳端點，使用者能上傳景點相片或行程照片，並由 ImageKit 自動處理壓縮與 CDN 加速，最後將圖片 URL 回傳前端。
+> 使用 Node.js + Express 打造的 RESTful API 後端服務
 
-行程系統包含行程主表與每日行程子表，後端支援建立行程、編輯行程、刪除行程、複製他人公開行程、加入每日景點、加入備註、設定公開或私人等功能。使用者可以自由規劃多天行程，並在任一天新增欲前往的景點資料。收藏系統則讓使用者能建立自己的收藏清單，新增景點、移除景點，並維護與景點的關聯關係。
+![Node.js](https://img.shields.io/badge/Node.js-Express-339933?style=flat-square&logo=node.js)
+![MySQL](https://img.shields.io/badge/MySQL-Database-4479A1?style=flat-square&logo=mysql)
+![JWT](https://img.shields.io/badge/Auth-JWT-000000?style=flat-square&logo=jsonwebtokens)
+![Socket.io](https://img.shields.io/badge/Socket.io-Realtime-010101?style=flat-square&logo=socket.io)
 
-留言與回覆系統採用景點留言表與景點回覆表（以及行程留言與回覆，若前端有此功能），後端提供新增留言、回覆留言、取得留言列表等功能，以支援前端社群互動。
+---
 
-整體專案採用 MVC 結構。Routes 負責 API 路由與 Token 保護、Controllers 處理邏輯、Models 對應資料表。專案的主要資料表包含 users、places、trips、trip_days、favorites、place_comments、place_replies 等。每個 API 都使用標準 RESTful 設計，例如 /api/auth/login、/api/places/:id、/api/trips/:tripId/day、/api/favorites 等，讓前端開發者能容易取得資料與管理行程。
+## 專案簡介
 
-在專案部署前，須建立 .env 
-設定環境變數，包括資料庫連線、JWT 秘鑰、ImageKit API 金鑰。啟動方式為 npm install 安裝所有依賴，並使用 
+Sailo Backend 提供前端（[sailo_fronte_end](https://github.com/bton9/sailo_fronte_end)）所需的完整 API 服務，涵蓋使用者驗證、景點管理、行程規劃、即時聊天、購物車與 AI 聊天助手等功能。
 
-npm run dev 啟動後端伺服器。
+資料庫 Schema：[sailo_db](https://github.com/bton9/sailo_db)
 
+---
 
-Sailo Backend 承載整個旅遊平台的資料處理核心，負責行程邏輯、使用者資訊、圖片儲存、地圖位置資料與社群留言互動，前後端分離架構讓前端能夠順暢地使用 API 建構出完整的使用者旅遊規劃體驗。
+## 主要功能
+
+###  使用者驗證
+- JWT 身份驗證（Access Token + Refresh Token）
+- Google OAuth 第三方登入
+- OTP 信箱驗證、忘記密碼流程
+- 登入失敗次數限制與帳號鎖定機制
+
+###  景點與地圖
+- 景點 CRUD，支援分類、城市篩選、關鍵字搜尋
+- 景點精準經緯度儲存
+- 收藏景點清單管理
+
+###  行程管理（本人負責核心 API）
+- 行程建立、編輯、刪除（支援公開 / 私人）
+- 多天行程規劃，景點加入 / 移除
+- 行程複製、收藏功能
+- 景點備註管理
+
+###  即時聊天
+- Socket.io 客服聊天室（使用者  客服）
+- AI 聊天助手（串接 Ollama 本地模型）
+- 聊天歷史紀錄儲存
+
+###  購物車與金流
+- 購物車 CRUD
+- 訂單建立與狀態管理
+- 綠界金流（ECPay）串接
+
+###  圖片上傳
+- ImageKit 雲端儲存
+- 使用者頭像上傳
+- 景點照片上傳與 CDN 快取
+
+###  部落格
+- 文章發布、編輯、刪除
+- 留言、按讚、追蹤功能
+- 標籤系統與搜尋
+
+---
+
+## 技術架構
+
+| 技術 | 用途 |
+|------|------|
+| Node.js + Express | 後端框架 |
+| MySQL | 資料庫 |
+| RESTful API | API 設計規範 |
+| JWT | 身份驗證 |
+| Google OAuth 2.0 | 第三方登入 |
+| Socket.io | 即時聊天 |
+| ImageKit | 雲端圖片儲存 |
+| Ollama | 本地 AI 模型 |
+| Speakeasy | OTP 驗證 |
+| Nodemailer | 信件發送 |
+| ECPay | 綠界金流 |
+
+---
+
+## 專案結構
+
+```
+sailo_backend/
+ src/
+    app.js                # 主程式入口
+    config/               # 設定檔
+       database.js       # MySQL 連線
+       passport.js       # Google OAuth
+       imagekit.js       # ImageKit 設定
+       ollama.js         # Ollama AI 設定
+    controllers/          # 控制器
+       authControllerV2.js
+       placesController.js
+       favoriteController.js
+       custom/           # 行程相關（本人負責）
+          tripcontroller.js
+          tripitemcontroller.js
+          tripfavoritecontroller.js
+       blog/             # 部落格
+       cart/             # 購物車
+       chat/             # 聊天室
+    routes/               # 路由
+       authRoutesV2.js
+       placesRoutes.js
+       custom/           # 行程路由（本人負責）
+       blog/
+       cart/
+       chat/
+    middleware/           # 中介層
+       authV2.js         # JWT 驗證
+       upload.middleware.js
+    services/             # 服務層
+       ollamaService.js
+       refreshTokenService.js
+    utils/                # 工具函式
+        email.js
+        jwt.js
+        password.js
+ uploads/                  # 本機上傳暫存
+```
+
+---
+
+## 安裝與使用
+
+### 環境需求
+- Node.js v18+
+- MySQL
+- npm
+
+### 安裝步驟
+
+```bash
+# 1. Clone 專案
+git clone https://github.com/bton9/sailo_backend.git
+cd sailo_backend
+
+# 2. 安裝相依套件
+npm i
+
+# 3. 設定環境變數
+cp .env.example .env
+# 填入對應設定（見下方說明）
+
+# 4. 匯入資料庫 Schema
+# 請參考 sailo_db repo
+
+# 5. 啟動伺服器
+npm start
+```
+
+伺服器預設運行於 `http://localhost:5000`
+
+---
+
+## 環境變數
+
+請在專案根目錄建立 `.env` 檔案：
+
+```env
+# Server
+PORT=
+NODE_ENV=
+FRONTEND_URL=http://localhost:3000
+
+# Database
+DB_HOST=
+DB_PORT=
+DB_USER=
+DB_PASSWORD=
+DB_NAME=
+
+# JWT
+JWT_SECRET=
+JWT_EXPIRES_IN=
+JWT_REFRESH_EXPIRES_IN=
+
+# Session
+SESSION_SECRET=
+
+# System Settings
+MAX_LOGIN_ATTEMPTS=
+ACCOUNT_LOCK_MINUTES=
+
+# Gmail
+EMAIL_HOST=
+EMAIL_PORT=
+EMAIL_SECURE=
+EMAIL_USER=
+EMAIL_PASSWORD=
+
+# Google OAuth
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_CALLBACK_URL=http://localhost:5000/api/v2/auth/google/callback
+
+# ImageKit
+IMAGEKIT_PUBLIC_KEY=
+IMAGEKIT_PRIVATE_KEY=
+IMAGEKIT_URL_ENDPOINT=
+
+# Ollama AI
+OLLAMA_BASE_URL=
+OLLAMA_MODEL=
+OLLAMA_TEMPERATURE=
+OLLAMA_TOP_K=
+OLLAMA_REPEAT_PENALTY=
+OLLAMA_TIMEOUT=30000
+```
+
+> 如需完整設定，請聯繫作者。
+---
+
+## 作者
+**林新堯**  
+資展國際前端工程師就業養成班（2025/6  2025/11）  
+GitHub：[@bton9](https://github.com/bton9)
