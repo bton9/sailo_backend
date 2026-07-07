@@ -123,11 +123,13 @@ export const getTripDetail = async (req, res, next) => {
   try {
     const { tripId } = req.params
 
-    // 取得行程基本資料
+    // 取得行程基本資料（含建立者名稱）
     const [trips] = await pool.execute(
-      `SELECT t.*, l.name as location_name
+      `SELECT t.*, l.name as location_name,
+              u.name as creator_name, u.avatar as creator_avatar
        FROM trips t                                    --  確保是 trips
        LEFT JOIN locations l ON t.location_id = l.location_id
+       LEFT JOIN users u ON t.user_id = u.id
        WHERE t.trip_id = ?`,
       [tripId]
     )
