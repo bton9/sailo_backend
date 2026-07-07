@@ -4,16 +4,18 @@ import {
   uploadTripCover,
   handleUploadError,
 } from '../../middleware/custom/tripupload.js'
+import { authenticate } from '../../middleware/authV2.js'
 
 const router = express.Router()
 
 /**
  * @route   POST /api/trip-upload/cover
  * @desc    上傳行程封面圖
- * @access  Public (之後可加入認證)
+ * @access  Private（需登入）
  */
 router.post(
   '/cover',
+  authenticate,
   uploadTripCover,
   handleUploadError,
   tripUploadController.uploadTripCover
@@ -22,8 +24,8 @@ router.post(
 /**
  * @route   DELETE /api/trip-upload/:fileId
  * @desc    刪除 ImageKit 圖片 (選用)
- * @access  Public (之後可加入認證)
+ * @access  Private（需登入）
  */
-router.delete('/:fileId', tripUploadController.deleteImage)
+router.delete('/:fileId', authenticate, tripUploadController.deleteImage)
 
 export default router

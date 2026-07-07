@@ -17,14 +17,22 @@ export const addPlaceToDay = async (req, res, next) => {
       end_time = null,
     } = req.body
 
-    // 檢查 trip_days 是否存在
+    // 檢查 trip_days 是否存在，並取得所屬行程的擁有者
     const [existingDay] = await pool.execute(
-      `SELECT trip_day_id FROM trip_days WHERE trip_day_id = ?`,
+      `SELECT td.trip_day_id, t.user_id
+       FROM trip_days td
+       JOIN trips t ON td.trip_id = t.trip_id
+       WHERE td.trip_day_id = ?`,
       [tripDayId]
     )
 
     if (existingDay.length === 0) {
       return error(res, '找不到該天的行程', 404)
+    }
+
+    // 僅能在自己的行程中新增景點
+    if (existingDay[0].user_id !== req.user.userId) {
+      return error(res, '無權操作此行程', 403)
     }
 
     // 取得當前最大的 sort_order
@@ -61,14 +69,23 @@ export const removePlaceFromTrip = async (req, res, next) => {
   try {
     const { tripItemId } = req.params
 
-    // 檢查項目是否存在
+    // 檢查項目是否存在，並取得所屬行程的擁有者
     const [existing] = await pool.execute(
-      `SELECT trip_item_id FROM trip_items WHERE trip_item_id = ?`,
+      `SELECT ti.trip_item_id, t.user_id
+       FROM trip_items ti
+       JOIN trip_days td ON ti.trip_day_id = td.trip_day_id
+       JOIN trips t ON td.trip_id = t.trip_id
+       WHERE ti.trip_item_id = ?`,
       [tripItemId]
     )
 
     if (existing.length === 0) {
       return error(res, '找不到該景點項目', 404)
+    }
+
+    // 僅能刪除自己行程中的景點
+    if (existing[0].user_id !== req.user.userId) {
+      return error(res, '無權操作此行程', 403)
     }
 
     await pool.execute(`DELETE FROM trip_items WHERE trip_item_id = ?`, [
@@ -87,14 +104,23 @@ export const updatePlaceOrder = async (req, res, next) => {
     const { tripItemId } = req.params
     const { sort_order } = req.body
 
-    // 檢查項目是否存在
+    // 檢查項目是否存在，並取得所屬行程的擁有者
     const [existing] = await pool.execute(
-      `SELECT trip_item_id FROM trip_items WHERE trip_item_id = ?`,
+      `SELECT ti.trip_item_id, t.user_id
+       FROM trip_items ti
+       JOIN trip_days td ON ti.trip_day_id = td.trip_day_id
+       JOIN trips t ON td.trip_id = t.trip_id
+       WHERE ti.trip_item_id = ?`,
       [tripItemId]
     )
 
     if (existing.length === 0) {
       return error(res, '找不到該景點項目', 404)
+    }
+
+    // 僅能調整自己行程中的景點順序
+    if (existing[0].user_id !== req.user.userId) {
+      return error(res, '無權操作此行程', 403)
     }
 
     await pool.execute(

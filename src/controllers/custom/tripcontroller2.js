@@ -13,7 +13,8 @@ export const copyTrip = async (req, res, next) => {
     await connection.beginTransaction()
 
     const { tripId } = req.params
-    const { user_id } = req.body
+    // 複製後的行程一律歸屬目前登入的使用者，不採用前端傳來的 user_id
+    const user_id = req.user.userId
 
     // 取得原行程資料
     const [originalTrip] = await connection.execute(
@@ -27,6 +28,12 @@ export const copyTrip = async (req, res, next) => {
     }
 
     const trip = originalTrip[0]
+
+    // 只能複製公開行程，或自己的行程
+    if (!trip.is_public && trip.user_id !== req.user.userId) {
+      await connection.rollback()
+      return error(res, '無權複製此行程', 403)
+    }
 
     // 建立新行程
     const [newTrip] = await connection.execute(
@@ -99,12 +106,14 @@ export const copyTrip = async (req, res, next) => {
 }
 
 // ==================== 7. 搜尋行程 ====================
+// 這支路由不需登入即可呼叫，因此無論如何都只能搜尋「公開」行程，
+// 不接受客戶端指定 is_public 來查看私人行程（避免洩漏他人私人行程）。
 export const searchTrips = async (req, res, next) => {
   try {
-    const { keyword, location_id, is_public } = req.query
+    const { keyword, location_id } = req.query
 
     let sql = `
-      SELECT 
+      SELECT
         t.*,
         l.name as location_name,
         u.name as user_name,
@@ -115,7 +124,7 @@ export const searchTrips = async (req, res, next) => {
       LEFT JOIN users u ON t.user_id = u.id
       LEFT JOIN trip_days td ON t.trip_id = td.trip_id
       LEFT JOIN trip_items ti ON td.trip_day_id = ti.trip_day_id
-      WHERE 1=1
+      WHERE t.is_public = 1
     `
 
     const params = []
@@ -128,12 +137,6 @@ export const searchTrips = async (req, res, next) => {
     if (location_id) {
       sql += ` AND t.location_id = ?`
       params.push(location_id)
-    }
-
-    if (is_public !== undefined) {
-      const isPublicValue = is_public === 'true' || is_public === '1' ? 1 : 0
-      sql += ` AND t.is_public = ?`
-      params.push(isPublicValue)
     }
 
     sql += ` GROUP BY t.trip_id ORDER BY t.created_at DESC`

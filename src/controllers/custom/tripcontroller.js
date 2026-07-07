@@ -14,7 +14,6 @@ export const createTrip = async (req, res, next) => {
 
     const {
       trip_name,
-      user_id,
       description,
       start_date,
       end_date,
@@ -23,6 +22,10 @@ export const createTrip = async (req, res, next) => {
       is_public,
       location_id,
     } = req.body
+
+    // 行程的擁有者一律是目前登入的使用者，不採用前端傳來的 user_id，
+    // 避免任何人能偽造成別人的名義建立行程
+    const user_id = req.user.userId
 
     // 建立行程
     const [tripResult] = await connection.execute(
@@ -84,6 +87,11 @@ export const getUserTrips = async (req, res, next) => {
     const { userId } = req.params
     const { sort = 'created_at' } = req.query //  預設使用 created_at
 
+    // 只能查詢自己的行程列表，避免任何人透過猜測 userId 看到別人的行程清單
+    if (Number(userId) !== req.user.userId) {
+      return error(res, '無權查詢其他使用者的行程', 403)
+    }
+
     // 允許的排序欄位 (只保留你資料庫有的欄位)
     const allowedSortFields = ['created_at', 'start_date', 'trip_name']
     const sortField = allowedSortFields.includes(sort) ? sort : 'created_at'
@@ -128,6 +136,12 @@ export const getTripDetail = async (req, res, next) => {
       return error(res, '找不到該行程', 404)
     }
 
+    // 私人行程僅本人可查看；公開行程任何登入者皆可查看
+    const trip = trips[0]
+    if (!trip.is_public && trip.user_id !== req.user.userId) {
+      return error(res, '無權查看此行程', 403)
+    }
+
     // 取得每天的行程
     const [days] = await pool.execute(
       `SELECT * FROM trip_days WHERE trip_id = ? ORDER BY day_number`,
@@ -168,12 +182,17 @@ export const updateTrip = async (req, res, next) => {
 
     // 檢查行程是否存在
     const [existingTrip] = await pool.execute(
-      `SELECT trip_id FROM trips WHERE trip_id = ?`,
+      `SELECT trip_id, user_id FROM trips WHERE trip_id = ?`,
       [tripId]
     )
 
     if (existingTrip.length === 0) {
       return error(res, '找不到該行程', 404)
+    }
+
+    // 僅能更新自己的行程
+    if (existingTrip[0].user_id !== req.user.userId) {
+      return error(res, '無權修改此行程', 403)
     }
 
     // 建立動態更新 SQL
@@ -226,13 +245,19 @@ export const deleteTrip = async (req, res, next) => {
 
     // 檢查行程是否存在
     const [existingTrip] = await connection.execute(
-      `SELECT trip_id FROM trips WHERE trip_id = ?`,
+      `SELECT trip_id, user_id FROM trips WHERE trip_id = ?`,
       [tripId]
     )
 
     if (existingTrip.length === 0) {
       await connection.rollback()
       return error(res, '找不到該行程', 404)
+    }
+
+    // 僅能刪除自己的行程
+    if (existingTrip[0].user_id !== req.user.userId) {
+      await connection.rollback()
+      return error(res, '無權刪除此行程', 403)
     }
 
     // 先刪除 trip_items (最底層)
