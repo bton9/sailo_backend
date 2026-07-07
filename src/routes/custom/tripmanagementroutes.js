@@ -12,6 +12,7 @@ import {
   validateTripItemId,
   validateSearch,
 } from '../../middleware/custom/tripvalidator.js'
+import { authenticate } from '../../middleware/authV2.js'
 
 const router = express.Router()
 
@@ -20,68 +21,99 @@ const router = express.Router()
 /**
  * @route   POST /api/trip-management/trips
  * @desc    建立新行程
- * @access  Public (之後可加入認證)
+ * @access  Private（需登入）
  */
-router.post('/trips', validateCreateTrip, tripController.createTrip)
+router.post(
+  '/trips',
+  authenticate,
+  validateCreateTrip,
+  tripController.createTrip
+)
 
 /**
  * @route   GET /api/trip-management/trips/user/:userId
  * @desc    取得使用者的所有行程
- * @access  Public
+ * @access  Private（只能查詢自己的行程列表）
  */
-router.get('/trips/user/:userId', validateUserId, tripController.getUserTrips)
+router.get(
+  '/trips/user/:userId',
+  authenticate,
+  validateUserId,
+  tripController.getUserTrips
+)
 
 /**
  * @route   GET /api/trip-management/trips/public
  * @desc    取得公開行程列表
- * @access  Public
+ * @access  Public（公開行程瀏覽，不需登入）
  */
 router.get('/trips/public', tripController2.getPublicTrips)
 
 /**
  * @route   GET /api/trip-management/trips/search
- * @desc    搜尋行程
- * @access  Public
+ * @desc    搜尋行程（僅搜尋公開行程）
+ * @access  Public（公開行程瀏覽，不需登入）
  */
 router.get('/trips/search', validateSearch, tripController2.searchTrips)
 
 /**
  * @route   GET /api/trip-management/trips/:tripId
  * @desc    取得單一行程詳細資料
- * @access  Public
+ * @access  Private（公開行程任何登入者可看，私人行程僅本人可看）
  */
-router.get('/trips/:tripId', validateTripId, tripController.getTripDetail)
+router.get(
+  '/trips/:tripId',
+  authenticate,
+  validateTripId,
+  tripController.getTripDetail
+)
 
 /**
  * @route   PUT /api/trip-management/trips/:tripId
  * @desc    更新行程
- * @access  Public (之後可加入認證,只能更新自己的行程)
+ * @access  Private（僅能更新自己的行程）
  */
-router.put('/trips/:tripId', validateUpdateTrip, tripController.updateTrip)
+router.put(
+  '/trips/:tripId',
+  authenticate,
+  validateUpdateTrip,
+  tripController.updateTrip
+)
 
 /**
  * @route   DELETE /api/trip-management/trips/:tripId
  * @desc    刪除行程
- * @access  Public (之後可加入認證,只能刪除自己的行程)
+ * @access  Private（僅能刪除自己的行程）
  */
-router.delete('/trips/:tripId', validateTripId, tripController.deleteTrip)
+router.delete(
+  '/trips/:tripId',
+  authenticate,
+  validateTripId,
+  tripController.deleteTrip
+)
 
 /**
  * @route   POST /api/trip-management/trips/:tripId/copy
  * @desc    複製行程
- * @access  Public
+ * @access  Private（僅能複製公開行程或自己的行程）
  */
-router.post('/trips/:tripId/copy', validateTripId, tripController2.copyTrip)
+router.post(
+  '/trips/:tripId/copy',
+  authenticate,
+  validateTripId,
+  tripController2.copyTrip
+)
 
 // ==================== Trip Item 操作 ====================
 
 /**
  * @route   POST /api/trip-management/trips/days/:tripDayId/items
  * @desc    新增景點到某一天
- * @access  Public
+ * @access  Private（僅能操作自己的行程）
  */
 router.post(
   '/trips/days/:tripDayId/items',
+  authenticate,
   validateAddPlace,
   tripItemController.addPlaceToDay
 )
@@ -89,10 +121,11 @@ router.post(
 /**
  * @route   DELETE /api/trip-management/trips/items/:tripItemId
  * @desc    刪除行程中的景點
- * @access  Public
+ * @access  Private（僅能操作自己的行程）
  */
 router.delete(
   '/trips/items/:tripItemId',
+  authenticate,
   validateTripItemId,
   tripItemController.removePlaceFromTrip
 )
@@ -100,10 +133,11 @@ router.delete(
 /**
  * @route   PUT /api/trip-management/trips/items/:tripItemId/order
  * @desc    更新景點順序
- * @access  Public
+ * @access  Private（僅能操作自己的行程）
  */
 router.put(
   '/trips/items/:tripItemId/order',
+  authenticate,
   validateUpdateOrder,
   tripItemController.updatePlaceOrder
 )

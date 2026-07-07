@@ -9,7 +9,9 @@ import { success, error } from '../../utils/custom/response.js'
 // ==================== 1️⃣ 新增收藏 ====================
 export const addFavorite = async (req, res, next) => {
   try {
-    const { user_id, trip_id } = req.body
+    const { trip_id } = req.body
+    // 收藏的擁有者一律是目前登入的使用者，不採用前端傳來的 user_id
+    const user_id = req.user.userId
 
     // 檢查行程是否存在
     const [trip] = await pool.execute(
@@ -45,8 +47,9 @@ export const addFavorite = async (req, res, next) => {
 // ==================== 2️⃣ 移除收藏 ====================
 export const removeFavorite = async (req, res, next) => {
   try {
-    //  支援兩種方式: URL 參數或 body
-    const userId = req.params.userId || req.body.user_id
+    // 一律使用目前登入的使用者身分，不採用 URL 或 body 傳來的 userId，
+    // 避免任何人能取消別人的收藏
+    const userId = req.user.userId
     const tripId = req.params.tripId || req.body.trip_id
 
     console.log('🗑️ 取消收藏:', { userId, tripId })
@@ -78,6 +81,11 @@ export const removeFavorite = async (req, res, next) => {
 export const getUserFavorites = async (req, res, next) => {
   try {
     const { userId } = req.params
+
+    // 只能查詢自己的收藏列表
+    if (Number(userId) !== req.user.userId) {
+      return error(res, '無權查詢其他使用者的收藏列表', 403)
+    }
 
     const [favorites] = await pool.execute(
       `SELECT 
