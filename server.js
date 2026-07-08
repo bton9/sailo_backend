@@ -15,10 +15,8 @@ import userRoutes from './src/routes/userRoutes.js'
 import blogRoutes from './src/routes/blog/index.js' //blog用
 import setupProductRoutes from './src/middleware/product/pd_router.js' // 改名
 import customerServiceRoutes from './src/routes/chat/customerServiceRoutes.js' // 🆕 客服聊天路由
-import aiChatRoutes from './src/routes/chat/aiChatRoutes.js' // 🆕 AI 客服路由
 import { setupSocketHandlers } from './src/utils/chat/socketHandler.js' // 🆕 WebSocket 處理器
 import { setSocketIO } from './src/controllers/chat/adminCustomerServiceController.js' // 🆕 設定 Socket.IO
-import { validateOllamaConnection } from './src/config/ollama.js' // 🆕 Ollama 驗證
 
 // 行程規畫用
 import locationRoutes from './src/routes/location.js'
@@ -46,24 +44,6 @@ dotenv.config()
 
 // ============ 驗證 ImageKit 配置 ============
 validateImageKitConfig()
-
-// ============ 驗證 Ollama 連線 (非阻斷性) ============
-validateOllamaConnection()
-  .then((result) => {
-    if (result.success) {
-      console.log(' Ollama 連線成功')
-      if (result.models?.length > 0) {
-        console.log('   可用模型:', result.models.map((m) => m.name).join(', '))
-      }
-    } else {
-      console.warn('  Ollama 連線失敗:', result.message)
-      console.warn('   AI 客服功能將無法使用')
-      console.warn('   請確認 Ollama 已啟動: ollama serve')
-    }
-  })
-  .catch((error) => {
-    console.warn('  Ollama 驗證異常:', error.message)
-  })
 
 const app = express()
 const httpServer = createServer(app) // 🆕 建立 HTTP Server
@@ -135,7 +115,6 @@ app.use(passport.session()) // 啟用 Passport session 支援
 app.use('/api/v2/auth', authRoutesV2) // OAuth 2.0 版本 (新)
 app.use('/api/v2/user', userRoutes) // OAuth 2.0 版本 (新)
 app.use('/api/customer-service', customerServiceRoutes) // 🆕 客服聊天 API
-app.use('/api/ai-chat', aiChatRoutes) // 🆕 AI 客服 API (Ollama)
 
 // ============ Health Check ============
 app.get('/health', (req, res) => {
