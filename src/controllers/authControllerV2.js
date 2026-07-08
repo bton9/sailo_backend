@@ -38,12 +38,19 @@ import QRCode from 'qrcode'
 
 /**
  * Cookie 配置
+ *
+ * 正式環境前後端為不同網域（跨站），瀏覽器要求 SameSite=None 的 cookie
+ * 必須同時帶 Secure，否則會被直接忽略；開發環境維持 Lax + 非 Secure
+ * 才能在 http://localhost 底下運作。
  */
-const COOKIE_OPTIONS = {
-  httpOnly: true, // 防止 XSS 攻擊，JavaScript 無法存取
-  secure: false, // 開發環境使用 HTTP，設為 false
-  sameSite: 'lax', // CSRF 防護
-  path: '/',
+function getCookieOptions() {
+  const isProduction = process.env.NODE_ENV === 'production'
+  return {
+    httpOnly: true, // 防止 XSS 攻擊，JavaScript 無法存取
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
+    path: '/',
+  }
 }
 
 const ACCESS_TOKEN_COOKIE = 'access_token'
@@ -184,19 +191,19 @@ export async function login(req, res) {
     // ============================================
     // Access Token Cookie (短期，7 天)
     res.cookie(ACCESS_TOKEN_COOKIE, accessToken, {
-      ...COOKIE_OPTIONS,
+      ...getCookieOptions(),
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 天
     })
 
     // Refresh Token Cookie (長期，30 天)
     res.cookie(REFRESH_TOKEN_COOKIE, refreshTokenResult.refreshToken, {
-      ...COOKIE_OPTIONS,
+      ...getCookieOptions(),
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 天
     })
 
     // Session Token Cookie (24 小時)
     res.cookie(SESSION_TOKEN_COOKIE, sessionResult.sessionToken, {
-      ...COOKIE_OPTIONS,
+      ...getCookieOptions(),
       maxAge: 24 * 60 * 60 * 1000, // 24 小時
     })
 
@@ -272,9 +279,9 @@ export async function refreshAccessToken(req, res) {
 
     if (!rotationResult) {
       // Refresh Token 無效，清除所有 cookies
-      res.clearCookie(ACCESS_TOKEN_COOKIE, COOKIE_OPTIONS)
-      res.clearCookie(REFRESH_TOKEN_COOKIE, COOKIE_OPTIONS)
-      res.clearCookie(SESSION_TOKEN_COOKIE, COOKIE_OPTIONS)
+      res.clearCookie(ACCESS_TOKEN_COOKIE, getCookieOptions())
+      res.clearCookie(REFRESH_TOKEN_COOKIE, getCookieOptions())
+      res.clearCookie(SESSION_TOKEN_COOKIE, getCookieOptions())
 
       return res.status(401).json({
         success: false,
@@ -321,12 +328,12 @@ export async function refreshAccessToken(req, res) {
     // 步驟 5: 更新 Cookies
     // ============================================
     res.cookie(ACCESS_TOKEN_COOKIE, newAccessToken, {
-      ...COOKIE_OPTIONS,
+      ...getCookieOptions(),
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 天
     })
 
     res.cookie(REFRESH_TOKEN_COOKIE, newRefreshToken, {
-      ...COOKIE_OPTIONS,
+      ...getCookieOptions(),
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 天
     })
 
@@ -371,9 +378,9 @@ export async function logout(req, res) {
     }
 
     // 清除所有 Auth Cookies
-    res.clearCookie(ACCESS_TOKEN_COOKIE, COOKIE_OPTIONS)
-    res.clearCookie(REFRESH_TOKEN_COOKIE, COOKIE_OPTIONS)
-    res.clearCookie(SESSION_TOKEN_COOKIE, COOKIE_OPTIONS)
+    res.clearCookie(ACCESS_TOKEN_COOKIE, getCookieOptions())
+    res.clearCookie(REFRESH_TOKEN_COOKIE, getCookieOptions())
+    res.clearCookie(SESSION_TOKEN_COOKIE, getCookieOptions())
 
     res.json({
       success: true,
@@ -1021,38 +1028,24 @@ export async function googleCallback(req, res) {
     // ========================================
     // 儲存 Tokens 到 httpOnly cookies
     // ========================================
-    const cookieOptions = {
-      httpOnly: true,
-      secure: false, // 開發環境 HTTP
-      sameSite: 'none', // 允許跨站 cookie（Google OAuth 需要）
-      path: '/',
-    }
-
-    // 如果是開發環境且使用 HTTP，sameSite 必須是 'lax' 或 'none'
-    // 但 'none' 需要 secure: true，所以開發環境用 'lax'
-    if (process.env.NODE_ENV !== 'production') {
-      cookieOptions.sameSite = 'lax'
-      cookieOptions.secure = false
-    }
-
     res.cookie(ACCESS_TOKEN_COOKIE, accessToken, {
-      ...cookieOptions,
+      ...getCookieOptions(),
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 天
     })
 
     res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, {
-      ...cookieOptions,
+      ...getCookieOptions(),
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 天
     })
 
     res.cookie(SESSION_TOKEN_COOKIE, sessionData.sessionToken, {
-      ...cookieOptions,
+      ...getCookieOptions(),
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 天
     })
 
     console.log(' Google login successful for:', user.email)
     console.log('🍪 Tokens stored in httpOnly cookies')
-    console.log('🍪 Cookie options:', cookieOptions)
+    console.log('🍪 Cookie options:', getCookieOptions())
 
     // ========================================
     // 重導向到前端頁面
