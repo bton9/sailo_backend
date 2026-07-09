@@ -58,6 +58,27 @@ const REFRESH_TOKEN_COOKIE = 'refresh_token'
 const SESSION_TOKEN_COOKIE = 'session_token'
 
 /**
+ * Google OAuth 一次性交換代碼暫存
+ *
+ * Google → 後端 → 前端 是跨越三個網域的轉址鏈，若在中間（後端 callback）
+ * 直接用 res.cookie() 設 cookie，Safari 的反彈追蹤防護 (bounce tracking
+ * protection) 會把這種轉址鏈中設定的 cookie 直接丟棄。改成後端先把 token
+ * 存到這裡、只在網址帶一個短效期代碼，前端 /auth/callback 頁面再用一般
+ * fetch（非導向）把代碼換成 cookie，避開轉址鏈中設 cookie 的模式。
+ *
+ * Render 免費方案僅單一 process（WEB_CONCURRENCY=1），記憶體儲存即可。
+ */
+const googleAuthExchangeStore = new Map()
+const EXCHANGE_CODE_TTL_MS = 60 * 1000 // 60 秒，只需撐過一次頁面轉址
+
+function cleanupExpiredExchangeCodes() {
+  const now = Date.now()
+  for (const [code, entry] of googleAuthExchangeStore) {
+    if (entry.expiresAt < now) googleAuthExchangeStore.delete(code)
+  }
+}
+
+/**
  * 登入
  *
  * OAuth 2.0 流程：
@@ -1026,31 +1047,22 @@ export async function googleCallback(req, res) {
     )
 
     // ========================================
-    // 儲存 Tokens 到 httpOnly cookies
+    // 產生一次性交換代碼，暫存 tokens（不在轉址鏈中直接設 cookie）
     // ========================================
-    res.cookie(ACCESS_TOKEN_COOKIE, accessToken, {
-      ...getCookieOptions(),
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 天
-    })
-
-    res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, {
-      ...getCookieOptions(),
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 天
-    })
-
-    res.cookie(SESSION_TOKEN_COOKIE, sessionData.sessionToken, {
-      ...getCookieOptions(),
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 天
+    cleanupExpiredExchangeCodes()
+    const exchangeCode = crypto.randomBytes(32).toString('hex')
+    googleAuthExchangeStore.set(exchangeCode, {
+      accessToken,
+      refreshToken,
+      sessionToken: sessionData.sessionToken,
+      expiresAt: Date.now() + EXCHANGE_CODE_TTL_MS,
     })
 
     console.log(' Google login successful for:', user.email)
-    console.log('🍪 Tokens stored in httpOnly cookies')
-    console.log('🍪 Cookie options:', getCookieOptions())
 
     // ========================================
-    // 重導向到前端頁面
+    // 重導向到前端 /auth/callback，帶一次性代碼（非 token 本身）
     // ========================================
-    // 安全性改進：不在 URL 中傳遞 token，前端會自動從 cookie 讀取
     // 支援自訂重導向路徑（從 OAuth state 參數讀取）
     let redirectPath = user.isNewUser ? '/' : '/site/membercenter'
 
@@ -1069,7 +1081,7 @@ export async function googleCallback(req, res) {
     }
 
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000'
-    const redirectUrl = `${frontendUrl}${redirectPath}`
+    const redirectUrl = `${frontendUrl}/auth/callback?code=${exchangeCode}&redirect=${encodeURIComponent(redirectPath)}`
 
     console.log('🔄 最終重導向到:', redirectUrl)
     res.redirect(redirectUrl)
@@ -1078,6 +1090,57 @@ export async function googleCallback(req, res) {
     res.redirect(
       `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=server_error`
     )
+  }
+}
+
+/**
+ * 交換 Google OAuth 一次性代碼，換取 httpOnly cookie
+ *
+ * 前端 /auth/callback 頁面收到 code 後，用一般 fetch（非導向）呼叫本端點
+ * 換取 cookie，避開在跨網域轉址鏈中直接設 cookie 被 Safari 反彈追蹤防護
+ * 擋掉的問題（見 googleAuthExchangeStore 上方註解）。
+ *
+ * @route POST /api/v2/auth/google/exchange
+ * @body {string} code
+ */
+export async function exchangeGoogleCode(req, res) {
+  try {
+    const { code } = req.body
+
+    if (!code) {
+      return res.status(400).json({ success: false, message: '缺少交換代碼' })
+    }
+
+    const entry = googleAuthExchangeStore.get(code)
+    googleAuthExchangeStore.delete(code) // 一次性使用，無論成功失敗都要刪除
+
+    if (!entry || entry.expiresAt < Date.now()) {
+      return res.status(400).json({
+        success: false,
+        message: '交換代碼無效或已過期，請重新登入',
+      })
+    }
+
+    res.cookie(ACCESS_TOKEN_COOKIE, entry.accessToken, {
+      ...getCookieOptions(),
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 天
+    })
+    res.cookie(REFRESH_TOKEN_COOKIE, entry.refreshToken, {
+      ...getCookieOptions(),
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 天
+    })
+    res.cookie(SESSION_TOKEN_COOKIE, entry.sessionToken, {
+      ...getCookieOptions(),
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 天
+    })
+
+    res.json({ success: true, message: '登入成功' })
+  } catch (error) {
+    console.error(' Google 代碼交換失敗:', error)
+    res.status(500).json({
+      success: false,
+      message: '伺服器錯誤，請稍後再試',
+    })
   }
 }
 
