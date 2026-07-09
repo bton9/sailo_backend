@@ -253,7 +253,11 @@ export async function login(req, res) {
       success: true,
       message: '登入成功',
       user: userData,
-      // 不再回傳 token，改用 httpOnly cookie
+      // Token 仍主要透過 httpOnly cookie 傳遞；額外在這裡回傳一份給前端存在
+      // 記憶體中，是給 Socket.IO 連線用的（WebSocket 無法像一般 API 那樣經由
+      // Vercel rewrite 代理成同網域請求，跨網域 cookie 在 Safari 上不穩定，
+      // 所以 Socket.IO 改用這個 token 明確帶在 handshake 的 auth 欄位）
+      accessToken,
     })
   } catch (error) {
     console.error(' Login error:', error)
@@ -483,6 +487,8 @@ export async function verify(req, res) {
     res.json({
       valid: true,
       user: userData,
+      // 給 Socket.IO handshake 用，見 login() 的同類註解
+      accessToken: token,
     })
   } catch (error) {
     console.error(' Token verify error:', error)
@@ -1134,7 +1140,12 @@ export async function exchangeGoogleCode(req, res) {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 天
     })
 
-    res.json({ success: true, message: '登入成功' })
+    res.json({
+      success: true,
+      message: '登入成功',
+      // 給 Socket.IO handshake 用，見 login() 的同類註解
+      accessToken: entry.accessToken,
+    })
   } catch (error) {
     console.error(' Google 代碼交換失敗:', error)
     res.status(500).json({
