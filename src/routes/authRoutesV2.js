@@ -29,6 +29,7 @@ import {
   resetPassword,
   googleLogin,
   googleCallback,
+  exchangeGoogleCode,
   enable2FA,
   verify2FA,
   disable2FA,
@@ -184,6 +185,13 @@ router.get(
   }),
   googleCallback
 )
+
+/**
+ * 交換 Google OAuth 一次性代碼，換取 httpOnly cookie
+ * @route POST /api/v2/auth/google/exchange
+ * @body {string} code
+ */
+router.post('/google/exchange', exchangeGoogleCode)
 
 // ============================================
 // Google Authenticator (2FA) 端點
