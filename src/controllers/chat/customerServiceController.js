@@ -50,7 +50,7 @@ export async function createOrGetRoom(req, res) {
     const subject = req.body?.subject || null
     const priority = req.body?.priority || 'medium'
 
-    console.log('📝 建立聊天室請求:', {
+    console.log('建立聊天室請求:', {
       userId,
       subject,
       priority,
@@ -114,7 +114,7 @@ export async function createOrGetRoom(req, res) {
       isNew: true,
     })
   } catch (error) {
-    console.error(' 建立聊天室失敗:', error)
+    console.error('建立聊天室失敗:', error)
     res.status(500).json({
       success: false,
       message: '建立聊天室失敗',
@@ -166,7 +166,7 @@ export async function getUserRooms(req, res) {
       rooms,
     })
   } catch (error) {
-    console.error(' 取得聊天室失敗:', error)
+    console.error('取得聊天室失敗:', error)
     res.status(500).json({
       success: false,
       message: '取得聊天室失敗',
@@ -190,7 +190,7 @@ export async function getRoomMessages(req, res) {
     const limit = parseInt(req.query.limit) || 50
     const offset = parseInt(req.query.offset) || 0
 
-    console.log('🔍 getRoomMessages 參數:', {
+    console.log('getRoomMessages 參數:', {
       roomId,
       limit,
       offset,
@@ -291,7 +291,7 @@ export async function getRoomMessages(req, res) {
       },
     })
   } catch (error) {
-    console.error(' 取得訊息失敗:', error)
+    console.error('取得訊息失敗:', error)
     res.status(500).json({
       success: false,
       message: '取得訊息失敗',
@@ -384,7 +384,7 @@ export async function getAllHistory(req, res) {
       total: rooms.length,
     })
   } catch (error) {
-    console.error(' 取得歷史記錄失敗:', error)
+    console.error('取得歷史記錄失敗:', error)
     res.status(500).json({
       success: false,
       message: '取得歷史記錄失敗',
@@ -408,7 +408,7 @@ export async function uploadChatImage(req, res) {
     const { file, fileName } = req.body
     const roomId = parseInt(req.body.roomId)
 
-    console.log('📤 圖片上傳請求:', {
+    console.log('圖片上傳請求:', {
       userId,
       roomId,
       fileName,
@@ -424,14 +424,14 @@ export async function uploadChatImage(req, res) {
     )
 
     if (room.length === 0) {
-      console.log(' 無權存取聊天室:', { roomId, userId })
+      console.log('無權存取聊天室:', { roomId, userId })
       return res.status(403).json({
         success: false,
         message: '無權存取此聊天室',
       })
     }
 
-    console.log(' 聊天室驗證通過:', room[0])
+    console.log('聊天室驗證通過:', room[0])
 
     // ============================================
     // 步驟 2: 上傳圖片到 ImageKit
@@ -444,7 +444,7 @@ export async function uploadChatImage(req, res) {
       tags: [`room_${roomId}`, `user_${userId}`],
     })
 
-    console.log(' ImageKit 上傳成功:', {
+    console.log('ImageKit 上傳成功:', {
       url: uploadResult.url,
       size: uploadResult.size,
     })
@@ -463,7 +463,7 @@ export async function uploadChatImage(req, res) {
        VALUES (${roomId}, ${userId}, 'image', '${uploadResult.url}', '${safeFileName}', ${fileSize ? fileSize : 'NULL'}, ${thumbnailUrl ? `'${thumbnailUrl}'` : 'NULL'})`
     )
 
-    console.log(' 訊息儲存成功:', result.insertId)
+    console.log('訊息儲存成功:', result.insertId)
 
     res.json({
       success: true,
@@ -473,7 +473,7 @@ export async function uploadChatImage(req, res) {
       messageId: result.insertId,
     })
   } catch (error) {
-    console.error(' 圖片上傳失敗:', error)
+    console.error('圖片上傳失敗:', error)
     res.status(500).json({
       success: false,
       message: '圖片上傳失敗',
@@ -537,7 +537,7 @@ export async function updateRoomStatus(req, res) {
       status,
     })
   } catch (error) {
-    console.error(' 更新狀態失敗:', error)
+    console.error('更新狀態失敗:', error)
     res.status(500).json({
       success: false,
       message: '更新狀態失敗',
@@ -601,7 +601,7 @@ export async function assignAgent(req, res) {
       agent: agent[0],
     })
   } catch (error) {
-    console.error(' 分配客服失敗:', error)
+    console.error('分配客服失敗:', error)
     res.status(500).json({
       success: false,
       message: '分配客服失敗',
@@ -700,7 +700,7 @@ export async function transferFromAI(req, res) {
       roomId,
     })
   } catch (error) {
-    console.error(' AI 轉人工失敗:', error)
+    console.error('AI 轉人工失敗:', error)
     res.status(500).json({
       success: false,
       message: 'AI 轉人工失敗',
@@ -729,7 +729,7 @@ export async function submitRating(req, res) {
     const { roomId } = req.params
     const { rating, comment = null } = req.body
 
-    console.log('⭐ 使用者提交評分:', { userId, roomId, rating, comment })
+    console.log('使用者提交評分:', { userId, roomId, rating, comment })
 
     // ============================================
     // 步驟 1: 驗證評分有效性
@@ -813,14 +813,14 @@ export async function submitRating(req, res) {
       [roomId, userId, room.agent_id, rating, comment]
     )
 
-    console.log(' 評分提交成功')
+    console.log('評分提交成功')
 
     res.json({
       success: true,
       message: '感謝您的評分！',
     })
   } catch (error) {
-    console.error(' 提交評分失敗:', error)
+    console.error('提交評分失敗:', error)
     res.status(500).json({
       success: false,
       message: '提交評分失敗',

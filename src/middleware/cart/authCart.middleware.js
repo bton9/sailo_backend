@@ -19,7 +19,7 @@ import { verifyToken } from '../../utils/jwt.js'
  */
 export const requireAuth = (req, res, next) => {
   try {
-    // 🔐 Auth V2: 從 httpOnly cookie 取得 access_token
+    // Auth V2: 從 httpOnly cookie 取得 access_token
     const token = req.cookies?.access_token
 
     if (!token) {
@@ -47,7 +47,7 @@ export const requireAuth = (req, res, next) => {
 
     next()
   } catch (error) {
-    console.error(' Authentication error:', error)
+    console.error('Authentication error:', error)
     return res.status(401).json({
       success: false,
       message: '身份驗證失敗',
@@ -63,7 +63,7 @@ export const requireAuth = (req, res, next) => {
  */
 export const optionalAuth = (req, res, next) => {
   try {
-    // 🔐 Auth V2: 從 httpOnly cookie 取得 access_token
+    // Auth V2: 從 httpOnly cookie 取得 access_token
     const token = req.cookies?.access_token
 
     if (token) {
@@ -79,7 +79,7 @@ export const optionalAuth = (req, res, next) => {
     next()
   } catch (error) {
     // 即使驗證失敗也繼續，因為這是可選的
-    console.warn(' Optional auth failed:', error.message)
+    console.warn('Optional auth failed:', error.message)
     next()
   }
 }
@@ -137,7 +137,7 @@ export const validateCartOwnership = (req, res, next) => {
 
     next()
   } catch (error) {
-    console.error(' Ownership validation error:', error)
+    console.error('Ownership validation error:', error)
     return res.status(500).json({
       success: false,
       message: '驗證失敗',

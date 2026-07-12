@@ -37,10 +37,10 @@ const transporter = nodemailer.createTransport({
 export async function verifyEmailConnection() {
   try {
     await transporter.verify()
-    console.log(' Email server is ready to send messages')
+    console.log('Email server is ready to send messages')
     return true
   } catch (error) {
-    console.error(' Email server connection failed:', error.message)
+    console.error('Email server connection failed:', error.message)
     return false
   }
 }
@@ -66,7 +66,7 @@ export async function sendPasswordResetEmail(email, resetToken, userName) {
     // 參數: token (用於驗證使用者身份)
     const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/reset-password?token=${resetToken}`
 
-    console.log('📧 準備發送密碼重置郵件:', {
+    console.log('準備發送密碼重置郵件:', {
       to: email,
       resetUrl: resetUrl,
       userName: userName || '(未提供)',
@@ -158,7 +158,7 @@ export async function sendPasswordResetEmail(email, resetToken, userName) {
       <body>
         <div class="container">
           <div class="header">
-            <h1>🔐 密碼重置請求</h1>
+            <h1>密碼重置請求</h1>
           </div>
           <div class="content">
             <h2>親愛的 ${userName || '使用者'}，您好！</h2>
@@ -215,15 +215,15 @@ ${resetUrl}
     const info = await transporter.sendMail({
       from: `"SailoTravel 客服中心" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: '🔐 SailoTravel - 密碼重置請求',
+      subject: 'SailoTravel - 密碼重置請求',
       text: textContent,
       html: htmlContent,
     })
 
-    console.log(' Password reset email sent:', info.messageId)
+    console.log('Password reset email sent:', info.messageId)
     return true
   } catch (error) {
-    console.error(' Failed to send password reset email:', error)
+    console.error('Failed to send password reset email:', error)
     return false
   }
 }
@@ -313,7 +313,7 @@ export async function sendVerificationEmail(
       <body>
         <div class="container">
           <div class="header">
-            <h1>✉️ Email 驗證</h1>
+            <h1>Email 驗證</h1>
           </div>
           <div class="content">
             <h2>歡迎加入 SailoTravel！</h2>
@@ -344,14 +344,14 @@ export async function sendVerificationEmail(
     const info = await transporter.sendMail({
       from: `"SailoTravel 客服中心" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: '✉️ SailoTravel - Email 驗證',
+      subject: 'SailoTravel - Email 驗證',
       html: htmlContent,
     })
 
-    console.log(' Verification email sent:', info.messageId)
+    console.log('Verification email sent:', info.messageId)
     return true
   } catch (error) {
-    console.error(' Failed to send verification email:', error)
+    console.error('Failed to send verification email:', error)
     return false
   }
 }
@@ -407,7 +407,7 @@ export async function sendWelcomeEmail(email, userName) {
       <body>
         <div class="container">
           <div class="header">
-            <h1>🎉 歡迎加入 SailoTravel！</h1>
+            <h1>歡迎加入 SailoTravel！</h1>
           </div>
           <div class="content">
             <h2>親愛的 ${userName}，</h2>
@@ -425,14 +425,14 @@ export async function sendWelcomeEmail(email, userName) {
     await transporter.sendMail({
       from: `"SailoTravel 客服中心" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: '🎉 歡迎加入 SailoTravel！',
+      subject: '歡迎加入 SailoTravel！',
       html: htmlContent,
     })
 
-    console.log(' Welcome email sent to:', email)
+    console.log('Welcome email sent to:', email)
     return true
   } catch (error) {
-    console.error(' Failed to send welcome email:', error)
+    console.error('Failed to send welcome email:', error)
     return false
   }
 }
@@ -454,7 +454,7 @@ export async function sendWelcomeEmail(email, userName) {
  */
 export async function sendPasswordResetOTPEmail(email, otp, userName) {
   try {
-    console.log('📧 準備發送密碼重置 OTP 郵件:', {
+    console.log('準備發送密碼重置 OTP 郵件:', {
       to: email,
       otp: otp,
       userName: userName || '(未提供)',
@@ -563,7 +563,7 @@ export async function sendPasswordResetOTPEmail(email, otp, userName) {
             
             <div class="info-box">
               <p style="margin: 0;">
-                <strong>🔢 驗證次數：</strong> 最多可驗證 <strong>5 次</strong>，超過後需重新申請
+                <strong>驗證次數：</strong> 最多可驗證 <strong>5 次</strong>，超過後需重新申請
               </p>
             </div>
             
@@ -601,14 +601,14 @@ export async function sendPasswordResetOTPEmail(email, otp, userName) {
     await transporter.sendMail({
       from: `"SailoTravel 客服中心" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: '🔒 密碼重置驗證碼 - SailoTravel',
+      subject: '密碼重置驗證碼 - SailoTravel',
       html: htmlContent,
     })
 
-    console.log(' Password reset OTP email sent to:', email)
+    console.log('Password reset OTP email sent to:', email)
     return true
   } catch (error) {
-    console.error(' Failed to send password reset OTP email:', error)
+    console.error('Failed to send password reset OTP email:', error)
     return false
   }
 }

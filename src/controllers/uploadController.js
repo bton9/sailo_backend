@@ -58,7 +58,7 @@ export async function handleImageUpload(req, res) {
     `
     await query(sql, [place_id, url, place_id])
 
-    console.log(' 景點封面圖片上傳成功:', url)
+    console.log('景點封面圖片上傳成功:', url)
 
     res.json({
       success: true,
@@ -67,7 +67,7 @@ export async function handleImageUpload(req, res) {
       thumbnailUrl: uploadResponse.thumbnailUrl,
     })
   } catch (err) {
-    console.error(' 封面圖片上傳失敗:', err)
+    console.error('封面圖片上傳失敗:', err)
     res.status(500).json({
       success: false,
       message: '圖片上傳錯誤',
@@ -125,7 +125,7 @@ export async function handleGalleryUpload(req, res) {
       uploadResponse.url, //  儲存 ImageKit URL
     ])
 
-    console.log(' 景點相簿圖片上傳成功:', uploadResponse.url)
+    console.log('景點相簿圖片上傳成功:', uploadResponse.url)
 
     res.json({
       success: true,
@@ -136,7 +136,7 @@ export async function handleGalleryUpload(req, res) {
       message: '圖片上傳成功',
     })
   } catch (err) {
-    console.error(' 景點相簿圖片上傳失敗:', err)
+    console.error('景點相簿圖片上傳失敗:', err)
     res.status(500).json({
       success: false,
       message: '圖片上傳錯誤',
@@ -167,7 +167,7 @@ export async function getPlaceGallery(req, res) {
       images: rows || [],
     })
   } catch (err) {
-    console.error(' 取得相簿失敗:', err)
+    console.error('取得相簿失敗:', err)
     res.status(500).json({ success: false, message: '資料庫錯誤' })
   }
 }
@@ -236,7 +236,7 @@ export const deleteGalleryImage = async (req, res) => {
       media_id,
     ])
 
-    console.log('🗑️ 刪除結果:', result)
+    console.log('刪除結果:', result)
 
     if (result.affectedRows === 0) {
       return res.status(500).json({

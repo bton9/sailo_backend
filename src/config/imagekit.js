@@ -48,14 +48,14 @@ export function validateImageKitConfig() {
   const missing = requiredVars.filter((varName) => !process.env[varName])
 
   if (missing.length > 0) {
-    console.error(' ImageKit 配置錯誤: 缺少環境變數', missing)
+    console.error('ImageKit 配置錯誤: 缺少環境變數', missing)
     console.error(
-      '💡 請在 .env 檔案中設定: IMAGEKIT_PUBLIC_KEY, IMAGEKIT_PRIVATE_KEY, IMAGEKIT_URL_ENDPOINT'
+      '請在 .env 檔案中設定: IMAGEKIT_PUBLIC_KEY, IMAGEKIT_PRIVATE_KEY, IMAGEKIT_URL_ENDPOINT'
     )
     return false
   }
 
-  console.log(' ImageKit 配置檢查通過')
+  console.log('ImageKit 配置檢查通過')
   return true
 }
 

@@ -115,7 +115,7 @@ export async function authenticate(req, res, next) {
       fullUser: user,
     }
 
-    console.log(' 使用者驗證成功:', {
+    console.log('使用者驗證成功:', {
       userId: user.id,
       email: user.email,
     })
@@ -123,7 +123,7 @@ export async function authenticate(req, res, next) {
     // 繼續執行下一個中介層或路由處理器
     next()
   } catch (error) {
-    console.error(' Authentication error:', error)
+    console.error('Authentication error:', error)
     res.status(500).json({
       success: false,
       message: '伺服器錯誤',
@@ -183,7 +183,7 @@ export async function authenticateOptional(req, res, next) {
     next()
   } catch (error) {
     // 發生錯誤時視為訪客
-    console.warn(' Optional authentication error:', error)
+    console.warn('Optional authentication error:', error)
     req.user = null
     next()
   }

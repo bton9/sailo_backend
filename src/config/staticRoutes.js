@@ -18,7 +18,7 @@ export function setupStaticRoutes(app) {
 
     fs.readFile(filepath, (err, data) => {
       if (err) {
-        console.error(` Error reading file ${filename}:`, err)
+        console.error(`Error reading file ${filename}:`, err)
         return res.status(500).json({ error: 'Error reading file' })
       }
 
@@ -27,7 +27,7 @@ export function setupStaticRoutes(app) {
         process.env.FRONTEND_URL || 'http://localhost:3000'
       )
       res.setHeader('Access-Control-Allow-Credentials', 'true')
-      console.log(` Serving image: ${filename}`)
+      console.log(`Serving image: ${filename}`)
       res.send(data)
     })
   })

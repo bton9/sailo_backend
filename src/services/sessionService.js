@@ -118,7 +118,7 @@ export async function createSession(userId, accessToken, options = {}) {
       ]
     )
 
-    console.log(' Session 建立成功:', {
+    console.log('Session 建立成功:', {
       sessionId: result.insertId,
       userId,
       expiresAt,
@@ -131,7 +131,7 @@ export async function createSession(userId, accessToken, options = {}) {
       expiresAt,
     }
   } catch (error) {
-    console.error(' 建立 Session 失敗:', error)
+    console.error('建立 Session 失敗:', error)
     throw new Error('Failed to create session')
   }
 }
@@ -156,7 +156,7 @@ export async function validateSession(sessionToken, accessToken = null) {
     )
 
     if (sessions.length === 0) {
-      console.warn(' Session 不存在或已過期')
+      console.warn('Session 不存在或已過期')
       return null
     }
 
@@ -166,7 +166,7 @@ export async function validateSession(sessionToken, accessToken = null) {
     if (accessToken) {
       const accessTokenHash = hashAccessToken(accessToken)
       if (session.access_token_hash !== accessTokenHash) {
-        console.warn(' Access Token Hash 不匹配')
+        console.warn('Access Token Hash 不匹配')
         return null
       }
     }
@@ -176,14 +176,14 @@ export async function validateSession(sessionToken, accessToken = null) {
       session.id,
     ])
 
-    console.log(' Session 驗證成功:', {
+    console.log('Session 驗證成功:', {
       sessionId: session.id,
       userId: session.user_id,
     })
 
     return session
   } catch (error) {
-    console.error(' 驗證 Session 失敗:', error)
+    console.error('驗證 Session 失敗:', error)
     return null
   }
 }
@@ -205,10 +205,10 @@ export async function extendSession(sessionId, extendHours = 24) {
       [newExpiresAt, sessionId]
     )
 
-    console.log(' Session 延長成功:', { sessionId, newExpiresAt })
+    console.log('Session 延長成功:', { sessionId, newExpiresAt })
     return true
   } catch (error) {
-    console.error(' 延長 Session 失敗:', error)
+    console.error('延長 Session 失敗:', error)
     return false
   }
 }
@@ -236,10 +236,10 @@ export async function revokeSession(sessionToken) {
       [sessionToken]
     )
 
-    console.log(' Session 已撤銷:', { sessionToken })
+    console.log('Session 已撤銷:', { sessionToken })
     return true
   } catch (error) {
-    console.error(' 撤銷 Session 失敗:', error)
+    console.error('撤銷 Session 失敗:', error)
     return false
   }
 }
@@ -267,10 +267,10 @@ export async function revokeAllUserSessions(userId) {
     )
 
     const count = result.affectedRows
-    console.log(' 已撤銷使用者所有 Sessions:', { userId, count })
+    console.log('已撤銷使用者所有 Sessions:', { userId, count })
     return count
   } catch (error) {
-    console.error(' 撤銷所有 Sessions 失敗:', error)
+    console.error('撤銷所有 Sessions 失敗:', error)
     return 0
   }
 }
@@ -301,7 +301,7 @@ export async function getUserActiveSessions(userId) {
       device_info: session.device_info ? JSON.parse(session.device_info) : null,
     }))
   } catch (error) {
-    console.error(' 取得使用者 Sessions 失敗:', error)
+    console.error('取得使用者 Sessions 失敗:', error)
     return []
   }
 }
@@ -321,10 +321,10 @@ export async function cleanupExpiredSessions() {
     )
 
     const count = result.affectedRows
-    console.log(' 已清理過期 Sessions:', { count })
+    console.log('已清理過期 Sessions:', { count })
     return count
   } catch (error) {
-    console.error(' 清理過期 Sessions 失敗:', error)
+    console.error('清理過期 Sessions 失敗:', error)
     return 0
   }
 }

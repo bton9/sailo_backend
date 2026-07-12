@@ -56,7 +56,7 @@ export async function updateNickname(req, res) {
       userId,
     ])
 
-    console.log(` 使用者 ${userId} 更新暱稱為: ${nickname}`)
+    console.log(`使用者 ${userId} 更新暱稱為: ${nickname}`)
 
     // ============================================
     // 步驟 4: 回傳更新後的資料
@@ -69,7 +69,7 @@ export async function updateNickname(req, res) {
       },
     })
   } catch (error) {
-    console.error(' Update nickname error:', error)
+    console.error('Update nickname error:', error)
     res.status(500).json({
       success: false,
       message: '伺服器錯誤，請稍後再試',
@@ -185,7 +185,7 @@ export async function updateProfile(req, res) {
       ]
     )
 
-    console.log(` 使用者 ${userId} 更新個人資料`)
+    console.log(`使用者 ${userId} 更新個人資料`)
 
     // ============================================
     // 步驟 4: 回傳更新後的資料
@@ -201,7 +201,7 @@ export async function updateProfile(req, res) {
       },
     })
   } catch (error) {
-    console.error(' Update profile error:', error)
+    console.error('Update profile error:', error)
     res.status(500).json({
       success: false,
       message: '伺服器錯誤，請稍後再試',
@@ -327,7 +327,7 @@ export async function updatePassword(req, res) {
       userId,
     ])
 
-    console.log(` 使用者 ${userId} 密碼已更新`)
+    console.log(`使用者 ${userId} 密碼已更新`)
 
     // ============================================
     // 步驟 8: 回傳成功訊息
@@ -337,7 +337,7 @@ export async function updatePassword(req, res) {
       message: '密碼更新成功',
     })
   } catch (error) {
-    console.error(' Update password error:', error)
+    console.error('Update password error:', error)
     res.status(500).json({
       success: false,
       message: '伺服器錯誤，請稍後再試',

@@ -6,7 +6,7 @@ import { success, error } from '../../utils/custom/response.js'
  * 表：trip_favorites、trips、trip_days、trip_items、locations、users
  */
 
-// ==================== 1️⃣ 新增收藏 ====================
+// ==================== 新增收藏 ====================
 export const addFavorite = async (req, res, next) => {
   try {
     const { trip_id } = req.body
@@ -44,7 +44,7 @@ export const addFavorite = async (req, res, next) => {
   }
 }
 
-// ==================== 2️⃣ 移除收藏 ====================
+// ==================== 移除收藏 ====================
 export const removeFavorite = async (req, res, next) => {
   try {
     // 一律使用目前登入的使用者身分，不採用 URL 或 body 傳來的 userId，
@@ -52,7 +52,7 @@ export const removeFavorite = async (req, res, next) => {
     const userId = req.user.userId
     const tripId = req.params.tripId || req.body.trip_id
 
-    console.log('🗑️ 取消收藏:', { userId, tripId })
+    console.log('取消收藏:', { userId, tripId })
 
     // 驗證參數
     if (!userId || !tripId) {
@@ -72,12 +72,12 @@ export const removeFavorite = async (req, res, next) => {
 
     success(res, null, '取消收藏成功')
   } catch (err) {
-    console.error(' 取消收藏錯誤:', err)
+    console.error('取消收藏錯誤:', err)
     next(err)
   }
 }
 
-// ==================== 3️⃣ 取得使用者收藏列表 ====================
+// ==================== 取得使用者收藏列表 ====================
 export const getUserFavorites = async (req, res, next) => {
   try {
     const { userId } = req.params

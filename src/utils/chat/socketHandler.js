@@ -82,10 +82,10 @@ export function setupSocketHandlers(io) {
       socket.userEmail = decoded.email
       socket.userAccess = decoded.access
 
-      console.log(` Socket 認證成功: User ${socket.userId} (${decoded.email})`)
+      console.log(`Socket 認證成功: User ${socket.userId} (${decoded.email})`)
       next()
     } catch (error) {
-      console.error(' Socket 認證失敗:', error.message)
+      console.error('Socket 認證失敗:', error.message)
       next(new Error('Authentication error'))
     }
   })
@@ -96,7 +96,7 @@ export function setupSocketHandlers(io) {
   io.on('connection', (socket) => {
     const userId = socket.userId
 
-    console.log(`🔌 使用者連線: ${userId} (Socket ID: ${socket.id})`)
+    console.log(`使用者連線: ${userId} (Socket ID: ${socket.id})`)
 
     // 記錄使用者 Socket 連線
     if (!userSockets.has(userId)) {
@@ -146,7 +146,7 @@ export function setupSocketHandlers(io) {
         // 加入 Socket.IO Room
         socket.join(`room_${roomId}`)
 
-        console.log(`👥 使用者 ${userId} 加入聊天室 ${roomId}`)
+        console.log(`使用者 ${userId} 加入聊天室 ${roomId}`)
 
         // 取得使用者資訊
         const user = await query(
@@ -168,7 +168,7 @@ export function setupSocketHandlers(io) {
           message: '已加入聊天室',
         })
       } catch (error) {
-        console.error(' 加入聊天室失敗:', error)
+        console.error('加入聊天室失敗:', error)
         socket.emit('error', {
           message: '加入聊天室失敗',
           event: 'join_room',
@@ -192,7 +192,7 @@ export function setupSocketHandlers(io) {
 
         socket.leave(`room_${roomId}`)
 
-        console.log(`👋 使用者 ${userId} 離開聊天室 ${roomId}`)
+        console.log(`使用者 ${userId} 離開聊天室 ${roomId}`)
 
         // 通知聊天室內其他人
         socket.to(`room_${roomId}`).emit('user_left', {
@@ -206,7 +206,7 @@ export function setupSocketHandlers(io) {
           message: '已離開聊天室',
         })
       } catch (error) {
-        console.error(' 離開聊天室失敗:', error)
+        console.error('離開聊天室失敗:', error)
         socket.emit('error', {
           message: '離開聊天室失敗',
           event: 'leave_room',
@@ -258,7 +258,7 @@ export function setupSocketHandlers(io) {
         }
 
         // ============================================
-        // 🆕 檢查是否為第一則訊息
+        //  檢查是否為第一則訊息
         // 如果是，先插入歡迎訊息
         // ============================================
         const messageCount = await query(
@@ -301,7 +301,7 @@ export function setupSocketHandlers(io) {
           // 廣播歡迎訊息
           io.to(`room_${roomId}`).emit('new_message', welcomeMessage)
 
-          console.log(`📢 發送歡迎訊息到聊天室 ${roomId}`)
+          console.log(`發送歡迎訊息到聊天室 ${roomId}`)
         }
 
         // 儲存訊息到資料庫
@@ -338,7 +338,7 @@ export function setupSocketHandlers(io) {
           created_at: new Date().toISOString(), // 使用 ISO 字串格式
         }
 
-        console.log(`💬 使用者 ${userId} 在聊天室 ${roomId} 發送訊息`)
+        console.log(`使用者 ${userId} 在聊天室 ${roomId} 發送訊息`)
 
         // 廣播訊息給聊天室內所有人 (包含發送者)
         io.to(`room_${roomId}`).emit('new_message', newMessage)
@@ -363,7 +363,7 @@ export function setupSocketHandlers(io) {
           }
         }
       } catch (error) {
-        console.error(' 發送訊息失敗:', error)
+        console.error('發送訊息失敗:', error)
         socket.emit('error', {
           message: '發送訊息失敗',
           event: 'send_message',
@@ -402,7 +402,7 @@ export function setupSocketHandlers(io) {
            WHERE id IN (${messageIdsStr}) AND room_id = ${roomIdInt} AND sender_id != ${userId}`
         )
 
-        console.log(`👁️ 使用者 ${userId} 已讀訊息: ${messageIds.join(', ')}`)
+        console.log(`使用者 ${userId} 已讀訊息: ${messageIds.join(', ')}`)
 
         // 通知聊天室內其他人
         socket.to(`room_${roomId}`).emit('messages_read', {
@@ -412,7 +412,7 @@ export function setupSocketHandlers(io) {
           timestamp: new Date(),
         })
       } catch (error) {
-        console.error(' 標記已讀失敗:', error)
+        console.error('標記已讀失敗:', error)
       }
     })
 
@@ -452,7 +452,7 @@ export function setupSocketHandlers(io) {
      */
     socket.on('agent_online', async () => {
       if (socket.userAccess === 'admin') {
-        console.log(`🟢 客服上線: ${userId}`)
+        console.log(`客服上線: ${userId}`)
 
         // 更新客服狀態 (可擴充至資料庫)
         io.emit('agent_status_changed', {
@@ -468,7 +468,7 @@ export function setupSocketHandlers(io) {
     // ============================================
     socket.on('agent_offline', async () => {
       if (socket.userAccess === 'admin') {
-        console.log(`🔴 客服離線: ${userId}`)
+        console.log(`客服離線: ${userId}`)
 
         io.emit('agent_status_changed', {
           agentId: userId,
@@ -482,7 +482,7 @@ export function setupSocketHandlers(io) {
     // 斷線事件
     // ============================================
     socket.on('disconnect', (reason) => {
-      console.log(`🔌 使用者斷線: ${userId} (原因: ${reason})`)
+      console.log(`使用者斷線: ${userId} (原因: ${reason})`)
 
       // 移除 Socket 連線紀錄
       if (userSockets.has(userId)) {
@@ -507,11 +507,11 @@ export function setupSocketHandlers(io) {
     // 錯誤處理
     // ============================================
     socket.on('error', (error) => {
-      console.error(` Socket 錯誤 (User ${userId}):`, error)
+      console.error(`Socket 錯誤 (User ${userId}):`, error)
     })
   })
 
-  console.log(' WebSocket 事件處理器已設置')
+  console.log('WebSocket 事件處理器已設置')
 }
 
 /**
@@ -560,7 +560,7 @@ export function isUserOnline(userId) {
  * @param {Object} data - { roomId, agentId }
  */
 export function emitRoomAccepted(io, roomId, agentId, roomData) {
-  console.log('📌 [Socket] 客服接單:', { roomId, agentId })
+  console.log('[Socket] 客服接單:', { roomId, agentId })
 
   // 通知聊天室內所有成員
   io.to(`room_${roomId}`).emit('room_status_updated', {
@@ -592,7 +592,7 @@ export function emitRoomAccepted(io, roomId, agentId, roomData) {
  * @param {Object} roomData - 聊天室資料
  */
 export function emitRoomClosed(io, roomId, roomData) {
-  console.log('🔒 [Socket] 聊天室關閉:', roomId)
+  console.log('[Socket] 聊天室關閉:', roomId)
 
   // 通知聊天室內所有成員
   io.to(`room_${roomId}`).emit('room_status_updated', {
@@ -620,7 +620,7 @@ export function emitRoomClosed(io, roomId, roomData) {
  * @param {Object} roomData - 聊天室資料
  */
 export function emitNewRoomCreated(io, roomData) {
-  console.log('🆕 [Socket] 新聊天室建立:', roomData.id)
+  console.log('[Socket] 新聊天室建立:', roomData.id)
 
   // 通知所有在線客服
   io.emit('new_room_created', {
@@ -642,12 +642,12 @@ const onlineAgents = new Set()
 
 export function setAgentOnline(agentId) {
   onlineAgents.add(agentId)
-  console.log('🟢 [Socket] 客服上線:', agentId, '在線數:', onlineAgents.size)
+  console.log('[Socket] 客服上線:', agentId, '在線數:', onlineAgents.size)
 }
 
 export function setAgentOffline(agentId) {
   onlineAgents.delete(agentId)
-  console.log('🔴 [Socket] 客服離線:', agentId, '在線數:', onlineAgents.size)
+  console.log('[Socket] 客服離線:', agentId, '在線數:', onlineAgents.size)
 }
 
 export function getOnlineAgents() {
@@ -677,7 +677,7 @@ export function getOnlineAgentCount() {
  * - AI 回答失敗次數過多
  */
 export function emitAITransfer(io, roomData, aiContext) {
-  console.log('🤖 [Socket] AI 轉人工:', roomData.id)
+  console.log('[Socket] AI 轉人工:', roomData.id)
 
   // 通知所有在線客服（高優先級）
   io.emit('ai_transfer_request', {

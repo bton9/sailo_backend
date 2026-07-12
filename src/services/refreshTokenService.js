@@ -52,8 +52,8 @@ export async function createRefreshToken(userId, sessionId, options = {}) {
       userId,
       sessionId,
       type: 'refresh',
-      jti, // 🔧 加入唯一識別碼
-      iat: Math.floor(Date.now() / 1000), // 🔧 加入簽發時間
+      jti, //  加入唯一識別碼
+      iat: Math.floor(Date.now() / 1000), //  加入簽發時間
     })
 
     // 產生裝置指紋
@@ -63,7 +63,7 @@ export async function createRefreshToken(userId, sessionId, options = {}) {
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + expiresInDays)
 
-    // 🔧 防止重複：先檢查並刪除可能存在的相同 Token
+    //  防止重複：先檢查並刪除可能存在的相同 Token
     await query(`DELETE FROM refresh_tokens WHERE token = ? AND user_id = ?`, [
       refreshToken,
       userId,
@@ -85,7 +85,7 @@ export async function createRefreshToken(userId, sessionId, options = {}) {
       ]
     )
 
-    console.log(' Refresh Token 建立成功:', {
+    console.log('Refresh Token 建立成功:', {
       tokenId: result.insertId,
       userId,
       sessionId,
@@ -98,7 +98,7 @@ export async function createRefreshToken(userId, sessionId, options = {}) {
       expiresAt,
     }
   } catch (error) {
-    console.error(' 建立 Refresh Token 失敗:', error)
+    console.error('建立 Refresh Token 失敗:', error)
     throw new Error('Failed to create refresh token')
   }
 }
@@ -134,7 +134,7 @@ export async function validateRefreshToken(refreshToken, options = {}) {
     )
 
     if (tokens.length === 0) {
-      console.warn(' Refresh Token 不存在、已撤銷或已過期')
+      console.warn('Refresh Token 不存在、已撤銷或已過期')
       return null
     }
 
@@ -142,7 +142,7 @@ export async function validateRefreshToken(refreshToken, options = {}) {
 
     // 檢查關聯的 Session 是否仍然有效
     if (!tokenData.session_active) {
-      console.warn(' 關聯的 Session 已失效')
+      console.warn('關聯的 Session 已失效')
       // 撤銷此 Refresh Token
       await revokeRefreshToken(refreshToken)
       return null
@@ -152,14 +152,14 @@ export async function validateRefreshToken(refreshToken, options = {}) {
     if (strictDeviceCheck && (userAgent || ipAddress)) {
       const currentFingerprint = generateDeviceFingerprint(userAgent, ipAddress)
       if (tokenData.device_fingerprint !== currentFingerprint) {
-        console.warn(' 裝置指紋不匹配，可能是盜用行為')
+        console.warn('裝置指紋不匹配，可能是盜用行為')
         // 安全起見，撤銷此 Token
         await revokeRefreshToken(refreshToken)
         return null
       }
     }
 
-    console.log(' Refresh Token 驗證成功:', {
+    console.log('Refresh Token 驗證成功:', {
       tokenId: tokenData.id,
       userId: tokenData.user_id,
       sessionId: tokenData.session_id,
@@ -167,7 +167,7 @@ export async function validateRefreshToken(refreshToken, options = {}) {
 
     return tokenData
   } catch (error) {
-    console.error(' 驗證 Refresh Token 失敗:', error)
+    console.error('驗證 Refresh Token 失敗:', error)
     return null
   }
 }
@@ -193,13 +193,13 @@ export async function rotateRefreshToken(oldRefreshToken, options = {}) {
     const tokenData = await validateRefreshToken(oldRefreshToken, options)
 
     if (!tokenData) {
-      console.warn(' 無法輪替：Refresh Token 無效')
+      console.warn('無法輪替：Refresh Token 無效')
       return null
     }
 
     const { user_id: userId, session_id: sessionId } = tokenData
 
-    // 🔧 先刪除該 Session 所有舊的 Refresh Tokens (避免重複)
+    //  先刪除該 Session 所有舊的 Refresh Tokens (避免重複)
     await query(
       `DELETE FROM refresh_tokens 
        WHERE session_id = ? AND user_id = ?`,
@@ -210,7 +210,7 @@ export async function rotateRefreshToken(oldRefreshToken, options = {}) {
     const { refreshToken: newRefreshToken, expiresAt } =
       await createRefreshToken(userId, sessionId, options)
 
-    console.log(' Refresh Token 輪替成功:', {
+    console.log('Refresh Token 輪替成功:', {
       userId,
       sessionId,
       oldTokenDeleted: true,
@@ -224,7 +224,7 @@ export async function rotateRefreshToken(oldRefreshToken, options = {}) {
       expiresAt,
     }
   } catch (error) {
-    console.error(' Refresh Token 輪替失敗:', error)
+    console.error('Refresh Token 輪替失敗:', error)
     return null
   }
 }
@@ -245,14 +245,14 @@ export async function revokeRefreshToken(refreshToken) {
     )
 
     if (result.affectedRows > 0) {
-      console.log(' Refresh Token 已撤銷')
+      console.log('Refresh Token 已撤銷')
       return true
     } else {
-      console.warn(' Refresh Token 不存在或已撤銷')
+      console.warn('Refresh Token 不存在或已撤銷')
       return false
     }
   } catch (error) {
-    console.error(' 撤銷 Refresh Token 失敗:', error)
+    console.error('撤銷 Refresh Token 失敗:', error)
     return false
   }
 }
@@ -273,13 +273,13 @@ export async function revokeSessionRefreshTokens(sessionId) {
     )
 
     const count = result.affectedRows
-    console.log(' 已撤銷 Session 的所有 Refresh Tokens:', {
+    console.log('已撤銷 Session 的所有 Refresh Tokens:', {
       sessionId,
       count,
     })
     return count
   } catch (error) {
-    console.error(' 撤銷 Session Refresh Tokens 失敗:', error)
+    console.error('撤銷 Session Refresh Tokens 失敗:', error)
     return 0
   }
 }
@@ -300,10 +300,10 @@ export async function revokeUserRefreshTokens(userId) {
     )
 
     const count = result.affectedRows
-    console.log(' 已撤銷使用者所有 Refresh Tokens:', { userId, count })
+    console.log('已撤銷使用者所有 Refresh Tokens:', { userId, count })
     return count
   } catch (error) {
-    console.error(' 撤銷使用者 Refresh Tokens 失敗:', error)
+    console.error('撤銷使用者 Refresh Tokens 失敗:', error)
     return 0
   }
 }
@@ -330,7 +330,7 @@ export async function getUserActiveRefreshTokens(userId) {
 
     return tokens
   } catch (error) {
-    console.error(' 取得使用者 Refresh Tokens 失敗:', error)
+    console.error('取得使用者 Refresh Tokens 失敗:', error)
     return []
   }
 }
@@ -350,10 +350,10 @@ export async function cleanupExpiredRefreshTokens() {
     )
 
     const count = result.affectedRows
-    console.log(' 已清理過期 Refresh Tokens:', { count })
+    console.log('已清理過期 Refresh Tokens:', { count })
     return count
   } catch (error) {
-    console.error(' 清理過期 Refresh Tokens 失敗:', error)
+    console.error('清理過期 Refresh Tokens 失敗:', error)
     return 0
   }
 }
@@ -383,7 +383,7 @@ export async function detectAndRevokeSuspiciousTokens(userId) {
     )
 
     if (suspiciousTokens.length > 0) {
-      console.warn(' 偵測到可疑活動:', { userId, sessions: suspiciousTokens })
+      console.warn('偵測到可疑活動:', { userId, sessions: suspiciousTokens })
 
       // 撤銷這些可疑的 Tokens
       for (const suspicious of suspiciousTokens) {
@@ -401,7 +401,7 @@ export async function detectAndRevokeSuspiciousTokens(userId) {
       revokedCount: 0,
     }
   } catch (error) {
-    console.error(' 偵測可疑 Token 失敗:', error)
+    console.error('偵測可疑 Token 失敗:', error)
     return { suspicious: false, revokedCount: 0 }
   }
 }

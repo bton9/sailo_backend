@@ -21,11 +21,11 @@ const setupProductRoutes = (app) => {
   // ==================== 靜態資源路由 ====================
   app.use(staticRouter)
 
-  console.log(' Routes initialized successfully')
-  console.log(' Routes initialized successfully')
-  console.log('   - Products API: /api/products/*')
-  console.log('   - Reviews API: /api/products/:id/reviews/*')
-  console.log('   - Reviews API: /api/reviews/*')
+  console.log('Routes initialized successfully')
+  console.log('Routes initialized successfully')
+  console.log('- Products API: /api/products/*')
+  console.log('- Reviews API: /api/products/:id/reviews/*')
+  console.log('- Reviews API: /api/reviews/*')
 }
 
 export default setupProductRoutes
