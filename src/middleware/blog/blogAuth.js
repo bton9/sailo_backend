@@ -1,10 +1,10 @@
 // Blog 專用的 auth middleware
-// 🔐 Auth V2: 使用 httpOnly cookies
+// Auth V2: 使用 httpOnly cookies
 import { verifyToken } from '../../utils/jwt.js'
 
 export const blogAuthMiddleware = (req, res, next) => {
   try {
-    // 🔐 Auth V2: 從 httpOnly cookie 取得 access_token
+    // Auth V2: 從 httpOnly cookie 取得 access_token
     const token = req.cookies?.access_token
 
     if (!token) {
@@ -46,13 +46,13 @@ export default blogAuthMiddleware
 
 /**
  * 可選登入的 middleware
- * 🔐 Auth V2: 從 httpOnly cookie 讀取
+ * Auth V2: 從 httpOnly cookie 讀取
  * - 有 token：驗證並設置 req.user
  * - 沒有 token：不報錯，req.user = undefined
  */
 export const optionalAuth = (req, res, next) => {
   try {
-    // 🔐 Auth V2: 從 httpOnly cookie 取得 access_token
+    // Auth V2: 從 httpOnly cookie 取得 access_token
     const token = req.cookies?.access_token
 
     if (!token) {

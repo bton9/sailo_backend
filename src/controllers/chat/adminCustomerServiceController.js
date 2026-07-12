@@ -24,7 +24,7 @@ let io = null
 
 export function setSocketIO(ioInstance) {
   io = ioInstance
-  console.log(' Socket.IO 實例已設定到 adminCustomerServiceController')
+  console.log('Socket.IO 實例已設定到 adminCustomerServiceController')
 }
 
 /**
@@ -46,7 +46,7 @@ const getRooms = async (req, res) => {
       offset = 0,
     } = req.query
 
-    console.log('📋 查詢客服聊天室列表:', { status, priority, limit, offset })
+    console.log('查詢客服聊天室列表:', { status, priority, limit, offset })
 
     // 建立查詢條件
     let whereConditions = []
@@ -123,7 +123,7 @@ const getRooms = async (req, res) => {
 
     const [rooms] = await db.query(query, queryParams)
 
-    console.log(' 找到聊天室數量:', rooms.length)
+    console.log('找到聊天室數量:', rooms.length)
 
     res.json({
       success: true,
@@ -135,7 +135,7 @@ const getRooms = async (req, res) => {
       },
     })
   } catch (error) {
-    console.error(' 查詢聊天室列表失敗:', error)
+    console.error('查詢聊天室列表失敗:', error)
     res.status(500).json({
       success: false,
       message: '查詢聊天室列表失敗',
@@ -155,7 +155,7 @@ const acceptRoom = async (req, res) => {
     const { roomId } = req.params
     const agentId = req.user.userId
 
-    console.log('📌 客服接單:', { roomId, agentId })
+    console.log('客服接單:', { roomId, agentId })
 
     await connection.beginTransaction()
 
@@ -208,10 +208,10 @@ const acceptRoom = async (req, res) => {
 
     await connection.commit()
 
-    console.log(' 接單成功')
+    console.log('接單成功')
 
     // ============================================
-    // 🆕 透過 WebSocket 即時發送「客服已加入對話」訊息
+    //  透過 WebSocket 即時發送「客服已加入對話」訊息
     // ============================================
     if (io) {
       // 取得客服資訊
@@ -237,7 +237,7 @@ const acceptRoom = async (req, res) => {
       }
 
       io.to(`room_${roomId}`).emit('new_message', systemMessage)
-      console.log(`📢 WebSocket 發送: 客服已加入對話 (聊天室 ${roomId})`)
+      console.log(`WebSocket 發送: 客服已加入對話 (聊天室 ${roomId})`)
     }
 
     res.json({
@@ -246,7 +246,7 @@ const acceptRoom = async (req, res) => {
     })
   } catch (error) {
     await connection.rollback()
-    console.error(' 接單失敗:', error)
+    console.error('接單失敗:', error)
     res.status(500).json({
       success: false,
       message: '接單失敗',
@@ -268,7 +268,7 @@ const closeRoom = async (req, res) => {
     const { roomId } = req.params
     const agentId = req.user.userId
 
-    console.log('🔒 關閉聊天室:', { roomId, agentId })
+    console.log('關閉聊天室:', { roomId, agentId })
 
     await connection.beginTransaction()
 
@@ -318,10 +318,10 @@ const closeRoom = async (req, res) => {
 
     await connection.commit()
 
-    console.log(' 關閉成功')
+    console.log('關閉成功')
 
     // ============================================
-    // 🆕 取得客服人員資訊 (用於前端顯示)
+    //  取得客服人員資訊 (用於前端顯示)
     // ============================================
     const [agentInfo] = await connection.query(
       'SELECT id, nickname, name FROM users WHERE id = ?',
@@ -330,7 +330,7 @@ const closeRoom = async (req, res) => {
     const agentName = agentInfo[0]?.nickname || agentInfo[0]?.name || '客服人員'
 
     // ============================================
-    // 🆕 透過 WebSocket 通知使用者聊天室已關閉
+    //  透過 WebSocket 通知使用者聊天室已關閉
     // ============================================
     if (io) {
       io.to(`room_${roomId}`).emit('room_closed', {
@@ -340,7 +340,7 @@ const closeRoom = async (req, res) => {
         message: '客服已結束此對話',
         closedAt: new Date().toISOString(),
       })
-      console.log(`📢 WebSocket 通知: 聊天室 ${roomId} 已關閉，請求評分`)
+      console.log(`WebSocket 通知: 聊天室 ${roomId} 已關閉，請求評分`)
     }
 
     res.json({
@@ -349,7 +349,7 @@ const closeRoom = async (req, res) => {
     })
   } catch (error) {
     await connection.rollback()
-    console.error(' 關閉聊天室失敗:', error)
+    console.error('關閉聊天室失敗:', error)
     res.status(500).json({
       success: false,
       message: '關閉聊天室失敗',
@@ -366,7 +366,7 @@ const closeRoom = async (req, res) => {
  */
 const getStats = async (req, res) => {
   try {
-    console.log('📊 查詢統計資訊')
+    console.log('查詢統計資訊')
 
     // 等待中數量
     const [waitingCount] = await db.query(
@@ -415,14 +415,14 @@ const getStats = async (req, res) => {
       avg_response_time: Math.round(avgResponseTime[0].avg_time || 0),
     }
 
-    console.log(' 統計資訊:', stats)
+    console.log('統計資訊:', stats)
 
     res.json({
       success: true,
       stats: stats,
     })
   } catch (error) {
-    console.error(' 查詢統計資訊失敗:', error)
+    console.error('查詢統計資訊失敗:', error)
     res.status(500).json({
       success: false,
       message: '查詢統計資訊失敗',
@@ -447,7 +447,7 @@ const getAgentRating = async (req, res) => {
   try {
     const { agentId } = req.params
 
-    console.log('⭐ 查詢客服評分統計:', { agentId })
+    console.log('查詢客服評分統計:', { agentId })
 
     // ============================================
     // 查詢評分統計
@@ -472,7 +472,7 @@ const getAgentRating = async (req, res) => {
     const avgRating =
       stats.total_ratings > 0 ? parseFloat(stats.avg_rating).toFixed(1) : '0.0'
 
-    console.log(' 評分統計:', {
+    console.log('評分統計:', {
       agentId,
       avgRating,
       totalRatings: stats.total_ratings,
@@ -493,7 +493,7 @@ const getAgentRating = async (req, res) => {
       },
     })
   } catch (error) {
-    console.error(' 查詢評分統計失敗:', error)
+    console.error('查詢評分統計失敗:', error)
     res.status(500).json({
       success: false,
       message: '查詢評分統計失敗',

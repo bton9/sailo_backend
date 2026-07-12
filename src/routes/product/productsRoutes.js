@@ -9,7 +9,7 @@ import {
   getCategories,
 } from '../../controllers/product/productsController.js'
 
-// ⭐ 導入認證 middleware
+// 導入認證 middleware
 import { verifyToken } from '../../middleware/product/pd_auth.js'
 
 const router = express.Router()

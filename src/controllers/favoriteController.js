@@ -9,23 +9,23 @@ export const getUserFavorites = async (req, res) => {
   }
 
   try {
-    // 1️⃣ 取得使用者收藏清單 - 直接接收陣列，不要解構
+    // 取得使用者收藏清單 - 直接接收陣列，不要解構
     const lists = await query(
       `SELECT list_id, name, description, created_at 
        FROM favorite_lists
        WHERE user_id = ?`,
       [userId]
     )
-    console.log(' lists:', lists)
-    console.log(' lists type:', Array.isArray(lists))
+    console.log('lists:', lists)
+    console.log('lists type:', Array.isArray(lists))
 
     if (!lists || lists.length === 0) {
       return res.json({ success: true, favorites: [] })
     }
 
-    // 2️⃣ 取得每個清單的景點數量
+    // 取得每個清單的景點數量
     const listIds = lists.map((l) => l.list_id)
-    console.log(' listIds:', listIds)
+    console.log('listIds:', listIds)
 
     let countMap = {}
     if (listIds.length > 0) {
@@ -35,9 +35,9 @@ export const getUserFavorites = async (req, res) => {
                           WHERE list_id IN (${placeholders})
                           GROUP BY list_id`
 
-      console.log('🔍 執行計數查詢:', countQuery)
+      console.log('執行計數查詢:', countQuery)
       const counts = await query(countQuery, listIds)
-      console.log(' counts:', counts)
+      console.log('counts:', counts)
 
       // 建立 list_id -> count 的對應
       if (counts && Array.isArray(counts)) {
@@ -46,9 +46,9 @@ export const getUserFavorites = async (req, res) => {
         })
       }
     }
-    console.log(' countMap:', countMap)
+    console.log('countMap:', countMap)
 
-    // 3️⃣ 合併每個清單的景點數量
+    // 合併每個清單的景點數量
     const favorites = lists.map((list) => {
       return {
         list_id: list.list_id,
@@ -59,11 +59,11 @@ export const getUserFavorites = async (req, res) => {
       }
     })
 
-    console.log(' 最終結果:', favorites)
+    console.log('最終結果:', favorites)
     return res.json({ success: true, favorites })
   } catch (err) {
-    console.error(' getUserFavorites error:', err)
-    console.error(' Error stack:', err.stack)
+    console.error('getUserFavorites error:', err)
+    console.error('Error stack:', err.stack)
     return res.status(500).json({
       success: false,
       message: 'Internal server error',
@@ -88,7 +88,7 @@ export const getListPlaces = async (req, res) => {
        WHERE flp.list_id = ?`,
       [listId]
     )
-    console.log(' places:', places)
+    console.log('places:', places)
 
     if (!places || places.length === 0) {
       return res.json({ success: true, places: [] })
@@ -104,7 +104,7 @@ export const getListPlaces = async (req, res) => {
        WHERE place_id IN (${placeholders}) AND is_cover = 1`,
       placeIds
     )
-    console.log(' media:', media)
+    console.log('media:', media)
 
     // 建立 place_id -> cover_image 的對應
     const mediaMap = {}
@@ -122,8 +122,8 @@ export const getListPlaces = async (req, res) => {
 
     return res.json({ success: true, places: placesWithMedia })
   } catch (err) {
-    console.error(' getListPlaces error:', err)
-    console.error(' Error stack:', err.stack)
+    console.error('getListPlaces error:', err)
+    console.error('Error stack:', err.stack)
     return res.status(500).json({
       success: false,
       message: 'Internal server error',
@@ -149,7 +149,7 @@ export const toggleFavorite = async (req, res) => {
        WHERE list_id = ? AND place_id = ?`,
       [listId, placeId]
     )
-    console.log(' exists:', exists)
+    console.log('exists:', exists)
     if (exists && exists.length > 0) {
       // 移除收藏
       await query(
@@ -168,8 +168,8 @@ export const toggleFavorite = async (req, res) => {
       return res.json({ success: true, action: 'added' })
     }
   } catch (err) {
-    console.error(' toggleFavorite error:', err)
-    console.error(' Error stack:', err.stack)
+    console.error('toggleFavorite error:', err)
+    console.error('Error stack:', err.stack)
     return res.status(500).json({
       success: false,
       message: 'Internal server error',
@@ -194,7 +194,7 @@ export const createList = async (req, res) => {
        VALUES (?, ?, ?)`,
       [userId, name, description || null]
     )
-    console.log(' createList result:', result)
+    console.log('createList result:', result)
 
     return res.json({
       success: true,
@@ -203,8 +203,8 @@ export const createList = async (req, res) => {
       description: description || null,
     })
   } catch (err) {
-    console.error(' createList error:', err)
-    console.error(' Error stack:', err.stack)
+    console.error('createList error:', err)
+    console.error('Error stack:', err.stack)
     return res.status(500).json({
       success: false,
       message: 'Internal server error',
@@ -212,7 +212,7 @@ export const createList = async (req, res) => {
     })
   }
 }
-// 🗑️ 刪除收藏清單（僅限該使用者）
+// 刪除收藏清單（僅限該使用者）
 export const deleteList = async (req, res) => {
   const { userId, listId } = req.params
 
@@ -248,7 +248,7 @@ export const deleteList = async (req, res) => {
       message: ` 使用者 ${userId} 的收藏清單（ID: ${listId}）刪除成功`,
     })
   } catch (err) {
-    console.error(' deleteList error:', err)
+    console.error('deleteList error:', err)
     return res.status(500).json({
       success: false,
       message: '伺服器錯誤，無法刪除收藏清單',

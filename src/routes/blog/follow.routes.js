@@ -7,12 +7,12 @@ import {
   getFollowers,
   getFollowing,
   getUserStats,
-  checkFollowStatus  // ⭐ 加這行
+  checkFollowStatus  // 加這行
 } from '../../controllers/blog/follow.controller.js';
 
 import {
   getUserPosts,
-  getUserLikedPosts  // ⭐ 加這行
+  getUserLikedPosts  // 加這行
 } from '../../controllers/blog/post.controller.js';
 
 import {
@@ -56,7 +56,7 @@ router.get(
   getUserPosts
 );
 
-// ⭐ 新增:取得使用者按讚的文章
+// 新增:取得使用者按讚的文章
 router.get(
   '/:userId/liked',
   optionalAuth,
@@ -93,7 +93,7 @@ router.post(
   toggleFollow
 );
 
-// ⭐ 新增:檢查追蹤狀態
+// 新增:檢查追蹤狀態
 router.get(
   '/:userId/follow-status',
   optionalAuth,

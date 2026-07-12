@@ -186,7 +186,7 @@ export async function executeUserQuery(queryType, userId) {
     })
 
     // 執行查詢
-    console.log('🔍 執行使用者查詢:', {
+    console.log('執行使用者查詢:', {
       type: queryType,
       userId,
       description: queryConfig.description,
@@ -197,11 +197,11 @@ export async function executeUserQuery(queryType, userId) {
     // 格式化結果
     const formattedResult = queryConfig.format(result)
 
-    console.log(' 查詢完成:', queryType)
+    console.log('查詢完成:', queryType)
 
     return formattedResult
   } catch (error) {
-    console.error(' 資料庫查詢失敗:', error)
+    console.error('資料庫查詢失敗:', error)
     throw error
   }
 }

@@ -37,7 +37,7 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        console.log('📝 Google OAuth profile received:', {
+        console.log('Google OAuth profile received:', {
           id: profile.id,
           email: profile.emails?.[0]?.value,
           name: profile.displayName,
@@ -68,7 +68,7 @@ passport.use(
           // ========================================
           const user = users[0]
 
-          console.log(' Existing Google user found:', user.email)
+          console.log('Existing Google user found:', user.email)
 
           // 更新最後登入時間與頭像 (如果有變更)
           await query(
@@ -101,7 +101,7 @@ passport.use(
           const user = users[0]
 
           console.log(
-            '🔗 Linking Google account to existing local account:',
+            'Linking Google account to existing local account:',
             email
           )
 
@@ -129,7 +129,7 @@ passport.use(
         // ========================================
         // 步驟 3: 全新使用者，建立新帳號
         // ========================================
-        console.log('🆕 Creating new user from Google login:', email)
+        console.log('Creating new user from Google login:', email)
 
         const result = await query(
           `INSERT INTO users 
@@ -140,7 +140,7 @@ passport.use(
 
         const newUserId = result.insertId
 
-        console.log(' New user created successfully:', newUserId)
+        console.log('New user created successfully:', newUserId)
 
         return done(null, {
           id: newUserId,
@@ -151,7 +151,7 @@ passport.use(
           isNewUser: true, // 新使用者
         })
       } catch (error) {
-        console.error(' Google OAuth strategy error:', error)
+        console.error('Google OAuth strategy error:', error)
         return done(error, null)
       }
     }
@@ -189,7 +189,7 @@ passport.deserializeUser(async (id, done) => {
       access: user.access,
     })
   } catch (error) {
-    console.error(' Deserialize user error:', error)
+    console.error('Deserialize user error:', error)
     done(error, null)
   }
 })

@@ -94,7 +94,7 @@ export async function getImageKitAuth(req, res) {
     // 取得認證參數
     const authParams = imagekit.getAuthenticationParameters()
 
-    console.log(' ImageKit 認證參數已產生')
+    console.log('ImageKit 認證參數已產生')
 
     res.json({
       success: true,
@@ -103,7 +103,7 @@ export async function getImageKitAuth(req, res) {
       urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT,
     })
   } catch (error) {
-    console.error(' 產生 ImageKit 認證參數失敗:', error)
+    console.error('產生 ImageKit 認證參數失敗:', error)
 
     res.status(500).json({
       success: false,
@@ -141,7 +141,7 @@ export async function uploadAvatar(req, res) {
       })
     }
 
-    console.log(' 收到上傳請求:', {
+    console.log('收到上傳請求:', {
       filename: req.file.originalname,
       size: req.file.size,
       mimetype: req.file.mimetype,
@@ -161,14 +161,14 @@ export async function uploadAvatar(req, res) {
       if (rows && rows.avatar_file_id) {
         try {
           await imagekit.deleteFile(rows.avatar_file_id)
-          console.log(' 已刪除舊頭像:', rows.avatar_file_id)
+          console.log('已刪除舊頭像:', rows.avatar_file_id)
         } catch (err) {
           // 如果刪除失敗（例如檔案已不存在），記錄但繼續執行
-          console.error(' 刪除舊頭像失敗:', err.message)
+          console.error('刪除舊頭像失敗:', err.message)
         }
       }
     } catch (err) {
-      console.error(' 查詢舊頭像失敗:', err)
+      console.error('查詢舊頭像失敗:', err)
       // 繼續執行，不中斷上傳流程
     }
 
@@ -178,7 +178,7 @@ export async function uploadAvatar(req, res) {
     const timestamp = Date.now()
     const fileName = `avatar_${userId}_${timestamp}`
 
-    console.log('☁️ 開始上傳到 ImageKit...')
+    console.log('開始上傳到 ImageKit...')
 
     // 上傳圖片到 ImageKit
     const uploadResponse = await imagekit.upload({
@@ -189,7 +189,7 @@ export async function uploadAvatar(req, res) {
       tags: [`user_${userId}`, 'avatar'], // 標籤，方便管理
     })
 
-    console.log(' ImageKit 上傳成功:', {
+    console.log('ImageKit 上傳成功:', {
       fileId: uploadResponse.fileId,
       url: uploadResponse.url,
     })
@@ -202,7 +202,7 @@ export async function uploadAvatar(req, res) {
       [uploadResponse.url, uploadResponse.fileId, userId]
     )
 
-    console.log(' 資料庫已更新')
+    console.log('資料庫已更新')
 
     // ============ 步驟 5: 回傳成功訊息 ============
     res.json({
@@ -213,7 +213,7 @@ export async function uploadAvatar(req, res) {
       thumbnail: uploadResponse.thumbnailUrl, // 縮圖 URL（可選）
     })
   } catch (error) {
-    console.error(' 上傳頭像失敗:', error)
+    console.error('上傳頭像失敗:', error)
 
     // 回傳錯誤訊息
     res.status(500).json({
@@ -244,7 +244,7 @@ export async function deleteAvatar(req, res) {
   try {
     const userId = req.user.userId
 
-    console.log('🗑️ 開始刪除頭像, userId:', userId)
+    console.log('開始刪除頭像, userId:', userId)
 
     // ============ 步驟 1: 查詢頭像資訊 ============
     const [rows] = await query(
@@ -266,9 +266,9 @@ export async function deleteAvatar(req, res) {
     if (fileId) {
       try {
         await imagekit.deleteFile(fileId)
-        console.log(' 已從 ImageKit 刪除頭像:', fileId)
+        console.log('已從 ImageKit 刪除頭像:', fileId)
       } catch (err) {
-        console.error(' ImageKit 刪除失敗:', err.message)
+        console.error('ImageKit 刪除失敗:', err.message)
         // 即使 ImageKit 刪除失敗，仍繼續清空資料庫
       }
     }
@@ -279,7 +279,7 @@ export async function deleteAvatar(req, res) {
       [userId]
     )
 
-    console.log(' 頭像已刪除')
+    console.log('頭像已刪除')
 
     // ============ 步驟 4: 回傳成功訊息 ============
     res.json({
@@ -287,7 +287,7 @@ export async function deleteAvatar(req, res) {
       message: '頭像已刪除',
     })
   } catch (error) {
-    console.error(' 刪除頭像失敗:', error)
+    console.error('刪除頭像失敗:', error)
 
     res.status(500).json({
       success: false,

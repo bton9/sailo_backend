@@ -156,7 +156,7 @@ router.get('/google', (req, res, next) => {
 
   if (req.query.redirect) {
     state.redirect = req.query.redirect
-    console.log('📝 將重導向路徑編碼到 state:', state.redirect)
+    console.log('將重導向路徑編碼到 state:', state.redirect)
   }
 
   // 將 state 物件序列化為 JSON 字串
@@ -252,7 +252,7 @@ router.get('/sessions', authenticate, async (req, res) => {
       sessions,
     })
   } catch (error) {
-    console.error(' Get sessions error:', error)
+    console.error('Get sessions error:', error)
     res.status(500).json({
       success: false,
       message: '取得 Sessions 失敗',
@@ -292,7 +292,7 @@ router.delete('/sessions/:sessionId', authenticate, async (req, res) => {
       message: 'Session 已撤銷',
     })
   } catch (error) {
-    console.error(' Revoke session error:', error)
+    console.error('Revoke session error:', error)
     res.status(500).json({
       success: false,
       message: '撤銷 Session 失敗',
@@ -323,7 +323,7 @@ router.post('/sessions/revoke-all', authenticate, async (req, res) => {
       count,
     })
   } catch (error) {
-    console.error(' Revoke all sessions error:', error)
+    console.error('Revoke all sessions error:', error)
     res.status(500).json({
       success: false,
       message: '撤銷所有 Sessions 失敗',
