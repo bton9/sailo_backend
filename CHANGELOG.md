@@ -1,68 +1,98 @@
-Sailo Backend
-Sailo 旅遊行程平台 — Node.js 後端 API 服務
-專案簡介（Overview）
-Sailo Backend 是 Sailo 旅遊平台的後端服務，負責處理 會員系統、景點資料、行程管理、收藏功能、留言系統、圖片儲存、地圖座標 等所有資料與 API 邏輯。
-後端採用 Node.js + Express 搭配 MySQL 資料庫，並以 RESTful API 設計架構。
-同時整合 JWT Token 驗證、ImageKit 雲端圖片儲存 與 Leaflet/Google Maps 導航所需的精準經緯度資料。
-技術架構（Tech Stack）
-Runtime & Framework
-Node.js
-Express.js
-Database & ORM
-MySQL
-Knex / Sequelize（如果你有使用請告訴我，我能幫你補上）
-Authentication
-JWT（JSON Web Token）
-bcrypt 密碼加密
-File Storage
-ImageKit（圖片上傳、壓縮、CDN）
-Architecture
-RESTful API
-MVC 架構（Model / Controller / Routes）
-中介層（Middleware）處理驗證與錯誤管理
-主要後端功能（Backend Features）
-會員系統（Auth）
-使用者註冊
-使用者登入
-JWT 身分驗證
-密碼加密儲存（bcrypt）
-景點資料（Places）
-景點列表（支援分類與地區篩選）
-景點詳細資訊
-Google Maps 連結（導航、評論）
-精準經緯度儲存於資料庫（給 Leaflet 使用）
-收藏系統（Favorites）
-建立收藏清單
-新增 / 移除收藏
-取得使用者收藏列表
-行程管理（Trips）
-建立行程（含公開/私人設定）
-編輯行程名稱、日期範圍、交通方式
-刪除行程
-行程複製（複製別人公開行程）
-新增 / 刪除行程中的景點
-行程中的每日備註系統
-留言與回覆（Comments & Replies）
-景點留言（可含評分）
-景點留言回覆
-行程留言 & 回覆（若你有此功能）
-圖片上傳（Image Upload）
-使用者上傳景點照片
-透過 ImageKit 儲存並提供 URL
-自動壓縮、裁切、快取加速
-安裝與啟動 
-npm install
-環境變數（.env）
-請新增 .env 並填入：
-PORT=8080
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=xxxx
-DB_NAME=sailo
-JWT_SECRET=yourSecretKey
-IMAGEKIT_PUBLIC=xxxx
-IMAGEKIT_PRIVATE=xxxx
-IMAGEKIT_URL=xxxx
-npm run dev
-Email: pfw6638@gmail.com
-GitHub: https://github.com/bton9
+## [v0.1] - 2025-10-13
+
+- 原始版本
+- 登入登出 資料庫 連線設定
+
+## [v0.2] - 2025-10-21
+
+- V2版本
+- 各項驗證 頭貼上傳 imgkit google登入
+
+## [v0.3] - 2025-10-23
+
+- 第二次合併完成
+
+## [v0.4] - 2025-10-28
+
+- 第三次合併完成
+- 大修JWT＋Refresh token+session
+
+## [v0.5.0] - 2025-11-03
+
+- 第四次合併完成
+- AI/人工客服
+
+## [v0.5.4] - 2025-11-07
+
+- 新堯
+- 惠欣
+- VVN
+- +0
+
+## [v0.6.0] - 2025-11-08
+
+- 第五次合併完成
+- 新增AI跳轉修改密碼功能
+
+## [v0.6.1] - 2025-11-10
+
+- 改OLLAMA文字檔
+
+## [v0.6.2] - 2025-11-11
+
+- 半穩定版本
+
+## [v0.7.0] - 2025-11-11
+
+- 第六次合併完成
+
+## [v0.7.1] - 2025-11-17
+
+- 更新本地AI 數據抓取方式與對話文字判定
+
+## [v0.7.2] - 2025-11-27
+
+- README 文件整理與更新，移除專案結構章節
+
+## [v0.7.3] - 2025-11-28
+
+- 多個控制器與工具函式進行小幅修正與格式調整
+
+## [v0.8.0] - 2026-06-14
+
+- README 大幅更新
+
+## [v0.8.1] - 2026-07-06
+
+- 刪除測試檔案
+
+## [v0.8.2] - 2026-07-07
+
+- 新增登入驗證 API
+- 新增行程搜尋功能
+- 移除死路由 tripRoutes.js
+
+## [v0.8.3] - 2026-07-08
+
+- 整個移除 AI 客服（Ollama）功能
+- 修復正式環境跨網域登入會失敗的 cookie bug
+
+## [v0.8.4] - 2026-07-09
+
+- Google 登入改用 exchange 端點交換 cookie，不再直接用 res.cookie() 設 cookie 後轉址，token 改暫存記憶體（60 秒短效期、一次性）
+- authControllerV2.js 的 login、verify、Google exchange 回應額外附上 accessToken 明文，供 Socket.io 認證中介層在沒有 cookie 時 fallback 使用
+
+## [v0.9.0] - 2026-07-10
+
+- 新增 Admin 儀表板統計 API：adminController.js、adminRoutes.js，GET /api/v2/admin/stats，COUNT users/orders/products
+- server.js 掛載新的 admin 路由
+
+## [v0.9.1] - 2026-07-11
+
+- 新增 .env.example，補齊環境變數說明
+- 修正 .gitignore 讓範例檔可以被提交
+
+## [v0.9.2] - 2026-07-12
+
+- 全面清除程式碼註解與 console.log 中的 emoji
+- 修正 console.log/error/warn 開頭殘留的孤立空格
